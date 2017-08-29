@@ -1,0 +1,61 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Supercomputadores
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+
+* Sequoia Supercomputer (IBM BlueGene/Q) 
+1.572.864 cores -- 17 petaflops -- #3 2014/2
+
+#+CAPTION: BlueGene/Q
+[[./img/bluegene_big.png]]
+
+* Titan Supercomputer (Cray XK7) 
+560.640 cores -- 17 petaflops -- #2 2014/2
+
+#+CAPTION: AMD Opteron + NVIDIA K20
+[[./Titan_render.png]]
+
+* Tianhe-2 Supercomputer 
+3.120.000 cores -- 22 petaflops -- #1 2014/2
+
+#+CAPTION: Intel Xeon + Intel Xeon Phi
+[[./img/tianhe.png]]
+
+* NVidia Tesla K80 
+#+ATTR_LATEX: :width 6.5cm
+#+CAPTION: 2x Kepler GK210 for a total of 4992 cores
+[[./img/nvidia.png]]
+
+* Xeon Phi ``Knights Corner''
+
+#+CAPTION: 64 cores (256 threads) for 1 Teraflop
+[[./img/xeonphi.png]]
+
+* Samsung Galaxy S6
+
+#+CAPTION: 4-core 2.1 GHz Cortex-A57 (big), 4-core 1.5 GHz Cortex-A53 (LITTLE)
+#+ATTR_LATEX: :height 3.5cm
+[[./img/s6.png]]
+
+* MPAA 256 from Kalray
+
+#+CAPTION: 256 cores with NoC for 0.5 Teraflop, low-power
+[[./img/mppa256-kalray.png]]
+
+* Cubie Truck
+#+ATTR_LATEX: :width 10cm
+#+CAPTION: A20 Dual-Core ARM Cortex-A7
+[[./cubie-truck.png]]
+
