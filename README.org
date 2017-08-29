@@ -39,7 +39,7 @@ com o objetivo de melhorar o aprendizado da disciplina.
 
 ** Plano e Cronograma
 
-Veja a [[http://www.inf.ufrgs.br/ppgc/disciplinas/lista-de-disciplinas/cmp134/][Súmula da disciplina]].
+- Veja a [[http://www.inf.ufrgs.br/ppgc/disciplinas/lista-de-disciplinas/cmp134/][Súmula da disciplina]].
 
 - [[./cronograma/index.org][Cronograma]] (ainda por ser definido)
   - Edição 2017/2 - Turma Única
