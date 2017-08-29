@@ -1,0 +1,195 @@
+# -*- coding: utf-8 -*-"
+#+STARTUP: overview indent
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:auto
+#+OPTIONS: html-preamble:t html-scripts:t html-style:t
+#+OPTIONS: html5-fancy:nil tex:t
+#+HTML_DOCTYPE: xhtml-strict
+#+HTML_CONTAINER: div
+#+DESCRIPTION:
+#+KEYWORDS:
+#+HTML_LINK_HOME:
+#+HTML_LINK_UP:
+#+HTML_MATHJAX:
+#+HTML_HEAD:
+#+HTML_HEAD_EXTRA:
+#+SUBTITLE:
+#+INFOJS_OPT:
+#+CREATOR: <a href="http://www.gnu.org/software/emacs/">Emacs</a> 25.2.2 (<a href="http://orgmode.org">Org</a> mode 9.0.1)
+#+LATEX_HEADER:
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+#+TAGS: noexport(n) deprecated(d)
+
+* Planejamento                                                     :noexport:
+** Modelo do cronograma em TEX                                       :ATTACH:
+:PROPERTIES:
+:Attachments: layout-cronograma.tex
+:ID:       b5ee4331-cf38-48fb-a9a1-3d1c138acdc4
+:END:
+
+** Aulas (em ORG)
+
+#+NAME: listagem_de_encontros
+| Setor       | Descrição                                             |
+|-------------+-------------------------------------------------------|
+| Geral       | Apresentação da disciplina                            |
+| Geral       | Introdução geral                                      |
+| Arquitetura | Introdução Exascale                                   |
+| Arquitetura | Revisão Pipeline                                      |
+| Arquitetura | Superescalar                                          |
+| Arquitetura | Gerenciamento de desvios                              |
+| Arquitetura | Dependências e Escalonamento                          |
+| Arquitetura | Superpipeline e VLIW                                  |
+| Arquitetura | Arquiteturas Multithread                              |
+| Arquitetura | Multicore                                             |
+| Arquitetura | Virtualização                                         |
+| Arquitetura | Interconexão                                          |
+| Arquitetura | Arquitetura SIMD                                      |
+| Modelos     | Introdução e Motivação                                |
+| Modelos     | Resolvendo em Paralelo                                |
+| MPI         | Introdução, SMPI, Operações ponto-a-ponto             |
+| MPI         | Operações coletivas                                   |
+| MPI         | Operações assíncronas, modos de envio                 |
+| MPI         | Topologias virtuais, processos dinâmicos e fechamento |
+| OpenMP      | Introdução, Algoritmos de escalonamento               |
+| OpenMP      | Paralelismo de tarefas, Sincronização                 |
+| OpenMP      | Prática em laboratório                                |
+| StarPU      | Introdução, DAG                                       |
+| Análise     | Introdução a Análise de Desempenho                    |
+
+** Cronograma (para TEX)
+#+name: cronograma
+#+header: :var aulas=listagem_de_encontros
+#+begin_src R :results output :session :exports both
+suppressMessages(library(lubridate));
+suppressMessages(library(tidyverse));
+suppressMessages(library(xtable));
+
+aulas <- aulas %>% as.tibble();
+
+daysOff <- c(
+ymd("2017-9-7"),   # Independen
+ymd("2017-9-20"),  # Farroupilh
+ymd("2017-10-12"), # Religioso 
+ymd("2017-10-16"), # SEMAC     
+ymd("2017-10-17"), # SEMAC     
+ymd("2017-10-18"), # SEMAC     
+ymd("2017-10-19"), # SEMAC     
+ymd("2017-10-20"), # SEMAC     
+ymd("2017-10-21"), # Dia nao letive
+ymd("2017-10-26"), # LICIA
+ymd("2017-10-27"), # LICIA
+ymd("2017-10-28"), # Servidor  
+ymd("2017-11-2"),  # Mortos    
+ymd("2017-11-15"), # Republica 
+seq(ymd("2017-11-14"), ymd("2017-11-28"), by="days"), # EcoSud
+ymd("2017-12-23"), # Recesso   
+ymd("2017-12-24"), # Recesso   
+ymd("2017-12-25"), # Recesso   
+ymd("2017-12-26"), # Recesso   
+ymd("2017-12-27"), # Recesso   
+ymd("2017-12-28"), # Recesso   
+ymd("2017-12-29"), # Recesso   
+ymd("2017-12-30"), # Recesso   
+ymd("2017-12-31"), # Recesso   
+ymd("2018-1-1"),   # Recesso  
+ymd("2018-1-3"),   # Ajuste do Cronograma
+ymd("2018-1-6"),   # Vestibular
+ymd("2018-1-7"),   # Vestibular
+ymd("2018-1-8"),   # Vestibular
+ymd("2018-1-9"),   # Vestibular
+ymd("2018-1-10")   # Vestibular
+)
+
+dataDaRecuperação <- ymd("2018-01-22");
+
+dates <- tibble(Dia=seq(ymd("2017-08-28"), ymd("2018-01-27"), by="days")) %>%
+    # Define o dia da semana
+    mutate(DiaDaSemana = wday(Dia)) %>%
+    # Compiladores Segundas-Quartas
+    filter(DiaDaSemana %in% c(2, 4)) %>%
+    # Remove dias onde não haverá aula
+    filter(!(Dia %in% daysOff));
+
+aulas %>%
+    # Associa as datas
+    bind_cols(dates %>% slice(1:nrow(aulas))) %>%
+    # Altera a data da PR
+    mutate(Dia = case_when (grepl("PR", Descrição) ~ dataDaRecuperação,
+                            TRUE ~ Dia)) %>%
+    # Converte as datas para caracter
+    mutate(Encontro = as.character(Dia)) %>%
+    # Ordena as aulas
+    mutate(N = 1:nrow(.)) -> aulas;
+
+aulas %>%
+    select(N, Encontro, Local, Setor, Descrição, Projeto) %>%
+    as.data.frame() %>%
+    xtable(.) %>%
+    print (print.results=FALSE,
+           booktabs = TRUE,
+           include.rownames=FALSE) %>%
+    as.character -> cronograma;
+#+end_src
+
+#+RESULTS: cronograma
+
+** Cronograma (em PDF)
+#+name: modelo_cronograma
+#+header: :var dep0=cronograma
+#+begin_src R :results output :session :exports both
+cronograma.modelo.filename = "data/8d/06941c-8871-4365-980a-b54f54214592/layout-cronograma.tex"
+cronograma.modelo = readChar(cronograma.modelo.filename, file.info(cronograma.modelo.filename)$size);
+turma = "Única";
+semestre = "2017/2"
+cronograma.modelo <- gsub("TURMA", turma, cronograma.modelo);
+cronograma.modelo <- gsub("SEMESTRE", semestre, cronograma.modelo);
+cronograma.modelo <- gsub("TABELA", gsub("\\\\", "\\\\\\\\", cronograma), cronograma.modelo);
+write(cronograma.modelo, "cronograma.tex");
+#+end_src
+
+#+RESULTS: modelo_cronograma
+
+#+header: :var dep=modelo_cronograma
+#+begin_src shell :results output
+rubber --pdf cronograma.tex
+#+end_src
+
+#+RESULTS:
+
+* Cronograma
+
+#+header: :var aulas=listagem_de_encontros
+#+begin_src R :results value table :session :exports output :colnames yes
+aulas %>%
+    mutate(N = 1:nrow(.)) %>%
+    select(N, Setor, Descrição)
+#+end_src
+
+#+RESULTS:
+|  N | Setor       | Descrição                                             |
+|----+-------------+-------------------------------------------------------|
+|  1 | Geral       | Apresentação da disciplina                            |
+|  2 | Geral       | Introdução geral                                      |
+|  3 | Arquitetura | Introdução Exascale                                   |
+|  4 | Arquitetura | Revisão Pipeline                                      |
+|  5 | Arquitetura | Superescalar                                          |
+|  6 | Arquitetura | Gerenciamento de desvios                              |
+|  7 | Arquitetura | Dependências e Escalonamento                          |
+|  8 | Arquitetura | Superpipeline e VLIW                                  |
+|  9 | Arquitetura | Arquiteturas Multithread                              |
+| 10 | Arquitetura | Multicore                                             |
+| 11 | Arquitetura | Virtualização                                         |
+| 12 | Arquitetura | Interconexão                                          |
+| 13 | Arquitetura | Arquitetura SIMD                                      |
+| 14 | Modelos     | Introdução e Motivação                                |
+| 15 | Modelos     | Resolvendo em Paralelo                                |
+| 16 | MPI         | Introdução, SMPI, Operações ponto-a-ponto             |
+| 17 | MPI         | Operações coletivas                                   |
+| 18 | MPI         | Operações assíncronas, modos de envio                 |
+| 19 | MPI         | Topologias virtuais, processos dinâmicos e fechamento |
+| 20 | OpenMP      | Introdução, Algoritmos de escalonamento               |
+| 21 | OpenMP      | Paralelismo de tarefas, Sincronização                 |
+| 22 | OpenMP      | Prática em laboratório                                |
+| 23 | StarPU      | Introdução, DAG                                       |
+| 24 | Análise     | Introdução a Análise de Desempenho                    |
