@@ -10,7 +10,7 @@ disciplina, podem variar em abrangência e profundidade.
 | Geral       | [[./aulas/geral/apresentacao.org][Apresentação da disciplina]]                            |
 | Geral       | [[./aulas/geral/introducao.org][Introdução geral]]                                      |
 | Geral       | [[./aulas/geral/supercomputadores.org][Supercomputadores]]                                     |
-| Geral       | [[./geral/aulas/programacao.org][Como programar supercomputadores?]]                     |
+| Geral       | [[./geral/aulas/programacao.org][Programando supercomputadores?]]                        |
 | Arquitetura | Introdução Exascale                                   |
 | Arquitetura | Revisão Pipeline                                      |
 | Arquitetura | Superescalar                                          |

@@ -1,0 +1,190 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Como programar supercomputadores?
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+
+
+
+* Programação paralela para alto desempenho
++ Programação paralela /versus/ distribuída
+  + Em nível de arquitetura
+  + Em nível do problema
++ <2->Objetivo principal: \alert{alto desempenho}
+  + Diferente de tolerância a falhas
+  + Diferente de maximizar o uso dos recursos
+  + Diferente de preocupações com consumo de energia
+* Objetivo: alto desempenho
++ Quer-se um ``bom'' programa paralelo
+  + Que tenha um bom tempo de execução?
+  + Que tenha uma boa aceleração/eficiência?
+  + Que tenha uma boa escalabilidade?
+* Aceleração e eficiência
++ Aceleração (/speedup/)
+  + S_p = T_1 / T_p
++ Eficiência
+  + E_p = S_p / p
+* Escalabilidade fraca /versus/ forte
++ Escalabilidade forte
+  + Tamanho do problema fixo enquanto aumenta-se p
++ Escalabilidade fraca
+  + Tamanho do problema aumenta enquanto aumenta-se p
+  
+* Objetivo: alto desempenho
++ Tendência: sair programando em geral falha
++ <2->Melhor abordagem em fases
+  + Análise \rightarrow escolha de um bom algoritmo para o problema
+  + <3->Implementação \rightarrow programação para uma arquitetura
+  + <4->Avaliação experimental do desempenho obtido
+* 
+\vfill
+\centering
+\LARGE Análise de complexidade \linebreak \normalsize a escolha de um bom algoritmo
+\vfill
+* Análise de complexidade
++ Complexidade
+  + Métrica de avaliação _quantitativa_ de um algoritmo
++ <2-> Depende
+  + Da modelagem do algoritmo/programa paralelo
+    + Dados, cálculos, quantidade de sincronizações
+  + Da modelagem da máquina paralela
+    + Processadores, memória, rede
+\vfill
++ <3->Enorme diferença da abordagem sequencial
+  + Modelo de Von Neumann
+  + Complexidade de algoritmos/problemas
+    + *É independente de máquina*
+    + Complexidade polinomial, exponencial
+    + Transformação polinomial
+* O que se deseja de um modelo?
++ Precisa ser *completo*
+  + Em geral, complexo demais com muitos parâmetros
+  + Deve levar a uma implementação do algoritmo
++ <2->Precisa *abstrair* fenômenos e capturar comportamento geral
+  + Ser mais genérico
++ <3->Precisa possibilitar a obtenção de métricas
+  + Tempo de execução
+  + Espaço de memória usado
+  + Volume de comunicações
+  + De uma maneira geral: permitir predições
+* Modelos para programação paralela
++ Não existe um modelo universal, existem vários
+  + Dependendo dos tipos de máquinas e programas
+\vfill
++ Alguns fatos
+  + <2->Difícil passar de um modelo com rede de interconexão para um
+    modelo de memória compartilhada sem uma profunda diferença na
+    complexidade do programa
+  + <3->Melhores resultados de análise foram obtidos com modelos de
+    *memória compartilhada*, embora limitados em escalabilidade
+  + <4->Se estuda a complexidade com modelos de máquina adaptados à
+    complexidade do programa
+  + <5->Isso impede de chegar à complexidade do algoritmo
+* Modelando a máquina
+- *Máquina PRAM* (/Parallel random-access machine/)
+  + Desconsiderar as comunicações
+  + Memória compartilhada
+  + Processadores multicore
+
+\vfill
+
+- <2-> Máquina estática homogênea; rede perfeita (lat = 0, vazão = \inf)
+- <3-> Máquina estática homogênea, rede com contenção
+   - *Máquina LogP*
+     - L: latência; o: /overhead/; g: gap; P: processos
+
+\vfill
+
+- <4-> E sobre máquinas concretas
+  - Grid, Cloud
+  - Supercomputadores heterogêneos
+  - Múltiplos níveis de cache
+* Modelando o *programa*
++ Contar os acessos à memória
+  + Cada acesso tem o mesmo custo (memória UMA)
+  + Extrai o grão máximo de paralelismo (como modelo PRAM)
++ <2->Levar em consideração as comunicações (troca de mensagens)
+  + Definir granularidade/tarefas, distribuição de dados
+  + Obtém-se um grafo
+    + De chamadas ou de tarefas
+    + De fluxo de dados (orientados ou não)
+  + <3->Problemas em aberto
+    + Controle automático da granularidade
+    + Como mapear o grafo na máquina
+    + Portabilidade
+* Modelos de máquina /versus/ Modelos de programa
+\vfill
+#+BEGIN_CENTER
+[[./modelos-programacao.png]]
+#+END_CENTER
+\vfill
+* 
+\vfill
+\centering
+\LARGE Fase de Implementação \linebreak \normalsize como escrever, quais ferramentas
+\vfill
+* Implementação -- Como paralelizar um algoritmo?
++ Uma abordagem possível
+  + Programa é constituído de tarefas
+  + Podem ser executadas em qualquer ordem, sem dependências
+  + Resultado no final é acumulado
++ <2->Abordagem *trivialmente paralelizável*, com vários nomes
+  + /Embarassingly parallel/ (EP)
+  + /Parameter sweeping/
+  + /Task farm/
+  + /Bag of tasks/
++ <3->Muito simples, mas muito útil em várias aplicações
+  + /Batches/ de tarefas (BOINC), simulação de hardware
+  + <4->Leva em conta a dinamicidade/heterogeneidade do sistema
+* Implementação
++ Classe de problemas que não se encaixa no modelo anterior
+  + Previsão do tempo
+  + Simulação de terremotos
+  + Exploração de petróleo
++ Envolvem dependência de dados
+  + Levam a comunicação entre os processos
+
+* 
+\vfill
+\centering
+\LARGE Correlações \linebreak \normalsize qual modelo escolher
+\vfill
+* Escolhendo um modelo de programação
++ <2->Memória compartilhada com múltiplos fluxos (CPU)
+  + POSIX Threads, OpenMP (estático), Cilk (dinâmico), StarPU
+
++ <3->Memória compartilhada (GPU)
+  + CUDA, OpenCL
+
++ <4->Distribuído / Passagem de mensagem
+  + MPI-3 (de facto industry standard)
+
++ <5->Modelo paralelo de dados (PGAS)
+  + Espaço de endereçamento global particionado, local ou distribuído
+  + Coarray Fortran, Unified Parallel C (UPC), Chapel
+
++ <6->Modelos híbridos
+  + MPI+OpenMP
+  + MPI+CUDA
+  + MPI+OpenMP+CUDA
+* Novas influências arquiteturais
++ Arquitetura ARM big.LITTLE
++ Múltiplas placas gráficas (GPGPU) por nó
++ Abordagens híbridas e heterogêneas
+* Tarefa
+
+Jacobsen, Dana A., Julien C. Thibault, and Inanc Senocak. "An MPI-CUDA
+implementation for massively parallel incompressible flow computations
+on multi-GPU clusters." 48th AIAA aerospace sciences meeting and
+exhibit. Vol. 16. 2010.
