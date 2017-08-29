@@ -126,7 +126,7 @@
 * Modelos de máquina /versus/ Modelos de programa
 \vfill
 #+BEGIN_CENTER
-[[./modelos-programacao.png]]
+[[./img/modelos-programacao.png]]
 #+END_CENTER
 \vfill
 * 
