@@ -56,6 +56,11 @@ com o objetivo de melhorar o aprendizado da disciplina.
 Aguarde
 
 ** Bibliografia
+
+- Casanova and Legrand and Robert. Parallel Algorithms.
+- Jajá. An Introduction to Parallel Algorithms.
+- Foster. Designing and building parallel programs.
+
 - HWANG, K., FAYE, A. B. Computer Architecture and Paralel Processing. McGraw-Hill, 1984.
 - STONE, H. S. High Performance Computer Architecture. Addison Wesley, 1987.
 - PATTERSON, HENNESSY. Computer Architecture: a Quantitative Approach. Morgan Kaufmann, 1995.
