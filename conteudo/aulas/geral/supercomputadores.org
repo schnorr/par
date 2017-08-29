@@ -57,5 +57,5 @@
 * Cubie Truck
 #+ATTR_LATEX: :width 10cm
 #+CAPTION: A20 Dual-Core ARM Cortex-A7
-[[./cubie-truck.png]]
+[[./img/cubie-truck.png]]
 
