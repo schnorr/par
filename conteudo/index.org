@@ -33,3 +33,11 @@ disciplina, podem variar em abrangência e profundidade.
 | OpenMP      | Prática em laboratório                                |
 | StarPU      | Introdução, DAG                                       |
 | Análise     | Introdução a Análise de Desempenho                    |
+
+** Artigos para discussão
+
+- Jacobsen, Dana A., Julien C. Thibault, and Inanc
+  Senocak. "[[http://scholarworks.boisestate.edu/cgi/viewcontent.cgi?article=1004&context=mecheng_facpubs][An
+  MPI-CUDA implementation for massively parallel incompressible flow
+  computations on multi-GPU clusters]]." 48th AIAA aerospace sciences
+  meeting and exhibit. Vol. 16. 2010.
