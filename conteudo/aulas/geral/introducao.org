@@ -1,0 +1,70 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Introdução Geral
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+
+* Introdução
++ Sequencialidade inerente em arquiteturas Von Neumann
+  + Fundamental nas arquiteturas atuais: Memória + CPU
+
+  [[./img/von-neumann-1.png]]
+
+* Programa concorrente
++ Programa concorrente
+  + Mais de um contexto ativo de execução
+  + Duas ou mais tarefas se executam ao mesmo tempo
+
++ <2-> Fluxo sequencial /versus/ fluxo concorrente
+  + Pilha de ativação
+
+* Objetivos para se ter concorrência
++ Capturar a estrutura lógica do problema
+  + Alguns problemas são naturalmente concorrentes
++ <2-> Usar processadores extra, por velocidade
+  + Por que não usar os recursos disponíveis?
++ <3-> Tratar aplicações distribuídas
+  + Computação voluntária (BOINC)
+
+* Concorrente /vs/ Paralelo /vs/ Distribuído -- \small Definições
++ Sistema Concorrente
+  + Duas ou mais tarefas se executam ao mesmo tempo
+  + Em um ponto imprevisível da sua execução
++ <2-> Sistema Paralelo
+  + Duas ou mais tarefas ativas fisicamente ao mesmo tempo
++ <3-> Sistema Distribuído
+  + Processadores em máquinas diferentes, conectados por rede
+\vfill
++ <4-> *Sem controle sobre a ordem de execução*
++ <5-> Concorrência lógica e física
+  + Paralelismo verdadeiro /versus/ Semi-paralelismo
+  + Mesma semântica, implementação diferente
+
+* Níveis de concorrência
++ Instrução de máquina
+  + Duas ou mais instruções
+  + Pipelines, processadores vetoriais
+  + Controlado pelo hardware
++ <2-> *Comandos*
+  + Dois ou mais comandos de linguagem
+  + Máquinas SIMD (/Single Instruction Multiple Data/)
+  + Um controlador, vários processadores e memória local
++ <3-> *Subprogramas*
+  + Dois ou mais subprogramas
+  + Processos ou /threads/
+  + Máquinas MIMD (/Multiple Instruction Multiple Data/)
+  + Memória compartilhada ou distribuída
++ <4-> Programa
+  + Dois ou mais programas
+  + Controlado pelo sistema operacional
