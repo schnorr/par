@@ -1,0 +1,73 @@
+#+startup: overview indent
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:auto
+#+OPTIONS: html-preamble:t html-scripts:t html-style:t
+#+OPTIONS: html5-fancy:nil tex:t
+#+HTML_DOCTYPE: xhtml-strict
+#+HTML_CONTAINER: div
+#+DESCRIPTION:
+#+KEYWORDS:
+#+HTML_LINK_HOME:
+#+HTML_LINK_UP:
+#+HTML_MATHJAX:
+#+HTML_HEAD:
+#+HTML_HEAD_EXTRA:
+#+SUBTITLE:
+#+INFOJS_OPT:
+#+CREATOR: <a href="http://www.gnu.org/software/emacs/">Emacs</a> 25.2.2 (<a href="http://orgmode.org">Org</a> mode 9.0.1)
+#+LATEX_HEADER:
+
+* Introdução ao Processamento Paralelo e Distribuído (CMP134)
+
+#+begin_html
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="img/88x31.png" /></a>
+#+end_html
+
+Seja bemvinda(o) a disciplina de Introdução ao Processamento Paralelo
+e Distribuído (PAR), uma disciplina do Programa de Pós-Graduação em
+Ciência da Computação (PPGC) da UFRGS (Universidade Federal do Rio
+Grande do Sul). O material da disciplina está em português brasileiro
+[pt-br] ou em inglês [en-us]. Disponibilizamos aqui uma parte dos
+slides utilizados pelo professor, material de apoio, especificação de
+trabalhos.
+
+** Estratégia Pedagógica
+
+As aulas são majoritariamente expositivas, com discussão a respeito de
+artigos proeminentes na área, motivando investigação.
+Experimentalmente, podem ser empregados métodos alternativos de ensino
+com o objetivo de melhorar o aprendizado da disciplina.
+
+** Plano e Cronograma
+
+Veja a [[http://www.inf.ufrgs.br/ppgc/disciplinas/lista-de-disciplinas/cmp134/][Súmula da disciplina]].
+
+- [[./cronograma/index.org][Cronograma]] (ainda por ser definido)
+  - Edição 2017/2 - Turma Única
+  - Terças e Quintas, 10:30 – 12:10
+
+** Principal
+
+- [[./conteudo/index.org][Acesse o conteúdo da disciplina]]
+  - Aulas
+  - Exercícios
+
+** Projeto
+
+Aguarde
+
+** Bibliografia
+- HWANG, K., FAYE, A. B. Computer Architecture and Paralel Processing. McGraw-Hill, 1984.
+- STONE, H. S. High Performance Computer Architecture. Addison Wesley, 1987.
+- PATTERSON, HENNESSY. Computer Architecture: a Quantitative Approach. Morgan Kaufmann, 1995.
+- HWANG, K. Advanced Computer Architecture: Parallism, Scalability, Programmability. McGraw Hill, 1993
+- BAL, H. E. Programming Distributed Systems. Prentice Hall, 1990.
+- SILBERSCHATZ, A., PETERSON, J. L., GALVIN, P. B. Operating Systems Concepts. Addison-Wesley, 1992.
+- TANENBAUM, A. S. Modern Operating Systems. Prentice Hall, 1992.
+- FOSTER, I. Designing and Building Paralllel Programs. Addison Weley, 1995.
+- JAJA, Joseph. An Introduction to Parallel Algorithms. Addison Weley, 1992.
+- Artigos selecionados.
+** Contato
+
+Se você encontrar algum problema, e também no caso de dúvidas, entre em contato por e-mail:
+- [[http://www.inf.ufrgs.br/~schnorr][Prof. Lucas (http://www.inf.ufrgs.br/~schnorr)]]
+- Prof. Navaux (navaux _at_ inf.ufrgs.br)
