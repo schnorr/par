@@ -22,8 +22,8 @@ disciplina, podem variar em abrangência e profundidade.
 | Arquitetura | Virtualização                                         |
 | Arquitetura | Interconexão                                          |
 | Arquitetura | Arquitetura SIMD                                      |
-| Modelos     | Introdução e Motivação                                |
-| Modelos     | Resolvendo em Paralelo                                |
+| Modelos     | [[./aulas/modelos/resolvendo.org][Resolvendo em Paralelo]]                                |
+| Modelos     | [[./aulas/modelos/decomposicao.org][Decomposição e Balanceamento]]                          |
 | MPI         | Introdução, SMPI, Operações ponto-a-ponto             |
 | MPI         | Operações coletivas                                   |
 | MPI         | Operações assíncronas, modos de envio                 |
