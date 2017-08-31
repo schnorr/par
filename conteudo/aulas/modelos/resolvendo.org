@@ -1,0 +1,418 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Resolvendo em Paralelo
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+
+* Preparação                                                       :noexport:
+
+  - Revisão, falar sobre
+
+    - Speedup e eficiência
+      - S = T_{seq} / T_{par}
+    - Escalabilidade forte, fraca
+    - Amdahl's Law
+      - Porcentagem do programa sem paralelização: (1-p)
+        T = (1-p)T + pT
+      - A segunda parte é aquela que pode ser acelerada pelo fator s
+	(p/s)T
+      - O tempo teórico de execução se torna então
+	T(s) = (1-p)T + (p/s)T
+      - Por fim, a lei de Amdahl
+	S_{latency} = 1/(1-p+p/s) where
+	- p indicates the parallel part
+	- s indicates the available resources for parallelization
+
+** Lei de Amdhal
+#+name: def_ahmdal
+#+begin_src R :results output :session :exports none
+amdhal <- function(p,s)
+{
+   1/(1-p+p/s);
+}
+s = c(1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536,131072);
+df <- data.frame(s=s, p=0.5);
+df <- rbind (df, data.frame(s=s, p=0.75));
+df <- rbind (df, data.frame(s=s, p=0.90));
+df <- rbind (df, data.frame(s=s, p=0.95));
+df <- rbind (df, data.frame(s=s, p=0.99)); # 99%
+df <- rbind (df, data.frame(s=s, p=1)); # speedup ideal
+df$a <- amdhal(df$p, df$s);
+#+end_src
+
+#+RESULTS:
+
+#+name: fig_ahmdal
+#+begin_src R :results output graphics :file img/amdhal_law_overview.png :exports both :width 700 :height 400 :session :var dep=def_ahmdal
+library(ggplot2);
+library(tidyverse);
+df %>%
+  #  filter(p!=1) %>%
+ggplot(aes(x=as.factor(s), y=a, color=as.factor(p*100), group=as.factor(p))) +
+  geom_point() +
+  geom_line() +
+  theme_bw(base_size=18) +
+  xlab ("Quantidade de Processos") +
+  ylab ("Aceleração") +
+  ggtitle ("A Lei de Amdhal para Aceleração") +
+  theme (legend.position="none") +
+  scale_colour_discrete(name  ="Parte\nParalela") +
+  theme(legend.position=c(.90,.65), legend.background = element_rect(fill="gray90", size=.5, linetype="dotted")) +
+  ylim (0,NA) +
+    coord_cartesian(ylim=c(0, 100)) +#, xlim=c(0,1E3)) +
+    theme(axis.text.x = element_text(angle = 20, hjust = 1))
+#+end_src
+
+#+RESULTS: fig_ahmdal
+[[file:img/amdhal_law_overview.png]]
+
+** Assíncrono / Síncrono
+
+Veja arquivos em:
+
+#+begin_src sh :results output :session :exports both
+find img/ | grep pdf$
+#+end_src
+
+#+RESULTS:
+: img/non-blocking.csv-STATE-10-20.pdf
+: img/blocking.csv-STATE-0-88.616592.pdf
+: img/blocking.csv-STATE-10-20.pdf
+: img/non-blocking.csv-STATE-0-50.725797.pdf
+
+Links:
+
+- Overview
+  - Blocking: file:img/blocking.csv-STATE-0-88.616592.pdf
+  - Non-blocking: file:img/non-blocking.csv-STATE-0-50.725797.pdf
+
+- Zoom
+  - Blocking: file:img/blocking.csv-STATE-10-20.pdf
+  - Non-blocking: file:img/non-blocking.csv-STATE-10-20.pdf
+
+* Lei de Amhdal
+
+#+BEGIN_CENTER
+[[./img/amdhal_law_overview.png]]
+#+END_CENTER
+
+* Resolvendo em paralelo
+- Tarefas do programador
+  - Identificar a concorrência
+  - <2-> Explorar esta concorrência
+  - <3-> Implementar a solução
+
+\vfill
+
+- <4-> Desafios principais
+  - Dependências
+  - Erros ligados ao paralelismo
+  - Reduzir parte sequencial
+* Encontrando concorrência
+- Decomposição do problema
+  - Identificar uma sequência de passos do algoritmo que pode ser
+    executada ao mesmo tempo \rightarrow Definir as *tarefas*
+  - <2-> *Granularidade*: tamanho de uma tarefa /vs/ quantidade de tarefas
+    - Fina: grande número de tarefas pequenas
+    - Grossa: pequeno número de tarefas grandes
+  - <3-> *Grau de concorrência*
+    - Maior # de tarefas que podem ser executadas simultaneamente
+\vfill
+- <4-> Descrever a dependência entre as tarefas
+  - Lógicas: ordem de execução das operações
+  - Dado: ordem de atualização dos dados
+* Estruturando o algoritmo
+Padrões comuns
+- Fork-Join
+- Stencil
+- Mapeamento
+- Recorrência
+- Escaneamento
+* Fork-Join
+- Divide o fluxo sequencial em fluxos paralelos
+- Junta os fluxos paralelos de volta ao fluxo sequencial
+- Divisão e conquista
+  - Exemplo: merge-sort
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :height 6cm
+[[./img/forkjoin.png]]
+#+END_CENTER
+* Stencil
+- Aplicar uma função para cada elemento e seus vizinhos: a saída é
+  uma combinação dos valores do elemento corrente e seus vizinhos
+  - Exemplo: dinâmica de fluidos
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 6cm
+[[./img/stencil.png]]
+#+END_CENTER
+* Mapeamento e recorrência
+Mapeamento
+- Aplica uma função para todos os elementos de uma coleção
+  - parallel for (sem dependências)
+  - CUDA streams
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 6cm
+[[./img/map.png]]
+#+END_CENTER
+
+Recorrência
+- Elementos podem usar a saída dos elementos adjacentes
+
+* Redução
+Combinar todos os elementos em uma coleção em um único elemento
+- Função de combinação binária associativa (soma, subtração, ...)
+Exemplos
+- =MPI_Reduce=
+- pragma reduce em OpenMP
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 6cm
+[[./img/reduction.png]]
+#+END_CENTER
+* Scan
+- Calcula todas as reduções parciais de uma coleção, para cada
+  posição de saída, uma redução da entrada até aquele ponto é
+  calculada
+  - Exemplo: soma de prefixo
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :height 5cm
+[[./img/scan.png]]
+#+END_CENTER
+
+* Transferência de calor (placa metálica)
+- Introdução do problema com video
+  - https://www.youtube.com/watch?v=TvlIfSlLB0c
+- Matriz de calor e equação
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 3cm :center
+[[./img/heat_initial.png]]
+
+#+ATTR_LATEX: :width 3cm :center
+[[./img/heat_equation.png]]
+#+END_CENTER
+\hfill Author of figures: Blaise Barney, LLNL
+
+* Exercício
+- É possível calcular em paralelo?
+- Dependência de dados?
+- Sincronização?
+* Referências
+- Referências
+  - Introduction to Parallel Computing
+    - https://computing.llnl.gov/tutorials/parallel_comp/
+  - Exame de qualificação: Vinicius Garcia Pinto
+    - http://www.inf.ufrgs.br/~vgpinto/slides/qualificacao.pdf
+
+* Problemas de Entrada/Saída                                       :noexport:
+  - Em geral inibe o paralelismo
+  - <2-> Requerem muito mais tempo que acesso à memória
+    #+BEGIN_CENTER
+    \includegraphics[width=.6\linewidth]{memoryAccessTimes.pdf}    \\
+    \footnotesize Author: Blaise Barney, LLNL
+    #+END_CENTER
+  \vfill
+  - <3-> Flutuações no tempo de operações de leitura 
+    - No caso de múltiplas requisições ao mesmo tempo
+  - <4->I/O sobre NFS pode ser catastrófico
+* Alternativas para Entrada/Saída                                  :noexport:
+   - Sistema de arquivos paralelo existem
+     - GPFS -- General Parallel File System (IBM)
+     - Lustre -- Linux-only (Intel)
+     - PVFS/PVFS2 (Clemson, Argonne, ...)
+   - <2-> MPI-2 tem funções para entrada/saída em paralelo
+   - <3-> Regras gerais
+     - Regra #1: reduzir I/O o máximo possível
+     - <4-> Usar sistema de arquivos paralelo se tiver acesso
+     - <5-> Escrever bastante dados ao invés de pouco
+     - <6-> Confinar entrada/saída para porções seriais do trabalho
+     - <7-> Agregar entrada/saída
+
+* Comunicação                                                      :noexport:
+** 
+   \vfill
+   \centering
+   \LARGE Comunicação
+   \vfill
+** Quem precisa de comunicação?
+   - Depende do problema
+     - Trivialmente paralelizável?
+   - Maioria dos problemas precisa de comunicação
+     - Todas as vezes onde há necessidade de compartilhar dados
+** Fatores a serem considerados
+   - Custo das comunicações
+   - Latência /vesus/ largura de banda
+   \vfill
+   - Mensagens pequenas /versus/ Mensagens grandes
+** Visibilidade das comunicações
+   - Modelo de passagens de mensagens
+     - Comunicações são explícitas, sob controle
+   - Modelo de paralelismo de dados
+     - As comunicação são transparentes
+       - Memória distribuída (Modelo PGAS)
+       - Memória compartilhada
+     - Fora de controle, não há como saber a implementação
+** Comunicações síncronas ou assíncronas
+   - Bloqueantes /versus/ não bloqueantes
+   - Benefício das comunicações assíncronas
+     - Sobreposição de cálculo e comunicação
+** Escopo das comunicações
+   - Ponto-a-ponto
+   - <2->Coletivas
+     #+BEGIN_CENTER
+     \includegraphics[width=.6\linewidth]{collective_comm.pdf}    \\
+     \footnotesize Author: Blaise Barney, LLNL      
+     #+END_CENTER       
+** Eficiência
+   - Programador pode ter escolha de fatores que afetam comunicações
+     - Qual implementação para um determinado modelo?
+       - Broadcast (coletiva) -- várias implementações, depende da
+         arquitetura
+     - Que tipo de comunicação: síncrono ou não?
+     - Enlace físico (exemplo: Ethernet ou Infiniband?)
+** Sobrecarga e complexidade
+     #+BEGIN_CENTER
+     \includegraphics[width=\linewidth]{helloWorldParallelCallgraph.pdf}    \\
+     \footnotesize Author: Blaise Barney, LLNL      
+     #+END_CENTER 
+* Sincronização                                                    :noexport:
+** 
+   \vfill
+   \centering
+   \LARGE Sincronização
+   \vfill
+** Sincronização
+   - Gerenciar a ordem de operações que deve ser realizada
+     - Pode ser um fator determinante para se obter desempenho
+     - Seguidamente requer a ``serialização'' de segmentos do programa
+   - <2-> Tipos de sincronização
+     - Barreira
+     - Lock/Semáforos
+     - Comunicação síncrona
+** Barreira
+   - Implica que todas as tarefas estão envolvidas
+   - Cada tarefa trabalha até chegar na barreira
+   - As tarefas continuam no momento que todas estão na barreira
+   \vfill
+   - Por que ter uma barreira?
+** Lock/Semáforos
+   - Pode envolver qualquer número de tarefas
+   - Usado para proteger um dado global ou seção de código
+     - Apenas uma tarefa pode alterar uma variável global
+   - Pode ser bloqueante ou não-bloqueante
+     - No nível do recurso computacional
+** Comunicação síncrona
+   - Envolve apenas aquelas tarefas executando uma operação de comunicação
+
+* Dependência de dados                                             :noexport:
+** 
+\vfill
+\centering
+\LARGE Dependência de dados
+\vfill
+** Dependência de dados
+- Uma *dependência* existe entre duas operações quando a ordem de
+  execução dessas operações afeta o resultado do programa
+- <2->Uma *dependência de dado* resulta da múltipla utilização da mesma
+  localização em armazenamento por diferentes tarefas
+  \vfill
+  - <3->Dependências são importantes em programação paralela
+    - Elas inibem paralelismo
+** Dependência de dados carregada em laços
+#+BEGIN_SRC C
+for (j = 0; j < 500; j++) {
+  A[j] = A[j-1] * 2.0
+    }
+#+END_SRC
+- <2-> Valor de A[j-1] tem que ser calculado antes de A[j]
+  - Paralelismo é portanto inibido
+- <3-> Se P2 tem a A[j] e P1 tem A[j-1]
+  - <4->Memória distribuída
+    - P2 deve obter A[j-1] de P1 depois que P1 termina
+  - <5->Memória compartilhada
+    - P2 deve ler A[j-1] depois que P1 o atualiza
+** Dependência de dados em laços independentes
+- P1
+  #+BEGIN_SRC C
+X = 2
+  //..
+  Y = X * 2
+  #+END_SRC
+- P2
+  #+BEGIN_SRC C
+X = 4
+  //..
+  Y = X * 3
+  #+END_SRC
+- <2-> Paralelismo é inibido; valor de Y depende:
+  - <3->Memória distribuída
+    - <4-> se ou quando o valor de X é comunicado
+  - <5->Memória compartilhada
+    - <6->Qual tarefa guarda por último o valor de X
+** Como lidar com dependência de dados?
+- <2-> Memória distribuída
+  - Utilizar comunicação em pontos de sincronização
+- <3-> Memória compartilhada
+  - Sincronizar operações de leitura/escrita entre as tarefas
+
+* Sincronização                                                    :noexport:
+** 
+   \vfill
+   \centering
+   \LARGE Sincronização
+   \vfill
+** Sincronização
+   - Gerenciar a ordem de operações que deve ser realizada
+     - Pode ser um fator determinante para se obter desempenho
+     - Seguidamente requer a ``serialização'' de segmentos do programa
+   - <2-> Tipos de sincronização
+     - Barreira
+     - Lock/Semáforos
+     - Comunicação síncrona
+** Barreira
+   - Implica que todas as tarefas estão envolvidas
+   - Cada tarefa trabalha até chegar na barreira
+   - As tarefas continuam no momento que todas estão na barreira
+   \vfill
+   - Por que ter uma barreira?
+** Lock/Semáforos
+   - Pode envolver qualquer número de tarefas
+   - Tipicamente usado para proteger um dado global ou seção de código
+     - Apenas uma tarefa pode alterar uma variável global
+   - Pode ser bloqueante ou não-bloqueante
+** Comunicação síncrona
+   - Envolve apenas aquelas tarefas executando uma operação de
+     comunicação
+
+
+* Depuração                                                        :noexport:
+   - Depurar código paralelo pode ser bem difícil
+     - Tarefa de depuração não é escalável
+   \vfill
+   - <2-> Solução básica: usar \texttt{gdb}
+     - Como fazer em distribuído?
+   - <3-> Algumas ferramentas
+     - TotalView (RogueWave Software)
+     - DDT (Allinea)
+     - Ispector (Intel)
+     - STAT (LLNL)
+   - <4-> *Em geral, complexas de se utilizar*
+* Análise de desempenho                                            :noexport:
+   - Pode ser bem difícil melhorar o desempenho
+     - Várias técnicas para detectar o problema
+   \vfill
+   - <2-> Teremos duas aulas sobre esse assunto
+   - <3-> Para se adiantar, olhar: **Análise de Desempenho de Programas Paralelos**. Lucas Mello Schnorr. Short course (3 hours)
+       prepared for the ERAD/RS 2014. Alegrete, RS, Brazil.
+
