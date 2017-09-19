@@ -18,7 +18,7 @@
 #+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
 
 * Message Passing Interface
-Especificação para programação paralela
+Especificação para programação paralela por _troca de mensagens_
 - Surgiu no início da década de 90 (MPI 1.0 em 1994)
 - Estende C, Fortran (bindings para C++)
 - Composta por *funções de comunicação*
