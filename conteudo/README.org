@@ -9,25 +9,25 @@ disciplina, podem variar em abrangência e profundidade.
 
 *** Programação
 
-| Setor   | Descrição                                                      |
-|---------+----------------------------------------------------------------|
-| Geral   | [[./aulas/geral/apresentacao.org][Apresentação da disciplina]]                                     |
-| Geral   | [[./aulas/geral/introducao.org][Introdução geral]]                                               |
-| Geral   | [[./aulas/geral/supercomputadores.org][Supercomputadores]]                                              |
-| Geral   | [[./aulas/geral/programacao.org][Programando supercomputadores?]]                                 |
-| Modelos | [[./aulas/modelos/resolvendo.org][Resolvendo em Paralelo]]                                         |
-| Modelos | [[./aulas/modelos/decomposicao.org][Decomposição e Balanceamento]]                                   |
-| MPI     | [[./aulas/mpi/introducao.org][Introdução]]                                                     |
-| MPI     | [[./aulas/mpi/ponto-a-ponto.org][Operações ponto a ponto]]                                        |
-| MPI     | SMPI: ambiente de programação para simulação de aplicações MPI |
-| MPI     | Operações coletivas                                            |
-| MPI     | Operações assíncronas, modos de envio                          |
-| MPI     | Topologias virtuais, processos dinâmicos e fechamento          |
-| OpenMP  | Introdução, Algoritmos de escalonamento                        |
-| OpenMP  | Paralelismo de tarefas, Sincronização                          |
-| OpenMP  | Prática em laboratório                                         |
-| StarPU  | Introdução, DAG                                                |
-| Análise | Introdução a Análise de Desempenho                             |
+| Setor   | Descrição                                             |
+|---------+-------------------------------------------------------|
+| Geral   | [[./aulas/geral/apresentacao.org][Apresentação da disciplina]]                            |
+| Geral   | [[./aulas/geral/introducao.org][Introdução geral]]                                      |
+| Geral   | [[./aulas/geral/supercomputadores.org][Supercomputadores]]                                     |
+| Geral   | [[./aulas/geral/programacao.org][Programando supercomputadores?]]                        |
+| Modelos | [[./aulas/modelos/resolvendo.org][Resolvendo em Paralelo]]                                |
+| Modelos | [[./aulas/modelos/decomposicao.org][Decomposição e Balanceamento]]                          |
+| MPI     | [[./aulas/mpi/introducao.org][Introdução]]                                            |
+| MPI     | [[./aulas/mpi/ponto-a-ponto.org][Operações ponto a ponto]]                               |
+| MPI     | [[./aulas/mpi/smpi.org][SimGrid's SMPI]]                                        |
+| MPI     | Operações coletivas                                   |
+| MPI     | Operações assíncronas, modos de envio                 |
+| MPI     | Topologias virtuais, processos dinâmicos e fechamento |
+| OpenMP  | Introdução, Algoritmos de escalonamento               |
+| OpenMP  | Paralelismo de tarefas, Sincronização                 |
+| OpenMP  | Prática em laboratório                                |
+| StarPU  | Introdução, DAG                                       |
+| Análise | Introdução a Análise de Desempenho                    |
 
 *** Arquitetura
 
