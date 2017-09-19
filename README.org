@@ -47,7 +47,7 @@ com o objetivo de melhorar o aprendizado da disciplina.
 
 ** Principal
 
-- [[./conteudo/index.org][Acesse o conteúdo da disciplina]]
+- [[./conteudo/README.org][Acesse o conteúdo da disciplina]]
   - Aulas
   - Exercícios
 
