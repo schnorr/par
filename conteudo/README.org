@@ -45,13 +45,13 @@ disciplina, podem variar em abrangência e profundidade.
 
 ** Artigos para discussão
 
+- Rolf Rabenseifner, Georg Hager, Gabriele Jost. Hybrid MPI/OpenMP
+  Parallel Programming on Clusters of Multi-Core SMP Nodes. PDP '09
+  Proceedings of the 2009 17th Euromicro International Conference on
+  Parallel, Distributed and Network-based Processing. Pages 427-436
+
 - Jacobsen, Dana A., Julien C. Thibault, and Inanc
   Senocak. "[[http://scholarworks.boisestate.edu/cgi/viewcontent.cgi?article=1004&context=mecheng_facpubs][An
   MPI-CUDA implementation for massively parallel incompressible flow
   computations on multi-GPU clusters]]." 48th AIAA aerospace sciences
   meeting and exhibit. Vol. 16. 2010.
-
-- Rolf Rabenseifner, Georg Hager, Gabriele Jost. Hybrid MPI/OpenMP
-  Parallel Programming on Clusters of Multi-Core SMP Nodes. PDP '09
-  Proceedings of the 2009 17th Euromicro International Conference on
-  Parallel, Distributed and Network-based Processing. Pages 427-436
