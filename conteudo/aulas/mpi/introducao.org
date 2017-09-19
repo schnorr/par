@@ -1,0 +1,163 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: MPI
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+* Message Passing Interface
+Especificação para programação paralela
+- Surgiu no início da década de 90 (MPI 1.0 em 1994)
+- Estende C, Fortran (bindings para C++)
+- Composta por *funções de comunicação*
+
+#+BEGIN_CENTER
+MPI é o padrão /de-facto/.
+#+END_CENTER
+
+#+latex: \vfill\pause
+
+Inúmeras funcionalidades, dentre as quais
+- Comunicação ponto-a-ponto, coletivas, assíncronas, síncronas
+- DMA (Direct Memory Access), I/O, GPU
+
+#+latex: \vfill\pause
+
+Implementações da especificação
+- _OpenMPI_ (www.open-mpi.org)
+- MPICH (www.mpich.org)
+- Fabricantes ([[http://mpi-forum.org/slides/2016/06/2016-06-iscbof.pdf][BoF at ISC 16, Jun. 21st, 2016: Slide 4]])
+* Referências
+#+BEGIN_CENTER
+Especificação MPI
+
+http://www.mpi-forum.org/
+#+END_CENTER
+
+#+Latex: \vfill
+
+Livros
+- Gropp, William et al., Using MPI, MIT Press.
+- Gropp, William et al., Using MPI-2, MIT Press.
+- Snir, M. et al., Dongarra J., MPI: The Complete Reference
+
+#+Latex: \vfill
+
+Conferências internacionais
+- EuroMPI, SuperComputing, IPDPS, CCGRID, Cluster
+
+* Visão geral sobre o Paradigma MPI
+
+Ao executar o programa:
+#+BEGIN_EXAMPLE
+mpirun -NP 64 ./binario_do_programa
+#+END_EXAMPLE
+
+No lançamento do programa
+- Um conjunto de processos é criado
+- Em princípio, todos usam o mesmo binário
+- Paradigma SPMD (/Single Program, Multiple Data/) e MPMD
+
+#+BEGIN_CENTER
+*Rank*
+
+Identificador único de cada processo
+#+END_CENTER
+
+#+Latex: \vfill
+
+Baseado no rank, cada processo pode
+- Calcular parte do programa
+- Comunicar-se com outros processos
+
+* Seis operações básicas de MPI
+- =MPI_Init= (&argc, &argv)
+- =MPI_Comm_rank= (&rank, comunicador)
+- =MPI_Comm_size= (&p, comunicador)
+- =MPI_Send= (...)
+- =MPI_Recv= (...)
+- =MPI_Finalize= ()
+
+#+latex: \vfill
+
+#+BEGIN_CENTER
+Comunicador básico é =MPI_COMM_WORLD=, que agrupa todos os processos.
+#+END_CENTER
+
+* =MPI_Init= e =MPI_Finalize=
+
+Chamadas obrigatórias.
+
+#+BEGIN_SRC C
+int MPI_Init(int*, char**);
+#+END_SRC
+- Inicializa os processos, escanea os argumentos
+- Sempre no início do programa, por todos os processos
+
+#+latex: \vfill\pause
+
+#+BEGIN_SRC C
+int MPI_Finalize();
+#+END_SRC
+- Libera recursos
+- Sempre no final do programa
+* =MPI_Comm_size= e =MPI_Comm_rank=
+#+BEGIN_SRC C
+int MPI_Comm_size(MPI_Communicator, int*);
+#+END_SRC
+- Encontrar a qtdade. de processos em execução no comunicador
+
+#+latex: \vfill\pause
+
+#+BEGIN_SRC C
+int MPI_Comm_rank(MPI_Communicator, int*);
+#+END_SRC
+- Determina o identificador (*rank*) do processo que realiza a chamada
+  - Dentro do comunicador informado
+* Olá Mundo
+
+#+BEGIN_SRC C :tangle exemplo_simples.c
+#include <stdio.h>
+#include <mpi.h>
+
+int main(int argc, char* argv[]) {
+  int NP, rank;
+  MPI_Init (&argc, &argv);
+  MPI_Comm_size (MPI_COMM_WORLD, &NP);
+  MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+  printf ("Oi pessoal, do processo %d dentro de %d!\n", rank, NP);
+  MPI_Finalize ();
+  return 0;
+}
+#+END_SRC
+
+#+latex: \vfill\pause
+
+Compilar e executar com seis processos
+
+#+begin_src shell :results output
+mpicc exemplo_simples.c -o exemplo_simples
+mpirun -np 6 ./exemplo_simples
+#+end_src
+
+#+RESULTS:
+: Oi pessoal, do processo 0 dentro de 6!
+: Oi pessoal, do processo 5 dentro de 6!
+: Oi pessoal, do processo 1 dentro de 6!
+: Oi pessoal, do processo 4 dentro de 6!
+: Oi pessoal, do processo 3 dentro de 6!
+: Oi pessoal, do processo 2 dentro de 6!
+
+
