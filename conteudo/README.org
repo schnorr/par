@@ -18,7 +18,7 @@ disciplina, podem variar em abrangência e profundidade.
 | Modelos | [[./aulas/modelos/resolvendo.org][Resolvendo em Paralelo]]                                         |
 | Modelos | [[./aulas/modelos/decomposicao.org][Decomposição e Balanceamento]]                                   |
 | MPI     | [[./aulas/mpi/introducao.org][Introdução]]                                                     |
-| MPI     | Operações ponto a ponto                                        |
+| MPI     | [[./aulas/mpi/ponto-a-ponto.org][Operações ponto a ponto]]                                        |
 | MPI     | SMPI: ambiente de programação para simulação de aplicações MPI |
 | MPI     | Operações coletivas                                            |
 | MPI     | Operações assíncronas, modos de envio                          |
