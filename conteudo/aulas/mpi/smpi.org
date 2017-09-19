@@ -1,0 +1,143 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: SMPI
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+* SimGrid e SMPI
+Simulador SimGrid - (Tutorial: [[http://simgrid.gforge.inria.fr/tutorials/simgrid-101.pdf][SimGrid 101]])
+- Estudar o comportamento de sistemas de grande escala
+- Implementa modelos de comunicação, cálculo, etc
+- Avaliar heurísticas, prototipar aplicações
+- Múltiplas API para programação
+
+
+#+Latex: \vfill\pause
+
+SMPI - (Tutorial: [[http://simgrid.gforge.inria.fr/tutorials/simgrid-smpi-101.pdf][SMPI 101]])
+- Reimplementa a especificação MPI sobre SimGrid
+- Cálculo é executado de verdade; comunicações são simuladas
+
+#+Latex: \vfill\pause
+
+São necessários
+1. Descrição da plataforma
+2. Lista de recursos (=hostfile=)
+3. Programa
+
+* Descrição da plataforma
+
+Descrição de um cluster a tag =cluster= ([[http://simgrid.gforge.inria.fr/simgrid/3.12/doc/platform.html#pf_cluster][Documentação]])
+
+#+BEGIN_SRC xml :tangle cluster.xml
+<?xml version=’1.0’?>
+<!DOCTYPE platform SYSTEM
+"http://simgrid.gforge.inria.fr/simgrid.dtd">
+<platform version="3">
+<cluster
+    id="acme"
+
+    prefix="node-"
+    radical="0-15"
+    suffix=".acme"
+    power="1Gf"
+
+    bw="125MBps"    
+    lat="50us"
+
+    bb_bw="2.25GBps"
+    bb_lat="500us"/>
+</platform>
+#+END_SRC
+
+* Hostfile a aplicação
+
+Lista com o nome dos recursos (idênticos àqueles da plataforma)
+
+#+BEGIN_SRC txt :tangle hostfile.txt
+node-0.acme
+node-1.acme
+#+END_SRC
+
+O código da aplicação
+
+#+begin_src C :results output :tangle appcode.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <mpi.h>
+#define NELEMENTS 2000000 //how many INTs
+int main(int argc, char**argv) {
+  int rank;
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  int nelements = atoi(argv[1]);
+  if (nelements == 1){
+    nelements = NELEMENTS;
+  }
+
+  int data[NELEMENTS];
+
+  if (rank == 0) { // rank
+    MPI_Send(&data, nelements, MPI_INT, 1, 1, MPI_COMM_WORLD);
+  } else {
+    MPI_Status status;
+    MPI_Recv(&data, nelements, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
+    printf("%f: Got message of %d INTs (%d bytes) from rank 0.\n", MPI_Wtime(), nelements, nelements*sizeof(int));
+  }
+
+ // free(data);
+
+  MPI_Finalize();
+  return 0;
+}
+#+end_src
+
+* Compilando e executando várias vezes
+
+#+begin_src shell :results output
+smpicc -g appcode.c -o app
+for i in $(seq 1 20)
+do
+    SIZE=$(echo "2^$i" | bc)
+    smpirun -platform platform.xml -hostfile hostfile.txt ./app $SIZE
+done
+
+#+end_src
+
+#+RESULTS:
+#+begin_example
+0.001209: Got message of 2 INTs (8 bytes) from rank 0.
+0.001209: Got message of 4 INTs (16 bytes) from rank 0.
+0.001209: Got message of 8 INTs (32 bytes) from rank 0.
+0.001209: Got message of 16 INTs (64 bytes) from rank 0.
+0.001210: Got message of 32 INTs (128 bytes) from rank 0.
+0.001211: Got message of 64 INTs (256 bytes) from rank 0.
+0.001184: Got message of 128 INTs (512 bytes) from rank 0.
+0.001194: Got message of 256 INTs (1024 bytes) from rank 0.
+0.000993: Got message of 512 INTs (2048 bytes) from rank 0.
+0.001171: Got message of 1024 INTs (4096 bytes) from rank 0.
+0.001380: Got message of 2048 INTs (8192 bytes) from rank 0.
+0.002281: Got message of 4096 INTs (16384 bytes) from rank 0.
+0.002469: Got message of 8192 INTs (32768 bytes) from rank 0.
+0.007544: Got message of 16384 INTs (65536 bytes) from rank 0.
+0.008101: Got message of 32768 INTs (131072 bytes) from rank 0.
+0.009216: Got message of 65536 INTs (262144 bytes) from rank 0.
+0.011445: Got message of 131072 INTs (524288 bytes) from rank 0.
+0.015904: Got message of 262144 INTs (1048576 bytes) from rank 0.
+0.024821: Got message of 524288 INTs (2097152 bytes) from rank 0.
+0.042656: Got message of 1048576 INTs (4194304 bytes) from rank 0.
+#+end_example
