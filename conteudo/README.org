@@ -1,3 +1,5 @@
+#+startup: overview indent
+
 * Conteúdo
 ** Aulas
 
@@ -5,23 +7,14 @@ A tabela abaixo traz uma lista dos assuntos abordados ao longo do
 semestre, por setor. Os tópicos, respeitando o plano de ensino da
 disciplina, podem variar em abrangência e profundidade.
 
+*** Programação
+
 | Setor       | Descrição                                             |
 |-------------+-------------------------------------------------------|
 | Geral       | [[./aulas/geral/apresentacao.org][Apresentação da disciplina]]                            |
 | Geral       | [[./aulas/geral/introducao.org][Introdução geral]]                                      |
 | Geral       | [[./aulas/geral/supercomputadores.org][Supercomputadores]]                                     |
 | Geral       | [[./aulas/geral/programacao.org][Programando supercomputadores?]]                        |
-| Arquitetura | Introdução Exascale                                   |
-| Arquitetura | Revisão Pipeline                                      |
-| Arquitetura | Superescalar                                          |
-| Arquitetura | Gerenciamento de desvios                              |
-| Arquitetura | Dependências e Escalonamento                          |
-| Arquitetura | Superpipeline e VLIW                                  |
-| Arquitetura | Arquiteturas Multithread                              |
-| Arquitetura | Multicore                                             |
-| Arquitetura | Virtualização                                         |
-| Arquitetura | Interconexão                                          |
-| Arquitetura | Arquitetura SIMD                                      |
 | Modelos     | [[./aulas/modelos/resolvendo.org][Resolvendo em Paralelo]]                                |
 | Modelos     | [[./aulas/modelos/decomposicao.org][Decomposição e Balanceamento]]                          |
 | MPI         | Introdução, SMPI, Operações ponto-a-ponto             |
@@ -33,6 +26,22 @@ disciplina, podem variar em abrangência e profundidade.
 | OpenMP      | Prática em laboratório                                |
 | StarPU      | Introdução, DAG                                       |
 | Análise     | Introdução a Análise de Desempenho                    |
+
+*** Arquitetura
+
+| Setor       | Descrição                    |
+|-------------+------------------------------|
+| Arquitetura | Introdução Exascale          |
+| Arquitetura | Revisão Pipeline             |
+| Arquitetura | Superescalar                 |
+| Arquitetura | Gerenciamento de desvios     |
+| Arquitetura | Dependências e Escalonamento |
+| Arquitetura | Superpipeline e VLIW         |
+| Arquitetura | Arquiteturas Multithread     |
+| Arquitetura | Multicore                    |
+| Arquitetura | Virtualização                |
+| Arquitetura | Interconexão                 |
+| Arquitetura | Arquitetura SIMD             |
 
 ** Artigos para discussão
 
