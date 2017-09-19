@@ -1,0 +1,153 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Operações Ponto a Ponto
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+* Troca de mensagens em MPI
+
+No processo A
+#+BEGIN_EXAMPLE
+MPI_Send(... mensagem ..., B);
+#+END_EXAMPLE
+
+No processo B
+#+BEGIN_EXAMPLE
+MPI_Recv(... mensagem ..., A);
+#+END_EXAMPLE
+
+* A função =MPI_Send=
+
+Envia o conteúdo de =buf= do processo corrent para =dest=
+- Tamanho em bytes é =count * sizeof(datatype)=
+#+BEGIN_SRC C
+int MPI_Send(
+  const void *buf,      //buffer para envio          
+  int count,            //tamanho do buffer          
+  MPI_Datatype datatype,//tipo do dado               
+  int dest,             //rank destino no comunicador
+  int tag,              //tag da mensagem
+  MPI_Comm comm         //comunicador
+);
+#+END_SRC
+
+Exemplo
+#+BEGIN_SRC C
+MPI_Send (&work, 1, MPI_INT, rank_dest, WORKTAG, MPI_COMM_WORLD);
+#+END_SRC
+
+#+latex: \vfill
+
+Detalhes:
+https://www.open-mpi.org/doc/v1.8/man3/MPI_Send.3.php
+
+* A função =MPI_Recv=
+
+Recebe o conteúdo no =buf= do processo corrente oriundo de =source=
+- Tamanho em bytes é =count * sizeof(datatype)=
+#+BEGIN_SRC C
+int MPI_Recv(
+  void *buf,            //buffer para recepção      
+  int count,            //tamanho do buffer         
+  MPI_Datatype datatype,//tipo do dado              
+  int source,           //rank origem no comunicador
+  int tag,              //tag da mensagem        
+  MPI_Comm comm,        //comunicador            
+  MPI_Status *status    //status sobre a recepção
+);
+#+END_SRC
+
+Exemplo
+#+BEGIN_SRC C
+MPI_Recv(&work, 1, MPI_INT, rank_origin, WORKTAG, MPI_COMM_WORLD, &status);     
+#+END_SRC
+
+#+latex: \vfill
+
+Detalhes:
+https://www.open-mpi.org/doc/v1.8/man3/MPI_Recv.3.php
+
+* Segundo exemplo completo
+#+BEGIN_SRC C :tangle exemplo_completo.c
+#include <stdio.h>
+#include <mpi.h>
+
+int main(int argc, char* argv[]) {
+   int p, r ;
+   int tag1 = 103;
+   MPI_Status stat;
+   double dado = -1;
+
+   MPI_Init(&argc, &argv) ;
+   MPI_Comm_size(MPI_COMM_WORLD, &p);
+   MPI_Comm_rank(MPI_COMM_WORLD, &r);
+
+   printf("Comeca %d\n",r);
+
+   if (r==0) {
+      dado = 3.14 ;
+      printf("Processo 0 manda uma mensagem a 1\n");
+      MPI_Send(&dado, 1, MPI_DOUBLE, 1, tag1, MPI_COMM_WORLD);
+      dado = 0;
+   } else if (r==1) {
+      printf("Processo %d - Vai receber uma mensagem de 0 (dado eh %f)\n", r, dado);
+      MPI_Recv(&dado, 1, MPI_DOUBLE, 0, tag1, MPI_COMM_WORLD, &stat);
+      printf("Processo %d - O dado recebido vale %.2lf\n", r, dado);
+   }
+   printf("Termina %d\n",r);
+   MPI_Finalize();
+   return 0 ;
+}
+#+END_SRC
+
+Compilando e executando
+
+#+begin_src shell :results output
+mpicc exemplo_completo.c -o exemplo_completo
+mpirun -np 2 ./exemplo_completo
+#+end_src
+
+#+RESULTS:
+: Comeca 0
+: Processo 0 manda uma mensagem a 1
+: Termina 0
+: Comeca 1
+: Processo 1 - Vai receber uma mensagem de 0 (dado eh -1.000000)
+: Processo 1 - O dado recebido vale 3.14
+: Termina 1
+
+* Algumas observações
+
+Tags devem ser predefinidas, evitam colisão (ou =MPI_ANY_TAG=)
+
+Assume-se que o buffer é contíguo na memória
+
+Assume-se que tamanho dos dados é conhecido (no envio e recepção)
+
+#+latex: \vfill\pause
+
+No =MPI_Recv=, pode-se usar o valor =MPI_ANY_SOURCE= (qualquer origem)
+Consulta-se o =MPI_Status=
+#+BEGIN_SRC C
+stat.MPI_TAG
+stat.MPI_SOURCE
+#+END_SRC
+
+#+latex: \vfill\pause
+
+=MPI_Send= e =MPI_Recv= são bloqueantes
++ Na prática, [[http://simgrid.gforge.inria.fr/contrib/smpi-calibration-doc/][bloqueante ou não depende do tamanho da mensagem]]
+
