@@ -50,6 +50,7 @@ com o objetivo de melhorar o aprendizado da disciplina.
 - [[./conteudo/README.org][Acesse o conteúdo da disciplina]]
   - Aulas
   - Exercícios
+  - Leituras para discussão
 
 ** Projeto
 
