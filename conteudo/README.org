@@ -1,13 +1,12 @@
 #+startup: overview indent
 
-* Conteúdo
-** Aulas
+* Aulas
 
 A tabela abaixo traz uma lista dos assuntos abordados ao longo do
 semestre, por setor. Os tópicos, respeitando o plano de ensino da
 disciplina, podem variar em abrangência e profundidade.
 
-*** Programação
+** Programação
 
 | Setor   | Descrição                                             |
 |---------+-------------------------------------------------------|
@@ -29,7 +28,7 @@ disciplina, podem variar em abrangência e profundidade.
 | StarPU  | Introdução, DAG                                       |
 | Análise | Introdução a Análise de Desempenho                    |
 
-*** Arquitetura
+** Arquitetura
 
 | Setor       | Descrição                    |
 |-------------+------------------------------|
@@ -45,7 +44,7 @@ disciplina, podem variar em abrangência e profundidade.
 | Arquitetura | Interconexão                 |
 | Arquitetura | Arquitetura SIMD             |
 
-** Artigos para discussão
+* Artigos para discussão
 
 - Rolf Rabenseifner, Georg Hager, Gabriele Jost. Hybrid MPI/OpenMP
   Parallel Programming on Clusters of Multi-Core SMP Nodes. PDP '09
