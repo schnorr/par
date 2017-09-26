@@ -1,0 +1,211 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Operações Coletivas
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+* Comunicações coletivas
+   + Implicam mais de dois processos
+     + Contraponto às comunicações ``ponto-a-ponto''
+   + <2-> Prototipação no MPI permite otimização
+     + Diferentes formas de implementação
+     + Depende da combinação arquitetural
+   \vfill
+   + <3-> Exemplos
+     + um para todos
+     + todos para todos
+     + todos para um
+     + split
+* Barreira
+   + Sincronizar todos (ou parte de) os processos
+     + Garantir a presença em um dado ponto do programa
+     + Medir um tempo
+   + <2-> Em MPI
+     #+BEGIN_SRC C
+MPI_Barrier (MPI_COMM_WORLD);
+     #+END_SRC
+   + <3-> Qual o problema do uso desta operação coletiva?
+     + <4-> *Perda de tempo*
+* Difusão (/Broadcast/)
+   + Um processo mestre difunde uma mensagem para todos
+     + Várias implementações possíveis
+       + Árvore binária, árvore de fibonacci
+   + <2-> Em MPI
+     #+BEGIN_SRC C
+MPI_Bcast (void *, int, MPI_Datatype, int, MPI_Comm);
+     #+END_SRC
+     + Semântica
+       + Envia os dados do buffer, do tipo informado, a partir do
+         mestre, para todos os processos que executaram a chamada
+         dentro do comunicador informado
+   + <3-> Exemplos
+     #+BEGIN_SRC C
+MPI_Bcast (&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
+#define RAIZ 0
+MPI_Bcast (dados, n, MPI_DOUBLE, RAIZ, MPI_COMM_WORLD);
+     #+END_SRC
+   + <4-> Observações
+     + *Todos* os processos do comunicador chamam =MPI_Bcast=
+     + É uma *sincronização* global dentro do comunicador
+     + O buffer muda de semântica conforme o rank
+* Centralizar dados (/gather/)
+   + Cada processo, inclusive a raiz, envia dados para a raiz
+     - A raiz realiza o armazenamento na ordem dos ranks
+   + <2-> Exemplo títico para remover operações ponto-a-ponto
+     + Vários =MPI_Send=, =MPI_Recv= se tornam um =MPI_Gather=
+   + <3-> Em MPI
+     #+BEGIN_SRC C
+       MPI_Gather (void *,       //buffer de envio
+                   int,          //tamanho do envio
+                   MPI_Datatype, //tipo do envio
+                   void *,       //buffer de recepção
+                   int,          //tamanho da recepção
+                   MPI_Datatype, //tipo da recepção
+                   int,          //mestre (o receptor único)
+                   MPI_Comm);    //o comunicador
+     #+END_SRC
+* Organização dos dados no =MPI_Gather=
+
+#+ATTR_LATEX: :width \linewidth
+[[./mycoll-fig2_gather.png]]
+
+* Exemplo de =MPI_Gather=
+#+Latex: \only<2->{
+   O argumento *tamanho* na recepção é o número de elementos
+     enviados/recepcionados por processo
+#+Latex: }
+   #+BEGIN_SRC C
+     double *sbuf, *rbuf;
+     int mestre = 2;
+     //...
+     if (rank == mestre){
+       rbuf = malloc (p*10*sizeof double);
+     }else{
+       sbuf = malloc (10*sizeof double);
+     }
+     MPI_Gather (sbuf, 10, MPI_DOUBLE, //envio
+                 rbuf, 10, MPI_DOUBLE, //recepção
+                 mestre, MPI_COMM_WORLD);
+   #+END_SRC
+* Distribuir dados (/scatter/)
+   + Faz o contrário da centralização de dados
+   + <2-> Em MPI
+     #+BEGIN_SRC C
+       MPI_Scatter (void *,       //buffer de envio
+                   int,          //tamanho do envio
+                   MPI_Datatype, //tipo do envio
+                   void *,       //buffer de recepção
+                   int,          //tamanho da recepção
+                   MPI_Datatype, //tipo da recepção
+                   int,          //mestre (o enviador único)
+                   MPI_Comm);    //o comunicador
+     #+END_SRC
+* Variações
+=MPI_Scatterv= (...)
+
+#+latex: \pause
+
+=MPI_Gatherv= (...)
+
+
+#+ATTR_LATEX: :width \linewidth
+[[./mycoll-fig3_gatherv.png]]
+
+* Variações
+   + =MPI_Allgather=
+     + Gather com cópia em todos os processos
+       + Ideia: centralizar para todos
+     + <2-> Em MPI (veja a ausência do mestre)
+       #+BEGIN_SRC C
+       MPI_Allgather (void *,       //buffer de envio
+                   int,          //tamanho do envio
+                   MPI_Datatype, //tipo do envio
+                   void *,       //buffer de recepção
+                   int,          //tamanho da recepção
+                   MPI_Datatype, //tipo da recepção
+                   MPI_Comm);    //o comunicador
+       #+END_SRC
+* Todos para todos (all to all)
+   + Versão avançada do =MPI_Allgather=, *com dados distintos*
+     + O bloco *j* mandado pelo processo *i* vai ser recebido pelo
+       processo *j* e armazenado no bloco *i* de seu /buffer/
+   + Protótipo
+     #+BEGIN_SRC C
+       MPI_Alltoall (
+                     void*,        //buffer de envio
+                     int,          //tamanho do envio
+                     MPI_Datatype, //tipo do envio
+                     void*,        //buffer de recepção
+                     int,          //tamanho da recepção
+                     MPI_Datatype, //tipo da recepção
+                     MPI_Comm);    //o comunicador
+     #+END_SRC
+* Exemplo de Alltoall
+   #+BEGIN_SRC C
+     int i,j;
+     double* sbuf, *rbuf;
+
+     rbuf = malloc(p*10*sizeof(double));
+     sbuf = malloc(p*10*sizeof(double));
+
+     MPI_Alltoall(sbuf, 10, MPI_DOUBLE,
+                  rbuf, 10, MPI_DOUBLE,
+                  MPI_COMM_WORLD);
+
+     for (i=0 ; i<p ; i++)
+       printf(“Recebi de %d : ”, i);
+
+     for (j=0 ; j<10 ; j++)
+       printf(“%lf”, rbuf[i*10+j]);
+
+   #+END_SRC
+* Reduções
+   + Para efetuar uma operação comutativa e associativa em paralelo
+   + =MPI_Reduce=, protótipo
+     #+BEGIN_SRC C
+       MPI_Reduce (
+         const void *sendbuf,  //buffer de envio
+         void *recvbuf,        //resultado
+         int count,            //tamanho
+         MPI_Datatype datatype,//tipo
+         MPI_Op op,            //operação
+         int root,             //raiz
+         MPI_Comm comm);       //comunicador
+     #+END_SRC
+   + <2-> Operador pode ser
+     + =MPI_MAX=, =MPI_MIN=, =MPI_SUM=, =MPI_PROD=, =MPI_LAND=, =MPI_LOR=, etc
+       + Veja a documentação para outros
+* Exemplo de =MPI_Reduce=
+   #+BEGIN_SRC C
+     double dado;
+     double resultado;
+
+     MPI_Reduce(&dado, &resultado, 1, MPI_DOUBLE,
+             MPI_SUM, 0, MPI_COMM_WORLD);
+   #+END_SRC
+* Com vetores
+
+#+ATTR_LATEX: :width \linewidth
+[[./mpi_reduce_2.png]]
+
+Buffer de recepção na raiz deve ter tamanho*sizeof(datatype)
+* Conclusões
+   + Sumário
+     + Operações coletivas são poderosas
+       + Várias versões possíveis, na mesma implementação
+     + Especificação portável e eficiente do paralelismo
+     + <2-> Modelo de programação mais avançado
+       + Equiponto com soquetes, RMI, threads
