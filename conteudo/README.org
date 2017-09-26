@@ -56,3 +56,8 @@ disciplina, podem variar em abrangência e profundidade.
   MPI-CUDA implementation for massively parallel incompressible flow
   computations on multi-GPU clusters]]." 48th AIAA aerospace sciences
   meeting and exhibit. Vol. 16. 2010.
+
+* Tarefas
+
+- Completar o Tópico #1 até a Atividade #2
+  - [[https://simgrid.github.io/SMPI_CourseWare/topic_basics_of_distributed_memory_programming/julia_set/][SMPI CourseWare]]
