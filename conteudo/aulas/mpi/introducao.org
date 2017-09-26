@@ -154,10 +154,10 @@ mpirun -np 6 ./exemplo_simples
 
 #+RESULTS:
 : Oi pessoal, do processo 0 dentro de 6!
-: Oi pessoal, do processo 5 dentro de 6!
 : Oi pessoal, do processo 1 dentro de 6!
-: Oi pessoal, do processo 4 dentro de 6!
+: Oi pessoal, do processo 5 dentro de 6!
 : Oi pessoal, do processo 3 dentro de 6!
+: Oi pessoal, do processo 4 dentro de 6!
 : Oi pessoal, do processo 2 dentro de 6!
 
 
