@@ -20,7 +20,7 @@ disciplina, podem variar em abrangência e profundidade.
 | MPI     | [[./aulas/mpi/ponto-a-ponto.org][Operações ponto a ponto]]                 |
 | MPI     | [[./aulas/mpi/smpi.org][SimGrid's SMPI]]                          |
 | MPI     | [[./aulas/mpi/coletivas.org][Operações coletivas]]                     |
-| MPI     | [[./aulas/assincronismo.org][Operações assíncronas, modos de envio]]   |
+| MPI     | [[./aulas/mpi/assincronas.org][Operações assíncronas, modos de envio]]   |
 | MPI     | [[./aulas/mpi/topologias.org][Topologias virtuais]]                     |
 | MPI     | [[./aulas/mpi/dinamicos.org][Processos dinâmicos]]                     |
 | OpenMP  | Introdução, Algoritmos de escalonamento |
