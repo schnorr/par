@@ -1,0 +1,90 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Processos Dinâmicos
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+* Processos dinâmicos
+Em tempo de execução, um processo lança a criação de outro
++ Modelo de execução dinâmico
++ Processos podem ser criados conforme a demanda da aplicação
+#+latex: \pause
+Em MPI, a evolução aconteceu na especificação 2
++ Modelo SPMD \rightarrow MPMD
+#+latex: \pause
+Possibilita a implementação de novas classes de aplicações
++ *Maleáveis*: se adaptar a dinamicidade dos recursos
++ *Evolutivas*: se adaptar irregularidade da carga de trabalho
++ *Paralelismo de tarefas*
+* Processos dinâmicos em MPI
+Cada processo possui seu *intracomunicador*
+#+latex: \vfill\pause
+Processo *pai* (quem dispara a criação) lança
++ =MPI_Comm_spawn= \pause
+Processo criados são chamados de *filhos*
++ =MPI_Comm_get_parent=
+#+latex: \vfill\pause
+Comunicação entre pai e filhos
++ Através do intercomunicador obtido com =MPI_Comm_get_parent=
+* Criando processos dinâmicos
+#+BEGIN_SRC C
+MPI_Comm_spawn (
+  char *command,
+  char *argv[],
+  int maxprocs,
+  MPI_Info info,           
+  int root,                //rank do pai
+  MPI_Comm comm,           //intracomunicador do pai
+  MPI_Comm *intercomm,     //intercomunicador criado
+  int array_of_errcodes[]
+)
+#+END_SRC
+
+*Demonstração*: pai-filho com troca de mensagens
+
+* Sequência de Fibonacci
+Cálculo do i-ésimo elemento da sequência de Fibonacci
+
+| Posição | 1 | 2 | 3 | 4 | 5 | 6 | 7 |  8 |  9 | 10 | 11 | 12 |     |
+|---------+---+---+---+---+---+---+---+----+----+----+----+----+-----|
+| Valor   | 0 | 1 | 1 | 2 | 3 | 5 | 8 | 13 | 21 | 34 | 55 | 89 | ... |
+
+Um elemento é a soma de seus dois antecessores
+#+latex: \vfill
+Algoritmo sequencial
+  #+BEGIN_SRC C
+  int fib (int n) {
+    if (n < 2) return n;
+    else return fib (n-1) + fib (n-2);
+  }
+  #+END_SRC
+* 
+#+ATTR_LATEX: :width \linewidth
+[[./fib_1.pdf]]
+* 
+#+ATTR_LATEX: :width \linewidth
+[[./fib_2.pdf]]
+* 
+#+ATTR_LATEX: :width \linewidth
+[[./fib_3.pdf]]
+* 
+#+ATTR_LATEX: :width \linewidth
+[[./fib_4.pdf]]
+* 
+#+ATTR_LATEX: :width \linewidth
+[[./fib_5.pdf]]
+* Implementando a Sequência de Fibonacci
+Como implementar em paralelo com =MPI_Comm_spawn=?
