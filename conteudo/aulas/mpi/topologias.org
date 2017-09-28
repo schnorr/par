@@ -1,0 +1,49 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Topologias Virtuais
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+* Topologia virtual em MPI
+Descrevem um mapeamento/ordenamento de processos MPI
++ Seguindo uma ``forma'' geométrica
+Duas topologias principais suportadas em MPI
++ Cartesiana (grid) e grafo (graph)
+#+latex: \vfill\pause
+Tais topologias são em geral virtuais
++ Sem relação com a topologia física
++ Mas pode existir exceções
+#+latex: \pause
+São implementadas com comunicadores e grupos
++ Programadas pelo desenvolvedor
+* Por que usar topologias virtuais em MPI?
+Conveniência
++ Podem ser úteis quando existem padrões específicos de comm.
++ Exemplo: aplicações stencil, com vizinhos
+
+#+latex: \vfill
+Eficiência da comunicação
++ Hardware pode impor penalidades para comunicações distantes
++ Implementação MPI pode otimizar o mapeamento de processos
+* Exemplo com uma topologia cartesiana
+Em azul os identificadores dos processos
++ Cada processo ganha uma coordenada no plano cartesiano
+
+#+ATTR_LATEX: :width .4\linewidth
+[[./Cartesian_topology.png]]
+
+*Demonstração*
+- Criar uma topologia cartesiana 4x4 a partir de 16 processos
