@@ -1,0 +1,182 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Operações Assíncronas
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+* Aprofundar Send/Recv Bloqueante
+=MPI_Send= e =MPI_Recv= são bloqueantes
++ Não retornam até o usuário poder reutilizar o buffer
++ Comportamento depende do tamanho da mensagem
+#+latex: \vfill\pause
+Existem três modos de envio par-a-par
++ Buferizada (=MPI_Bsend=) /Buffered/
+    + Obriga o registro explícito de buffers intermediários
+    + =MPI_Buffer_attach= e =MPI_Buffer_detach=
+#+latex: \pause
++ Síncrona (=MPI_Ssend=) /Synchronous/
+    + Efetua um rendezvouz, retorna após Recv terminar
+#+latex: \pause
++ Pronta (=MPI_Rsend=) /Ready/
+    + Send só começa se o Recv já existe, se não erro.
+* Motivação
+Comunicações bloqueantes
++ Tempo em operações de comunicação é tempo ``perdido''
+#+latex: \pause
+Exemplo de uma ligação telefônica tradicional
++ Necessita de sincronização dos dois lados
+#+latex: \vfill\pause
+
+#+BEGIN_CENTER
+*Mascarar as comunicações com cálculo*
+#+END_CENTER
+
+#+latex: \vfill\pause
+Exemplo dos correios (tradicional e eletrônico)
++ A carta encaminhada libera o enviador
+* Send/Recv tradicional com MPI :noexport:
+\small
+#+BEGIN_SRC C
+void main() {
+  int p, r, t = 103;
+  MPI_Status st;
+  double val ;
+  MPI_Init(&argc, &argv) ;
+  MPI_Comm_rank(MPI_COMM_WORLD, &r);
+  if (r==0) {
+ printf("Processor 0 sends a message to 1\n");
+ val = 3.14 ;
+ MPI_Send(&val, 1, MPI_DOUBLE, 1, t, MPI_COMM_WORLD);
+  } else {
+ printf("Processor 1 receives a message from 0\n");
+ MPI_Recv(&val, 1, MPI_DOUBLE, 0, t, MPI_COMM_WORLD, &st);
+ printf(“I received the value: %.2lf\n", valor);
+  }
+  MPI_Finalize();
+}
+#+END_SRC
+* Comunicações não-bloqueantes em MPI
+Funcionam através da estrutura =MPI_Request=
++ Identifica comunicações não-bloqueantes
++ Permite verificar andamento
+Protótipos idênticos a =MPI_Send=, =MPI_Recv=
++ Parâmetro final do tipo =MPI_Request=
+  #+BEGIN_SRC C
+MPI_Request *req1, *req2;
+MPI_Comm comm = MPI_COMM_WORLD;
+MPI_Isend(&work, 1, MPI_INT, dest, tag, comm, req1);
+MPI_Irecv(&result, 1, MPI_DOUBLE, 1, tag, comm, req2);
+  #+END_SRC
+
+#+latex: \vfill\pause
+
+Observações
++ Mescla entre assincronismo e os três modos de envio
++ Chamadas não-bloqueantes alocam a =MPI_Request=
+* Comportamento síncrono /versus/ assíncrono
+=MPI_Recv= é bloqueante, sempre
+
+=MPI_Ssend= e =MPI_Rsend= são síncronos, sempre
+
+#+latex: \vfill
+
+=MPI_Send= pode ser não-bloqueante (depende da implementação)
++ Poucos dados \rightarrow comunicação assíncrona (/eager/)
++ Muitos dados \rightarrow síncrona (/rendezvous/)
+  + Pode agregar mensagens
+=MPI_Bsend= é assíncrono (buffer explícito)
+
+* Controle do andamento das comunicações
+Quando uma comunicação assíncrona termina?
++ Como garantir que ela terminou com sucesso
+
+#+latex: \vfill\pause
+
+Duas possibilidades
+
+1. =MPI_Wait (MPI_Request *, MPI_Status * )=
+   + Retorna quando a =MPI_Request= terminar
+   + =MPI_Request= é liberado internamente
+2. =MPI_Test (MPI_Request *, int *, MPI_Status * )=
+   + Nunca bloqueia, retorno é sempre imediato
+   + Seta segundo parâmetro para 0 ou 1
+   + =MPI_Request= não é liberado
+
+#+latex: \vfill\pause
+
+Obtendo comunicação síncrona com op. assíncronas
+#+BEGIN_SRC C
+MPI_Irecv (..., req)
+MPI_Wait (req, ...)
+#+END_SRC
+
+#+latex: \pause
+
+_Outras operações auxiliares_
++ =MPI_Request_free=, =MPI_Wait_any=, =MPI_Test_any=
+* ``Testar primeiro, para só depois esperar''
+Boa prática: sobrepor computação / comunicação
+
+#+latex: \vfill\pause
+
+Procedimento
++ Dispara (todas) comunicações não-bloqueantes
++ Executa-se o cálculo que não depende das comunicações
+  + Testa-se a finalização quando realmente necessário
+
+#+latex: \vfill\pause
+
+Particularmente interessante quando uma iteração de cálculo é custosa
++ Achar um equilíbrio entre computação / comunicação
++ Análise de desempenho; modelar (para prever) a carga de trabalho
+* Exemplo =MPI_Irecv=, =MPI_Test= e =MPI_Wait= juntos
+#+BEGIN_SRC C
+MPI_Request req;
+MPI_Status status;
+int flag = 0;
+
+MPI_Irecv(&dado, ..., &req);
+
+while (flag == 0) {
+  /* Calcular para mascarar */
+
+  MPI_Test(req, &flag, &status);
+}
+MPI_Wait(req, &status);
+#+END_SRC
+* Estudo de caso: como melhorar mestre/trabalhador?
+1. Mestre particiona, distribui aos trabalhadores
+   - Espera retorno na ordem dos trabalhadores \pause
+2. Mestre particiona, distribui aos trabalhadores
+   - Espera retorno *de qualquer trabalhador* \\
+     Usa =MPI_Status= para saber qual trabalhador envio o dado \pause
+3. Mestre particiona, distribui aos trabalhadores *e a si*
+   - 100% do paralelismo, mas deve-se achar um bom equilíbrio
+
+#+latex: \vfill\pause
+
+Como melhorar com _assincronismo_?
+
+* Operações coletivas assíncronas
+Assincronismo com operações coletivas
++ =MPI_Ibcast=
++ =MPI_Ibarrier=
++ =MPI_Ialltoall=
++ =MPI_Ireduce=
++ ...
+#+latex: \vfill
+Mesmo protótipo, com =MPI_Request= no final
++ Compatível com =MPI_Test=, =MPI_Wait=
