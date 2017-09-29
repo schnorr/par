@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
   MPI_Comm_get_parent(&parent); 
   if (parent == MPI_COMM_NULL){
     printf ("No parent!\n");
+    MPI_Finalize();
     return -1;
   }
   MPI_Comm_remote_size(parent, &size);
