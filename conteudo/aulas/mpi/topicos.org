@@ -1,0 +1,42 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Tópicos de Pesquisa sobre MPI
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+* OpenMPI
+
+Subprojects
+- Hardware Locality (=hwloc=)
+- Network Locality (=netloc=)
+
+Check publications
+https://www.open-mpi.org/papers/
+
+[[https://www.open-mpi.org/papers/sc-2016][Supercomputing 2016 slides]]
+Slides from the Open MPI State of the Union BOF at SC'16
+
+* Supercomputing 2016 slides
+
+- Random sample of v2.x features / work (Slide 31)
+  - Singularity (32)
+  - Open MPI I/O (”OMPIO”) (38)
+- Exciting new capabilities in Open MPI (43)
+  - OMPI-X (DOE Exascale)
+  - =MPI_THREAD_MULTIPLE=
+  - Asynchronous progress
+  - Collective Communications
+- Mapping, Ranking, Binding: Oh My! (84)

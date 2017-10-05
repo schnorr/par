@@ -23,7 +23,7 @@ disciplina, podem variar em abrangência e profundidade.
 | MPI     | [[./aulas/mpi/assincronas.org][Operações assíncronas, modos de envio]]   |         5 |
 | MPI     | [[./aulas/mpi/topologias.org][Topologias virtuais]]                     |           |
 | MPI     | [[./aulas/mpi/dinamicos.org][Processos dinâmicos]]                     |           |
-| MPI     | Tópicos de pesquisa                     |         6 |
+| MPI     | [[./aulas/mpi/topicos.org][Tópicos de pesquisa]]                     |         6 |
 | OpenMP  | Introdução, Algoritmos de escalonamento |         7 |
 | OpenMP  | Paralelismo de tarefas, Sincronização   |           |
 | OpenMP  | Prática em laboratório                  |           |
