@@ -29,7 +29,8 @@ disciplina, podem variar em abrangência e profundidade.
 | OpenMP  | [[./aulas/openmp/compartilhamento.org][Compartilhamento de Variáveis]]         |         7 |
 | OpenMP  | [[./aulas/openmp/tarefas.org][Paralelismo de tarefas]]                |           |
 | OpenMP  | [[./aulas/openmp/sincronizacao.org][Sincronização]]                         |           |
-| OpenMP  | Prática em laboratório                |         8 |
+| OpenMP  | Tópicos de pesquisa                   |         8 |
+| OpenMP  | Prática em laboratório                |         9 |
 | StarPU  | Introdução, DAG                       |           |
 | Análise | Introdução a Análise de Desempenho    |           |
 
