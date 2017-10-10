@@ -1,0 +1,106 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Sincronização
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+
+* Construções de sincronização
+single, master, ordered
+
+critical, atomic
+
+barrier, flush
+
+taskwait, taskgroup e untied (tied)
+
+* single, master e ordered
+master (master.c)
++ O bloco é executado apenas pelo fluxo principal
+    #+BEGIN_SRC C
+    #pragma omp master
+    #+END_SRC
+#+latex: \vfill
+\pause  single (modificar master.c)
++ O bloco é executado por apenas um fluxo
++ Suporte para ações ``únicas''
+    #+BEGIN_SRC C
+    #pragma omp single
+    #+END_SRC
+#+latex: \vfill
+\pause  ordered (ordered.c)
++ Impõe execução sequencial dentro de um laço
+    #+BEGIN_SRC C
+    #pragma omp parallel for ordered
+    for (...)
+        #pragma omp ordered
+        { A(i); }
+    #+END_SRC
+* critical e atomic
+critical (critical.c)
++ Código que só deve ser executado por um fluxo a cada vez
+    #+BEGIN_SRC C
+    #pragma omp critical { ... }
+    #+END_SRC
+#+latex: \vfill
+atomic (modificar critical.c)
++ Versão leve da seção crítica
++ Define uma região de memória cuja mudança deve ser atômica
++ Funciona apenas para a próxima instrução de acesso à memória
+    #+BEGIN_SRC C
+    #pragma omp atomic
+       var = value;
+    #+END_SRC
+* barrier e flush
+barrier (ver master.c)
++ Sincronizar todos os fluxos (em um grupo)
+    #+BEGIN_SRC C
+    #pragma omp barrier
+    #+END_SRC
+#+latex: \vfill
+flush (flush.c)
++ Força que todos os fluxos tenham a mesma visão da memória
++ Ler:
+    http://stackoverflow.com/questions/19687233/explict-flush-direcitve-with-openmp-when-is-it-necessary-and-when-is-it-helpful
+* taskwait, taskgroup e untied(tied)
+taskwait
++ Espera o fim das tarefas geradas no bloco atual
+    #+BEGIN_SRC C
+    #pragma omp taskwait
+    #+END_SRC
+#+latex: \vfill
+\pause  taskgroup
++ Grupo de tarefas, taskwait implícito no final do bloco
+    #+BEGIN_SRC C
+    #pragma omp taskgroup
+    {
+       ...
+    }
+    #+END_SRC
+\pause  untied
++ Não está atada a um fluxo
++ Execução da tarefa pode ser suspensa
+    + Continua com outro fluxo
+* Exemplo Fibonacci
+Sequência de Fibonacci
+  #+BEGIN_SRC C
+   fib(n) = fib(n-1) + fib(n-2)
+  #+END_SRC
+Solução recursiva de fib(10)
+
+#+ATTR_LATEX: :width 1.7\linewidth
+[[./img/fib10.png]]
+

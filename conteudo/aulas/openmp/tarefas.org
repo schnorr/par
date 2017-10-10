@@ -1,0 +1,125 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Paralelismo de Tarefas
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+* Seções paralelas
+O que fazer quando não existem laços no programa?
++ Ou eles existem, mas tem um custo baixo
+#+latex: \vfill
+\pause  *Seções paralelas* (sections.c)
++ Seções de código a serem divididas entre as threads
+    #+BEGIN_SRC C
+    #pragma omp parallel sections
+    {
+        A;
+
+        #pragma omp section { B; }
+
+        #pragma omp section { C; }
+    }
+    #+END_SRC
+
+* Paralelismo de tarefas
+Aparece de forma explícita na versão OpenMP 3.0 (2008)
+
+\pause  Uma *tarefa* tem
++ Código para executar
++ Ambiente de dados
++ Um fluxo que a executa
+\pause  Funcionamento (empacotamento e execução)
++ Fluxo empacota uma nova instância de tarefa
++ Um fluxo executa a tarefa em um momento no futuro
+#+latex: \vfill
+\pause  Nota
++ Já existia em pre-3.0 (seções paralelas: sections.c)
++ Agora se torna explícito, parte da especificação
+    + Tarefas são criadas e executas posteriormente
+\pause  Aplicações do tipo produtor/consumidor
+* Paralelismo de tarefas com seções paralelas
+Exemplo básico (sections-implicit-barrier.c)
+  #+BEGIN_SRC C
+  int a, b, c, d;
+  #pragma omp parallel sections {
+
+    #pragma omp section { a = 0; }
+    #pragma omp section { b = 0; }
+    #pragma omp section { c = 0; }
+    #pragma omp section { d = 0; }
+
+  }
+  #+END_SRC
+\pause  Com laços independentes (sections-laco.c)
+#+latex: \vfill
+\pause  Limitações e diferenças entre parallel sections e *task*
+  +
+    http://stackoverflow.com/questions/13788638/difference-between-section-and-task-openmp
+* Criando tarefas e definições
+Construção Tarefa
+  #+BEGIN_SRC C
+  #pragma omp task <options*>
+  #+END_SRC
++ O bloco seguinte é o corpo da tarefa
++ Tarefa pode ser executada (escalonamento)
+    + Imediatamente pelo fluxo atual
+    + Repassada para um outro fluxo disponível
+#+latex: \vfill
+\pause  *Tarefa*
++ Pacote código/dados criado na Construção Tarefa
+\pause  Escalonamento
++ Início da tarefa, final da tarefa, pontos taskwait
+#+latex: \vfill
+\pause  Tarefas devem ser usadas para modelar
++ Tarefas independentes
++ Sem desvios para ou a partir do corpo da tarefa
+* Tarefas condicionais
+Construção Tarefa
+  #+BEGIN_SRC C
+  #pragma omp task <options*>
+  #+END_SRC
+Opções podem ser if(expr), untied, shared(list), private(list),
+  firstprivate(list), default(shared|none)
+#+latex: \vfill
+*if(expression)*
++ Se expressão é falsa, a tarefa é executada imediatamente
+    + Ambiente de dados continua sendo local
+    + Ainda assim é visto como uma nova tarefa
+É uma otimização configurável pelo usuário
++ Custo de repassar uma tarefa > custo de executar a tarefa
++ Controle de afinidade de cache e memória
+* Código exemplo
+\scriptsize
+#+BEGIN_SRC C
+  struct node {
+    struct node *left;
+    struct node *right;
+  };
+  extern void process (struct node*);
+
+  void traverse (struct node *p){
+    if (p->left){
+       #pragma omp task //p is firstprivate by default
+         traverse(p->left);
+    }
+
+    if (p->right){
+       #pragma omp task
+         traverse(p->right);
+    }
+    process(p);
+  }
+#+END_SRC
