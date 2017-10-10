@@ -39,6 +39,7 @@ disciplina, podem variar em abrangência e profundidade.
 | Arquitetura | Introdução Exascale          |
 | Arquitetura | Revisão Pipeline             |
 | Arquitetura | Superescalar                 |
+| Arquitetura | Stream Processing            |
 | Arquitetura | Gerenciamento de desvios     |
 | Arquitetura | Dependências e Escalonamento |
 | Arquitetura | Superpipeline e VLIW         |
