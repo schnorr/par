@@ -1,0 +1,40 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Tópicos de Pesquisa sobre OpenMP
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+* OpenMP
+
+OpenMP @ SC17 Denver, Colorado
+http://www.openmp.org/events/openmp-sc17-denver-co/
+
+- [[http://press3.mcs.anl.gov/atpesc/files/2017/08/ATPESC_2017_Track-2_3_8-2_830am_Mattson-OpenMP.pdf][OpenMP Common Core: A Hands-On Exploration]]
+  - Irregular parallelism and tasks
+- OpenMP 5.0 Tools Interface
+- Loop Scheduling in OpenMP
+- Make the Most of OpenMP Tasking
+
+SC16
+- [[https://github.com/UoB-HPC/sc16-tutorial/blob/master/omp_GPGPU_prog_SC16.pdf][Programming your GPU with OpenMP]] \linebreak
+  - Sources, exercises: https://github.com/UoB-HPC/sc16-tutorial/
+  - The device model in OpenMP
+
+[[http://www.openmp.org/specifications/][Latest specifications]]
+- OpenMP 4.5 Summary Card – C/C++
+- OMPT: An OpenMP Tools Application Programming Interface for Performance Analysis
+- OpenMP 5.0 draft
+
