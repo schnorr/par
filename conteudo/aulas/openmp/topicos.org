@@ -32,6 +32,8 @@ SC16
 - [[https://github.com/UoB-HPC/sc16-tutorial/blob/master/omp_GPGPU_prog_SC16.pdf][Programming your GPU with OpenMP]] \linebreak
   - Sources, exercises: https://github.com/UoB-HPC/sc16-tutorial/
   - The device model in OpenMP
+  - WSCAD Tutorial: https://github.com/rogerioag/minicurso-openmp-wscad-2017
+    - Text: http://www2.sbc.org.br/wscad/anais/Minicurso-III.pdf
 
 [[http://www.openmp.org/specifications/][Latest specifications]]
 - OpenMP 4.5 Summary Card – C/C++
