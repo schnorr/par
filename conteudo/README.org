@@ -8,32 +8,34 @@ disciplina, podem variar em abrangência e profundidade.
 
 ** Programação
 
-| Setor   | Descrição                             | Sequência |
-|---------+---------------------------------------+-----------|
-| Geral   | [[./aulas/geral/apresentacao.org][Apresentação da disciplina]]            |         1 |
-| Geral   | [[./aulas/geral/introducao.org][Introdução geral]]                      |           |
-| Geral   | [[./aulas/geral/supercomputadores.org][Supercomputadores]]                     |           |
-| Geral   | [[./aulas/geral/programacao.org][Programando supercomputadores?]]        |           |
-| Modelos | [[./aulas/modelos/resolvendo.org][Resolvendo em Paralelo]]                |         2 |
-| Modelos | [[./aulas/modelos/decomposicao.org][Decomposição e Balanceamento]]          |           |
-| MPI     | [[./aulas/mpi/introducao.org][Introdução]]                            |         3 |
-| MPI     | [[./aulas/mpi/ponto-a-ponto.org][Operações ponto a ponto]]               |           |
-| MPI     | [[./aulas/mpi/smpi.org][SimGrid's SMPI]]                        |           |
-| MPI     | [[./aulas/mpi/coletivas.org][Operações coletivas]]                   |         4 |
-| MPI     | [[./aulas/mpi/assincronas.org][Operações assíncronas, modos de envio]] |         5 |
-| MPI     | [[./aulas/mpi/topologias.org][Topologias virtuais]]                   |           |
-| MPI     | [[./aulas/mpi/dinamicos.org][Processos dinâmicos]]                   |           |
-| MPI     | [[./aulas/mpi/topicos.org][Tópicos de pesquisa]]                   |         6 |
-| OpenMP  | [[./aulas/openmp/introducao.org][Introdução]]                            |           |
-| OpenMP  | [[./aulas/openmp/lacos.org][Algoritmos de escalonamento]]           |           |
-| OpenMP  | [[./aulas/openmp/compartilhamento.org][Compartilhamento de Variáveis]]         |         7 |
-| OpenMP  | [[./aulas/openmp/tarefas.org][Paralelismo de tarefas]]                |           |
-| OpenMP  | [[./aulas/openmp/sincronizacao.org][Sincronização]]                         |           |
-| OpenMP  | [[./aulas/openmp/topicos.org][Tópicos de pesquisa]]                   |         8 |
-| OpenMP  | Prática em laboratório #1: PI         |         9 |
-| OpenMP  | Prática em laboratório #2: VADD GPU   |        10 |
-| Análise | Introdução a Análise de Desempenho    |        11 |
-| StarPU  | Introdução, DAG                       |           |
+| Setor   | Descrição                                    | Sequência |
+|---------+----------------------------------------------+-----------|
+| Geral   | [[./aulas/geral/apresentacao.org][Apresentação da disciplina]]                   |         1 |
+| Geral   | [[./aulas/geral/introducao.org][Introdução geral]]                             |           |
+| Geral   | [[./aulas/geral/supercomputadores.org][Supercomputadores]]                            |           |
+| Geral   | [[./aulas/geral/programacao.org][Programando supercomputadores?]]               |           |
+| Modelos | [[./aulas/modelos/resolvendo.org][Resolvendo em Paralelo]]                       |         2 |
+| Modelos | [[./aulas/modelos/decomposicao.org][Decomposição e Balanceamento]]                 |           |
+| MPI     | [[./aulas/mpi/introducao.org][Introdução]]                                   |         3 |
+| MPI     | [[./aulas/mpi/ponto-a-ponto.org][Operações ponto a ponto]]                      |           |
+| MPI     | [[./aulas/mpi/smpi.org][SimGrid's SMPI]]                               |           |
+| MPI     | [[./aulas/mpi/coletivas.org][Operações coletivas]]                          |         4 |
+| MPI     | [[./aulas/mpi/assincronas.org][Operações assíncronas, modos de envio]]        |         5 |
+| MPI     | [[./aulas/mpi/topologias.org][Topologias virtuais]]                          |           |
+| MPI     | [[./aulas/mpi/dinamicos.org][Processos dinâmicos]]                          |           |
+| MPI     | [[./aulas/mpi/topicos.org][Tópicos de pesquisa]]                          |         6 |
+| OpenMP  | [[./aulas/openmp/introducao.org][Introdução]]                                   |           |
+| OpenMP  | [[./aulas/openmp/lacos.org][Algoritmos de escalonamento]]                  |           |
+| OpenMP  | [[./aulas/openmp/compartilhamento.org][Compartilhamento de Variáveis]]                |         7 |
+| OpenMP  | [[./aulas/openmp/tarefas.org][Paralelismo de tarefas]]                       |           |
+| OpenMP  | [[./aulas/openmp/sincronizacao.org][Sincronização]]                                |           |
+| OpenMP  | [[./aulas/openmp/topicos.org][Tópicos de pesquisa]]                          |         8 |
+| OpenMP  | Prática em laboratório #1: PI                |         9 |
+| OpenMP  | Prática em laboratório #2: VADD GPU          |        10 |
+| Análise | [[./aulas/analise/introducao.org][Introdução]]                                   |           |
+| Análise | [[./aulas/analise/apresentacao.org][Do experimento até a visualização]]            |           |
+| Análise | [[./aulas/analise/analise-desempenho.org][Análise de Desempenho de Programas Paralelos]] |        11 |
+| StarPU  | Introdução, DAG                              |           |
 
 
 ** Arquitetura
