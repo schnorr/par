@@ -1,0 +1,197 @@
+#+startup: beamer
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [handout,12pt]
+#+latex_header: \usepackage{textcomp}
+#+latex_header: \usepackage{url}
+#+latex_header: \newcommand{\copyleft}{\includegraphics[width=0.5cm]{./img/cc/cc_cc_30.pdf}\hspace{0.2cm}\includegraphics[width=0.5cm]{./img/cc/cc_by_30.pdf}\hspace{0.2cm}\includegraphics[width=0.5cm]{./img/cc/cc_sa_30.pdf}}
+#+latex_header: \newcommand{\infufrgs}{\includegraphics[width=1cm]{./img/inf-ufrgs-bw.pdf}}
+#+TITLE: Análise de Desempenho \linebreak \normalsize do experimento até a visualização
+#+AUTHOR: Prof. Lucas M. Schnorr
+#+DATE: \copyleft
+#+OPTIONS:   H:2 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+BEAMER_FRAME_LEVEL: 2
+#+latex_header: \usepackage{tabularx}
+#+latex_header: \setbeamercolor{title}{fg=black}
+#+latex_header: \setbeamercolor{titlelike}{fg=black}
+#+latex_header: \setbeamercolor{itemize item}{fg=black}
+#+latex_header: \setbeamercolor{itemize subitem}{fg=black}
+#+latex_header: \setbeamercolor{itemize subsubitem}{fg=black}
+#+latex_header: \mode<beamer>{\usepackage{helvet}}
+#+latex_header: \mode<beamer>{\useinnertheme{rectangles}}
+#+latex_header: \mode<beamer>{\usenavigationsymbolstemplate{}}
+#+latex_header: \mode<beamer>{\setbeamertemplate{footline}{\hfill\insertframenumber/\inserttotalframenumber}}%\beamertemplatefootpagenumber}
+#+latex_header: \mode<handout>{\setbeamertemplate{footline}{\infufrgs\hfill\insertframenumber/\inserttotalframenumber}}%\beamertemplatefootpagenumber}
+#+LaTeX_HEADER: \newcommand{\murl}[2]{{#1://#2}}
+#+Latex_header: \setbeamersize{text margin left=.5cm}
+#+Latex_header: \setbeamersize{text margin right=.5cm}
+
+* Introdução
+** Alguém conhece esse livro?
+   #+BEGIN_CENTER
+   \vfill
+   \includegraphics[width=.4\linewidth]{./img/raj.pdf} \\
+   http://www.cs.wustl.edu/~jain/books/perfbook.htm
+   #+END_CENTER
+
+** A Arte da Avaliação de Desempenho
+   + Dois sistemas, duas cargas de trabalho
+     + Os valores numéricos são transações por segundo
+
+   |---------+---------+----------|
+   | Sistema | Carga 1 | Carga  2 |
+   |---------+---------+----------|
+   | A       |      20 |       10 |
+   | B       |      10 |       20 |
+   |---------+---------+----------|
+
+   + <2->Qual é o melhor sistema?
+** A Arte da Avaliação de Desempenho
+   + Média
+     \small
+     |---------+---------+----------+-------|
+     | Sistema | Carga 1 | Carga  2 | Média |
+     |---------+---------+----------+-------|
+     | A       |      20 |       10 |    15 |
+     | B       |      10 |       20 |    15 |
+     |---------+---------+----------+-------|
+   + <2->Considerar que o sistema B é a base
+     \small
+     |---------+---------+----------+-------|
+     | Sistema | Carga 1 | Carga  2 | Média |
+     |---------+---------+----------+-------|
+     | *A*     |       2 |      0.5 |  1.25 |
+     | B       |       1 |        1 |     1 |
+     |---------+---------+----------+-------|
+   + <3->Considerar que o sistema A é a base
+     \small
+     |---------+---------+----------+-------|
+     | Sistema | Carga 1 | Carga  2 | Média |
+     |---------+---------+----------+-------|
+     | A       |       1 |        1 |     1 |
+     | *B*     |     0.5 |        2 |  1.25 |
+     |---------+---------+----------+-------|
+   \vfill
+   + <4->Técnica conhecida como \alert{jogos da razão}
+** O Livro
+*** 							 :B_alertblock:BMCOL:
+    :PROPERTIES:
+    :BEAMER_env: alertblock
+    :BEAMER_col: 0.4
+    :END:
+    \includegraphics[width=\linewidth]{./img/raj.pdf}
+*** 							 :B_alertblock:BMCOL:
+    :PROPERTIES:
+    :BEAMER_env: alertblock
+    :BEAMER_col: 0.6
+    :END:
+   + Técnicas e ferramentas de medição
+   + Teoria probabilística e estatística
+   + Análise e projeto experimental
+   + Simulação
+   + Modelos de filas
+* Experimentos
+** 
+   \vfill
+   \centering
+   \LARGE Análise de Desempenho \\
+   \normalsize do experimento...
+   \vfill
+** Análise e Projeto Experimental
+   + Explosão da quantidade de fatores de medição
+   + <2->Uma análise apropriada requer
+     + Isolar os efeitos de cada fator dos efeitos dos outros
+     + \alert{Conclusões significativas} a respeito dos fatores
+   \vfill
+   + <3->Objetivo principal de um bom projeto experimental
+     + \alert{Obter o máximo de informação com o mínimo de experimentos}
+   \vfill
+   + <4->Tipos de Projeto Experimentais
+     + Simples
+     + Fatorial Completo
+     + Fatorial Fracionário
+** Tipos de Projeto Experimental -- \normalsize \alert{Simples}
+   + Um fator é variado por vez \rightarrow efeito no desempenho
+   + Estatisticamente ineficiente, desperdício de esforço
+   + Se fatores influenciam outros fatores
+     + <2-> \alert{Conclusões erradas}
+** Tipos de Projeto Experimental -- \normalsize \alert{Fatorial Completo}
+   + Todas as combinações possíveis de fatores e seus valores
+   + Detecta a influência entre fatores
+   + <2->Custo é o maior problema
+     + Reduzir a quantidade de fatores
+     + Reduzir a quantidade de valores para cada fator (Projeto 2^k)
+     + Usar projetos fatoriais fracionários
+** Tipos de Projeto Experimental -- \normalsize \alert{Fatorial Fracionário}
+   + Realize-se uma escolha nas combinações de fatores
+     + Experiência do analista
+   + Menos poderoso que o fatorial completo
+** Análise e Projeto Experimental
+   + Fatorial $2^k$
+   + Fatorial $2^{k}r$ com replicações
+   + Fatorial fracionário $2^{k-p}$
+   + Experimentos de um fator
+   + Fatorial completo com dois fatores sem replicação
+   + Fatorial completo com dois fatores /com/ replicação
+   + Fatorial completo geral com $k$ fatores
+* Visualização
+** 
+   \vfill
+   \centering
+   \LARGE Análise de Desempenho \\
+   \normalsize ...até a visualização
+   \vfill
+** Tianhe-2 Supercomputer \\ 3.120.000 cores
+   #+BEGIN_CENTER
+   \includegraphics[width=\linewidth]{img/tianhe-2.jpg}
+   #+END_CENTER
+** NVidia Tesla K20X \\ 2688 stream processors
+   #+BEGIN_CENTER
+   \includegraphics[width=.8\linewidth]{img/Tesla_GK110_K20_3Qtr_NCovr_x.jpg} \\
+   #+END_CENTER
+** Qual o problema para a visualização?
+   + Registro de comportamento
+     + Geram-se rastros da entidade a ser analisada
+     + Rastros são compostos de eventos datados
+   \vfill
+   + <2->\alert{Problemas}
+     + Muitas entidades
+     + Eventualmente muito detalhe no tempo
+     + Quase sempre muitos fatores a serem analisados
+** Técnicas de visualização
+   + Squarified Treemap View
+     + Observe outliers, differences of behavior
+     + Hierarchical aggregation \\
+       \includegraphics[height=1.3cm]{img/synthetic/large-scale_2.pdf}\hfill
+       \includegraphics[height=1.3cm]{img/synthetic/large-scale_3.pdf}\hfill
+       \includegraphics[height=1.3cm]{img/synthetic/large-scale_4.pdf}\hfill
+       \includegraphics[height=1.3cm]{img/synthetic/large-scale_5.pdf}
+
+   \vfill
+   + Hierarchical Graph View
+     + Correlate application behavior to network topology
+     + Pin-point resource contention
+       \includegraphics[width=\linewidth]{img/g5k_2ap_1Kt-2Kt_1E12_1E6-1E5__50+10__all.pdf}
+** Revisitando Gantt-Charts
+   + Prototipagem com \alert{R}
+   \vfill
+   #+BEGIN_CENTER
+   \includegraphics[width=\linewidth]{gc3_3.png} \\
+   \includegraphics[width=2\linewidth]{gc3_3.png}
+   #+END_CENTER
+** Ferramentas de análise e visualização
+   + It's all there \rightarrow http://github.com/schnorr/
+     + GPL!
+     + Viva, PajeNG, Akypuera, Poti and friends
+   + Esforço de institucionalização
+* Conclusão
+** Qual a proposta? \small Conclusão
+   + Grupo de estudos sobre \alert{Projeto de Experimentos}
+     + Sobretudo utilizar casos reais
+   + <2->\alert{Estudos de caso} para análise através da visualização
+     + Interesse em problemas de larga escala (espaço, tempo, fatores)
+
+
