@@ -1,0 +1,859 @@
+#+startup: beamer
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [handout,12pt]
+#+latex_header: \usepackage{textcomp}
+#+latex_header: \graphicspath{{../img/}{../../img/}{../../../img/}{./img/}}
+#+latex_header: \newcommand{\copyleft}{\includegraphics[width=0.5cm]{cc/cc_cc_30.pdf}\hspace{0.2cm}\includegraphics[width=0.5cm]{cc/cc_by_30.pdf}\hspace{0.2cm}\includegraphics[width=0.5cm]{cc/cc_sa_30.pdf}}
+#+latex_header: \newcommand{\infufrgs}{\includegraphics[width=1cm]{inf-ufrgs-bw.pdf}}
+#+latex_header: \newcommand{\orgmode}{\includegraphics[width=1cm]{org-mode-unicorn-logo.png}\linebreak{\tiny Made with Org Mode}}
+#+TITLE:     Análise de desempenho de programas paralelos
+#+AUTHOR: Prof. Lucas M. Schnorr (UFRGS)
+#+DATE: \copyleft \linebreak\linebreak Escola Regional de Alto Desempenho \linebreak Alegrete, RS, Brasil \linebreak Março 2014 \linebreak\vfill \orgmode
+#+bind: org-export-publishing-directory "./exports"
+#+OPTIONS:   H:2 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
+#+latex_header: \usepackage{tabularx}
+#+latex_header: \setbeamercolor{title}{fg=black}
+#+latex_header: \setbeamercolor{titlelike}{fg=black}
+#+latex_header: \setbeamercolor{itemize item}{fg=black}
+#+latex_header: \setbeamercolor{itemize subitem}{fg=black}
+#+latex_header: \setbeamercolor{itemize subsubitem}{fg=black}
+#+latex_header: \mode<beamer>{\usepackage{helvet}}
+#+latex_header: \mode<beamer>{\useinnertheme{rectangles}}
+#+latex_header: \mode<beamer>{\usenavigationsymbolstemplate{}}
+#+latex_header: \mode<beamer>{\beamertemplatefootpagenumber}
+#+latex_header: \mode<beamer>{\setbeamertemplate{footline}{\hfill\insertframenumber/\inserttotalframenumber}}%\beamertemplatefootpagenumber}
+#+latex_header: \mode<handout>{\setbeamertemplate{footline}{\infufrgs\hfill\insertframenumber/\inserttotalframenumber}}%\beamertemplatefootpagenumber}
+#+Latex_header: \setbeamersize{text margin left=.5cm}
+#+Latex_header: \setbeamersize{text margin right=.5cm}
+#+LaTeX_HEADER: \newcommand{\murl}[2]{{#1://#2}}
+#+LaTeX_HEADER: \newcommand{\et}[1]{{\scriptsize\texttt{#1}}}
+#+LaTeX_HEADER: \newcommand{\etn}[1]{{\texttt{#1}}}
+
+# Duas seções de 90 minutos cada uma
+
+* Apresentação
+** Apresentação do professor
+   + Prof. Lucas M. Schnorr
+   + Doutorado em co-tutela UFRGS/INPG (2005 -- 2009)
+   + Pesquisador CNRS na França (2009 -- 2013)
+     + Processamento Paralelo
+     + Sistemas Distribuídos
+     + Análise de Desempenho
+     + Visualização de Rastros
+   + Ferramentas: PajeNG, Viva, SimGrid, Akypuera, Poti, Tupi
+   + Professor de Compiladores e MLP
+   + Contato
+     + UFRGS, Prédio 43425, Sala 202
+     + \murl{http}{www.inf.ufrgs.br/$\sim$schnorr/}
+     + schnorr@inf.ufrgs.br
+
+** Funcionamento / Sondagem
+   + Interrupções são bem-vindas
+   + Dúvidas, pergunte imediatamente
+   \vfill
+   + <2->Experiência prévia?
+* Introdução
+**  
+   \vfill
+   \centering
+   \LARGE Introdução \linebreak
+   \normalsize e motivação
+   \vfill
+** Introdução
+   + Desenvolvimento de aplicações paralelas \linebreak
+     \rightarrow Tarefa desafiadora
+   \vfill
+   + <2->Dificuldade de se programar em paralelo
+     + Linguagens de programação não apropriadas
+   + <3->Restrições na forma de se utilizar os recursos
+     + CPU /versus/ GPU /versus/ Aceleradores
+   + <4->Indeterminismo da execução
+     + Comportamentos diferentes para a mesma entrada
+   + <5->Escalabilidade dos supercomputadores
+** Escalabilidade: Xeon Phi
+   61 cores (244 threads) para obter 1,2 Teraflop
+   #+begin_center
+   [[./Intel_Xeon_Phi_PCIe_Card.jpg]]
+   #+end_center
+** Escalabilidade: Kalray MPAA 256
+   256 cores com NoC para obter 0.5 Teraflop, baixo consumo
+   #+BEGIN_CENTER
+   [[./mppa256-kalray.jpg]]
+   #+END_CENTER
+** Escalabilidade: NVidia Tesla K40
+   2888 processadores para obter 4.29 TF in precisão simples
+   #+begin_center
+   #+ATTR_LATEX: width=0.8\textwidth
+   [[./NVIDIA_Tesla_K40_GPU_Accelerator_Top.jpg]]
+   #+end_center
+
+** Escalabilidade: Tianhe-2 Supercomputer
+   3120000 (cpu e gpu) cores para obter 34 Petaflops
+   #+begin_center
+   [[./tianhe-2.jpg]] \\
+   \small #1 na lista Top500 em novembro de 2013
+   #+end_center  
+** Introdução -- Controlando a complexidade
+   + Estratégias de controle da complexidade
+     + Uso de interfaces de programação (MPI, OpenMP, CUDA)
+     + Bom conhecimento do sistema de execução
+   \vfill
+   + <2->Alto desempenho em uma aplicação paralela
+     + Ótimo mapeamento dos requisitos da aplicação nos recursos
+     + Vários ciclos de análise de desempenho
+** Introdução -- Melhorando o desempenho
+   + Aplicação paralela/distribuída livre de erros de programação
+   \vfill
+   + <2->\alert{Objetivo da análise de desempenho}
+     + Verificar bom desempenho considerando o sistema
+   \vfill
+   + <3->Processo cíclico
+     + Execuções experimentais
+     + Coleta e análise de dados da execução
+     + Modificação/reconfiguração da aplicação
+** Introdução -- Fases da análise de desempenho
+   + Fase de coleta
+     + Ocorre durante a execução da aplicação
+     + Registrar informações consideradas importantes
+   + <2->Fase de análise dos dados
+     + Identificar problemas de desempenho e suas causas
+   \vfill
+   + <3->Na maioria das vezes, as fases são independentes
+     + <4->Não há consenso: alguns as realizam ao mesmo tempo
+** Introdução -- Análise de desempenho
+   + Análise de desempenho é crucial
+     + Durante o seu desenvolvimento
+     + Portabilidade da aplicação paralela/distribuída
+   \vfill
+   + <2->Objetivo do minicurso, dar uma visão geral de
+     + conceitos básicos, terminologia
+     + técnicas de coleta
+     + técnicas de análise
+     + algumas ferramentas
+** Roteiro
+   \tableofcontents
+* Conceitos básicos
+**  
+   \vfill
+   \centering
+   \LARGE Conceitos básicos \linebreak
+   \normalsize e terminologia
+   \vfill
+** Visão geral dos conceitos básicos 
+   + Efeito de sonda
+   + Análise online /versus/ offline
+   + Sincronização de relógios
+   \vfill
+   + <2->Outros conceitos
+     + Casamento de eventos independentes
+     + Execução não-determinística (e /replay/)
+     + Obtenção de estado global
+     + Resolução de relógios
+     + Formato de arquivo
+     + Observabilidade
+
+** Efeito de Sonda
+   + Comportamento natural
+     + Nenhum tipo de coleta de dados
+     + Ausência de atividades de análise
+   \vfill
+   + <2->\alert{Efeito de sonda}: tempo gasto no registro do comportamento
+     + Alteração do comportamento natural da aplicação
+   + <3->Manifesta-se sob diferentes formas
+     + Memória
+     + CPU
+     + Disco
+     + <4->\alert{Tempo} (ex: 3% mais lento)
+   \vfill
+   + <5->Quesitos na escolha de um sistema de coleta
+     + Funcionalidades
+     + Facilidade de uso
+     + Recursos necessários (memória, processamento e disco)
+     + <6->Efeito de sonda (intrusão)
+   \vfill
+   + <7->(Discussão sobre fases da análise de desempenho)
+** Caracterização da intrusão
+   + Medir a amplitude do efeito de sonda
+     + Normalmente em tempo
+   + Funcionamento
+     + Medir o tempo de cada observação
+     + Granularidade fina
+   \vfill
+   + <2->Uso principal da caracterização
+     + Corrigir o comportamento alterado registro pela observação
+     + Compensar com uma granularidade fina os pontos de medição
+   \vfill
+   + <3->\alert{Objetivo}: anular o efeito de sonda
+     + Difícil de ser obtido, depende do ambiente de execução
+** Intrusão zero, possível?
+   + <2->Caracterização \rightarrow Compensação: nem sempre funcionam
+   \vfill
+   + <3->Simulação
+     + Tempo de simulação /versus/ tempo de execução
+     + No registro do comportamento: tempo de simulação é parado
+** Análise online versus offline
+   + Análise de desempenho: fases de coleta e de análise
+   \vfill
+   + Abordagem /online/
+     + Coleta e análise simultâneas
+   + Abordagem /offline/
+     + Coleta e análise separadas
+** Análise online
+   Coleta e análise simultâneas
+   + Vantagens
+     + Ausência do custo de gerência dos dados \\
+       \rightarrow Evita escrita em disco
+     + <2->Interatividade na análise
+       + Analista pode influenciar os rumos da análise
+       + Exemplo
+   \vfill
+   + <3->Desvantagens
+     + Escalabilidade
+       + Transferência dos dados
+       + Processamento necessário para análise \linebreak
+         (compete com a própria aplicação) \rightarrow Efeito de sonda
+   \vfill
+   + <4->Abordagem pouco implementada em ferramentas
+** Análise offline (post-mortem)
+   Coleta e análise independentes
+   + Desvantagens e vantagens opostas àquelas da análise /online/
+     + Gerenciamento dos dados comportamentais
+     + Falta de interatividade
+     + <2->Melhor escalabilidade
+   \vfill
+   + <3->Técnicas de baixa intrusão relacionadas à escalabilidade
+     + Uso extensivo da memória durante a observação
+     + Uso de formato binário de dados
+** Aplicabilidade das abordagens online e offline
+   + Qual é a melhor?
+   \vfill
+   + <2->Abordagem /online/ relacionada a depuração de erros
+   + <3->Abordagem /post-mortem/ permite análise de desempenho
+** Sincronização de relógios
+   + Sistemas distribuídos e paralelos
+     + Cada máquina tem seu próprio relógio
+     + Na grande maioria das vezes, não há sincronia
+   \vfill
+   + <2->Principal problema (para a análise de desempenho)
+     + \alert{Manter a causalidade} entre os eventos
+     \bigskip
+     [[./sync-example.pdf]]
+** Técnicas de sincronização de relógios
+   Por software e hardware
+   + NTP (/Network Time Protocol/)
+     + Capaz de obter sincronia na ordem de milisegundos
+     + \alert{Problema:} sincronização insuficiente
+   \vfill
+   + <2->PTP (/Precision Time Protocol/)
+     + Sincroniza na ordem de microsegundos
+     + Em redes de baixa latência (supercomputadores)
+   \vfill
+   + <3-> Sincronização de relógio por /hardware/
+     + Relógios atômicos (fornecem hora precisa)
+     + Receptores GPS (/Global Positioning System/)
+     + Precisão na ordem de nanosegundos
+** Outros conceitos relacionados
+   + Execução não-determinística
+     + Dificuldade de estudar um problema de desempenho
+     + \alert{Reexecução determinística}
+       + Registra-se o comportamento em um primeiro momento
+       + Repete-se a execução obedecendo o comportamento inicial
+   + <2->Obtenção de estado global (/snapshot/)
+     + Útil para verificar propriedades globais da aplicação
+     + Dificuldades: latência da rede,
+     + Exemplo de incoerência
+   + <3->Observabilidade (níveis de abstração)
+   + <3->Casamento de informações independentes
+   + <3->Resolução de relógios
+   + <3->Formato de arquivo
+
+* Técnicas de observação e registro
+**  
+   \vfill
+   \centering
+   \LARGE Técnicas de observação e registro \linebreak
+   \normalsize conceitual e prática
+   \vfill
+** Visão geral das técnicas de observação / coleta
+   + Técnicas de observação
+     + Monitoramento
+     + Geração de índices estatísticos
+     + Definição de um perfil de execução
+     + Observação comportamental
+   \vfill
+   + Técnicas de coleta e registro
+     + Amostragem
+     + Cronometragem
+     + Contagem
+     + Rastreamento
+** Técnicas de observação (conceitual)
+   + Métodos utilizados para observar o comportamento
+   + Internos /versus/ externos
+   \vfill
+   + <2->Observação interna
+     + Fonte dos dados interna ao programa
+     + Sondas de observação
+     + Instrumentação
+   + <3->Externa
+     + Fonte externa
+     + Somente o efeito é observado
+** Técnicas de observação
+   + Monitoramento (observação externa) 
+     + Aplicação paralela é inalterada
+     + Poucos detalhes
+     + \alert{Foco}: sistemas computacionais, redes de interconexão
+   \vfill
+   + <2->Geração de índices estatísticos (interna)
+     + Tendências estatísticas através de métricas de desempenho
+     + \alert{Métricas}
+       + Tempo de espera em regiões de código
+       + Tempo médio de execução de uma tarefa
+     + Útil para isolar uma parte do programa a ser melhorada
+     + (necessita de uma técnica de coleta de dados)
+** Técnicas de observação
+   + Definição de um perfil de execução (interna ou externa)
+     + Estima o tempo gasto em partes do programa \linebreak
+       Função / método / módulo / região de código
+     + \alert{Indicador global} \rightarrow cautela em execuções de longa duração
+       
+   \vfill
+   + <2->Observação comportamental (interna)
+     + \alert{Indentificador preciso} do comportamento
+     + Fornece informações detalhadas para a análise
+     + Desvantagens relacionadas ao efeito de sonda
+** Qual a melhor técnica de observação?
+   + <2->Depende
+     + Tipo de análise de desempenho
+     + Conhecimento do analista a respeito da aplicação
+   \vfill
+   + <3->Exemplos
+     + Perfil de execução \rightarrow observação comportamental
+     + <4->Monitoramento e índices estatísticos \rightarrow perfil de execução
+     + <5->Observação comportamental
+   \vfill
+   + <6->Escolha deve ser feita caso a caso
+     + Aplicação /versus/ sistema paralelo
+** Técnicas de coleta e registro (prática)
+   + Situação ideal
+     + Registro preciso do comportamento
+     + Nível de intrusão próximo de zero
+     + Efeito de sonda passível de compensação
+   + <2->Difícil de se obter
+   \vfill
+   + <3->Cada técnica de coleta traz um equilíbrio
+     + precisão /versus/ intrusão
+** Classificação das técnicas de coleta
+   + De acordo como a maneira que o registro é lançado
+     + Dirigida pelo tempo ou por eventos
+   \vfill
+   #+BEGIN_CENTER
+   [[./coleta-classification.pdf]]
+   #+END_CENTER
+** Amostragem \normalsize (guiada pelo tempo)
+   + Examinar periodicamente o estado do programa
+   + Intervalo de tempo \rightarrow frequência da amostragem
+     + Definido pelo analista
+   \vfill
+   + <2->\alert{Funcionamento}: no momento da medição
+     + Sistema dispara uma ordem de observação
+       + Verifica qual o estado do programa, registra em memória
+     + Reconfigura para que a medição ocorra novamente
+   \vfill
+   + <3->Uso bastante comum \rightarrow Gerar um \alert{perfil de execução}
+     + Exemplo: frequência de 20 microsegundos, função em execução
+   + <4->Perfil indica somente quantas vezes a função foi executada
+     + Resultados são em porcentagem da quantidade de amostras
+** Amostragem
+   + Qualidade dos resultados
+     + Inversamente proporcional ao tamanho do intervalo
+   + <2->Exemplo: 100 nanosegundos /versus/ 1 segundo
+     + Funções em geral se executam na ordem de microsegundos
+   \vfill
+   + <3->Efeito de sonda causado pelo amostragem
+     + Diretamente proporcional à frequência de amostragem
+   \vfill
+   + <4->Achar um \alert{bom equilíbrio} entre qualidade e intrusão
+     + Caracterizar intrusão /versus/ frequência da amostragem
+   \vfill
+*** Complexidade no uso em uma aplicação paralela		    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: <5->
+    :END:
+     + Vários processos e computadores
+     + Múltiplos perfis de execução
+** Cronometragem \normalsize (guiada por evento)
+   + Medir o tempo passado em uma região de código
+   + Instrumentação manual ou automática do código do programa
+     + Inserir instruções extras responsáveis pela cronometragem
+   \vfill
+   + <2->\alert{Funcionamento}
+     + No local de início da medição, disparo do cronômetro
+     + No local do fim da medição, tempo é contabilizado
+     + Medições são somadas e associadas à região observada
+   \vfill
+   + <3->Gera um \alert{perfil de execução}
+     + Comparação com a amostragem
+** Cronometragem
+   + Intrusão
+     + Diretamente relacionada a quantidade de cronômetros
+     + Mais controlável quando comparada a amostragem
+   \vfill
+   + <2->Exemplo e contra-exemplo
+     + Cronometrar a região dentro de um laço
+   \vfill
+*** Vantagens e desvantagens					    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: <3->
+    :END:
+    + Flexível (analista define os cronômetros)
+    + Manual e eventualmente complexa
+*** Complexidade no uso em uma aplicação paralela		    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: <4->
+    :END:
+    + Vários processos e computadores
+    + Múltiplos perfis de execução
+** Contagem \normalsize (guiado por evento)
+    + Medir a quantidade de ocorrências de um evento
+      + Execução de uma função
+      + Uso de um recurso
+    \vfill
+    + <2->\alert{Funcionamento}
+      + Quando um evento é gerado
+      + Procura-se o contador correspondente em memória
+      + Incrementa o contador
+    \vfill
+    + <3->Maior vantagem
+      + Baixa intrusão (incremento de um contador para cada evento)
+      + Uso em programas de longa duração com eventos frequentes
+** Contagem
+   + Implementação multi-nível
+     + Contadores em /software/ e /hardware/
+     + Combinação entre eles
+   + <2->Contadores em /software/
+     + Flexibilidade, adaptação, portabilidade
+   + <3->Em /hardware/
+     + Imutabilidade, intrusão próxima de zero
+     + Esforço de padronização (PAPI)
+   \vfill
+   + <4->Exemplos
+     + Quantidade de faltas no acesso a memória cache
+     + Quantas instruções foram executadas
+   \vfill
+*** Complexidade no uso em uma aplicação paralela		    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: <5->
+    :END:
+** Rastreamento \normalsize (guiada por evento)
+
+   + Registrar dados significativos na forma de eventos datados
+   + \alert{Objetivo} de análise: reconstrução do comportamento original
+   \vfill
+   + <2->\alert{Funcionamento}
+     + Quando um ponto de geração de evento é atingido
+     + Um evento é criado e registrado em um arquivo de rastro
+   \vfill
+   + <3->Reconstrução do comportamento original
+     + Precisão, coerência e qualidade /versus/ intrusão
+** Rastreamento -- o que é um evento?
+   + Ocorrência de comportamento específico durante a execução
+   + <2->Contém
+     + Um tipo
+     + Uma data
+     + Informações adicionadas de acordo com o seu tipo
+   \vfill
+   + <3->Exemplos
+     + Início da execução de uma função
+     + Acesso ao um recurso de memória
+     + Envio de uma mensagem
+     + Liberação de um /lock/ (mutex)
+   \vfill
+*** Discussão: abrangência do rastreamento 			    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: <4->
+    :END:
+    + Abordagem mais genérica que as outras
+** Formas de rastreamento
+   /hardware/, /software/ e híbrido
+   \vfill
+   + <2->Por /hardware/
+     + Equipamentos especializados
+     + Falta de flexibilidade
+     + Baixa intrusão
+   + <3->Por /software/
+     + Dentro da aplicação ou em bibliotecas associadas
+     + Instruções extras embutidas
+   + <4->Híbrido
+     + Procura-se obter um bom equilíbrio entre os dois
+     + Eventos frequentes são registrados em /hardware/
+     + Menos frequentes e configuráveis em /software/
+   \vfill
+   + <5->Maioria das ferramentas \rightarrow rastreamento por /software/
+*** Complexidade no uso em uma aplicação paralela		    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: <6->
+    :END:
+** Qual a melhor técnica de coleta e registro?
+*** Amostragem, cronometragem, contagem, rastreamento? 		    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+   \vfill
+   + <2->Depende do nível de conhecimento que se pretende obter
+   + <3->Exemplos
+     + Panorama geral (sem alterar código) \rightarrow perfil por amostragem
+     + <4->Histograma temporal \rightarrow perfil por cronometragem
+       + Registrando o comportamento das funções suspeitas
+     + <5->Enriquecer com contadores de /hardware/ do processador
+       + Mesclando informações do nível da aplicação
+     + <6->Rastreamento investiga problemas de comunicação
+   \vfill
+   + <7->Escolha deve ser feita caso a caso
+     + Aplicação /versus/ sistema paralelo
+     + Suposição do analista e conhecimento prévio
+* Intervalo / Coffee-break
+**  
+   \vfill
+   \centering
+   \LARGE Intervalo \linebreak 
+   \small Coffee-break
+   \vfill
+* Técnicas para análise de desempenho
+**  
+   \vfill
+   \centering
+   \LARGE Técnicas para análise de desempenho
+   \vfill
+** Técnicas para análise de desempenho
+   + Lembrando as fases de análise
+     + Coleta / registro de comportamento
+     + Interpretação / análise do comportamento
+   \vfill
+   + <2->Inúmeras técnicas para a análise do comportamento
+     + Inspiradas e influenciadas pela forma da coleta
+   \vfill
+   + <3->Exemplos
+     + Análise através de índices estatísticos
+     + Construção de uma representação visual dos dados
+*** Variabilidade de técnicas de análise			    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: <4->
+    :END:
+    + Visão global de desempenho
+    + Análise local de desempenho
+** Objetivos da análise de desempenho
+   + Melhorar o desempenho da aplicação paralela
+     + Tempo de execução
+     + Aceleração
+     + Eficiência
+   + Aumentar a eficiência de utilização de recursos
+   \vfill
+   + <2->Outros objetivos?
+** Visão geral das técnicas de análise de desempenho
+   + Análise de perfis de execução
+   + Análise automática
+   + Análise por transformação de dados
+   + Análise interativa por visualização de rastros
+** Análise de perfis de execução
+   + Forma mais simples de ter uma ideia do desempenho
+   + <2->Funcionamento
+     + Amostragem / cronometragem
+     + Criação de um \alert{histograma}
+       + Quantidade de vezes detectada (amostragem)
+       + Tempo de execução (cronometragem)
+   \vfill
+   + <3->Histograma global /versus/ local
+     + Aplicação inteira / processos individuais
+   + <4->Lembrete: perfil condizente com a realidade
+     + Discussão sobre a frequência de coleta
+   + <5->Histograma baseado em dados de rastreamento
+** Análise automática
+   + Supercomputadores compostos de milhares de processadores
+     + Aplicações cada vez maiores
+   \vfill
+   + <2->Rastreamento e a grande quantidade de dados gerados
+     + \alert{Ondes3D}: propagação de ondas sísmicas em 3D
+       + 32p, execução de 50s , 100K eventos
+     + <3->\alert{LU.A.32}: Solver Lower-upper gauss-seidel
+       + 32p, 4.79s, cerca de 7 milhões de eventos (142 Mbytes)
+     + <4->\alert{Simulador de partículas}: BSP, implementação quadrática
+       + 32p, 6.26s, cerca de 200 milhões de eventos (2.5 Gbytes)
+   \vfill
+   + <5->Análise manual e interativa se torna difícil
+** Análise automática
+   + Detectar problemas de desempenho automaticamente
+   + <2->Funcionamento através de um \alert{programa de computador}
+     + Utiliza como entrada o registro de comportamento \linebreak
+       amostragem / cronometragem / contagem / \alert{rastros}
+       + Rastreamento é mais utilizada devido ao nível de detalhamento
+     + <3->Investiga problemas de desempenho (/\alert{data mining}/)
+     + <3->Apresenta os problemas identificados ao analista
+*** Escalabilidade						    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: <4->
+    :END:
+    + Uma quantidade maior de dados penaliza menos a análise
+    + <5->Mineração de dados pode ser paralelizada e distribuída
+** Análise automática -- padrões de desempenho ruim
+   + Problemas de desempenho devem ser previamente conhecidos
+   + <2->Um padrão de desempenho ruim deve conter
+     + Quantidade de processos envolvidos
+     + Qual o comportamento de cada processo (estados e variáveis)
+     + Estado das comunicações entre os processos
+   \vfill
+   + <3->Desvantagens
+     + Limitada aos padrões conhecidos
+     + Necessidade de se conhecer a semântica dos dados
+** Análise por transformações de dados
+   + Transformar os dados comportamentais coletados
+   \vfill
+   + <2->Razões para a transformação
+     + Reduzir o volume dos dados originais
+     + Necessidade de criação de (novas) métricas de desempenho
+   + <3->Alterar a natureza das métricas comportamentais
+     + Colocar em evidência características relevantes da aplicação
+   \vfill
+   + <4->\alert{Exemplo}
+     + Aplicação de larga escala
+       + Muitos processos com comportamento semelhante
+     + <5->\alert{Agrupar} comportamento semelhantes
+** Análise por transformações de dados
+   + Melhor aplicada em dados oriundos do rastreamento
+     + Mais detalhes, estado da aplicação, do sistema
+     + Maiores possibilidades de transformação
+   \vfill
+   + <2->Duas abordagens
+     + \alert{Agregação}
+       + Operadores de agregação para redução dos dados
+     + \alert{Agrupamento} (/clustering/)
+       + Agrupar o comportamento por semelhança
+** Análise por transformação de dados -- agregação
+   + Utilização de operadores de agregação
+     + Média, Max, Min, Soma, Subtração, ...
+   + <2->\alert{Objetivo}
+     + Agregar o comportamento de um conjunto de processos
+     + Obter um valor que representa o comportamento do conjunto
+   \vfill
+   + <3->Dados de amostragem / cronometragem
+     + Feita diretamente sobre os perfis de execução obtidos
+   + <4->Dados de rastreamento
+     + Integração temporal sobre variáveis e métricas de um processo
+     + Integração espacial sobre vários processos da aplicação
+     + Ambas
+** Análise por transformação de dados -- agrupamento
+   + Procura por comportamentos similares
+     + Utilizando uma ou mais métricas disponíveis
+   + <2->Escolhe-se um processo representativo
+     + Minimizando as diferenças entre ele o os outros do grupo
+   \vfill
+   + <3->Amostragem / cronometragem
+     + Perfis semelhantes de execução
+   + <4->Rastreamento
+     + Comportamento semelhante ao longo do tempo
+     + Reduz a complexidade da análise
+** Análise por transformação de dados
+   + Vantagens (sumário)
+     + Reduz a complexidade, o volume dos dados
+     + Permite definir uma nova visão sobre o comportamento
+   \vfill
+*** Desvantagens						    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: <2->
+    :END:
+     + Agregação
+       + Suavização demasiada do comportamento heterogêneo
+     + Agrupamento
+       + Processo representativo muito diferente da média do grupo
+** Análise por visualização de rastros
+   + Criar uma representação visual dos dados comportamentais
+     + Interatividade
+   + Se apoia sobre a experiência do analista
+   \vfill
+   + <2->Exemplo de visualização espaço/tempo
+     #+begin_center
+     [[./sweep3d-l3.png]]
+     #+end_center
+** Análise por visualização de rastros -- categorias
+   + Técnicas de visualização comportamental
+     + Espaço / tempo (gráficos de Gantt)
+     + Eixo vertical, eixo horizontal
+     + Eventual organização hierárquica no espaço
+     + \alert{Pontos fortes}
+       + Ênfase na causalidade entre eventos
+       + Análise de desempenho de grão fino
+   + <2->Técnicas estruturais
+     + Evidenciam a estrutura da aplicação ou do sistema
+     + Correlacionam o comportamento da aplicação
+     + Independentes da linha do tempo
+       + Valores instantâneos ou agregados temporalmente
+   + <3->Técnicas estatísticas
+     + Gráficos estatísticos de dispersão
+     + Duas ou mais variáveis correlacionadas
+** Análise de visualização de rastros
+   Exemplo de técnica estrutural
+   #+BEGIN_CENTER
+   [[./g5k_2ap_1Kt-2Kt_1E12_1E6-1E5__50+10__all.pdf]]
+   #+END_CENTER
+** Análise de visualização de rastros
+   + Vantagens (sumário)
+     + Representação visual
+     + Interatividade
+     + Experiência do analista
+   \vfill
+   + <2->Desvantagens
+     + Escalabilidade (análise manual, limitação técnica)
+     + Necessidade de combinar com outras técnicas
+       + Transformação de dados / análise automática
+** Qual a melhor técnica de análise?
+*** Perfis, automática, transformação, visualização? 		    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+    \vfill
+    + <2->Depende do tipo do problema de desempenho
+    + <3->Técnicas de análise são complementares
+      + Perfis \rightarrow Visualização de rastros
+      + Combinação diversa de técnicas
+	+ Global /versus/ local
+* Ferramentas e bibliotecas
+**  
+   \vfill
+   \centering
+   \LARGE Ferramentas e bibliotecas \linebreak
+   \normalsize apresentação não exaustiva
+   \vfill
+** Visão geral de ferramentas e bibliotecas
+   + Coleta e registro
+     + Score-P
+     + TAU
+     + EZTrace
+     + Akypuera
+     + SimGrid
+   + Análise
+     + Vampir
+     + Scalasca
+     + Vite
+     + PajéNG
+     + Viva
+** Score-P
+   + /Scalable Performance Measurement Infrastructure for Parallel Codes/
+     + Focado em aplicações paralelas MPI
+     + http://www.score-p.org/
+   + Desenvolvido por
+     + German BMBF project SILC
+     + US DOE project PRIMA
+     + Consórcio de laboratórios europeus e americanos
+   + <2->Implementa várias técnicas de coleta
+     + Rastreamento (com o formato OTF2)
+     + Geração de perfis de execução (com o formato CUBE3)
+** TAU
+   + /Tuning and Analysis Utilities/
+     + Suporta várias linguagens (Fortran, C, C++, Java, Python)
+     + http://www.cs.uoregon.edu/research/tau/
+   + Desenvolvido por
+     + Universidade do Oregon (Estados Unidos)
+   + <2->Implementa
+     + Rastreamento (formato próprio)
+     + Amostragem
+   + <3->Colaboração com o projeto Score-P
+** EZTrace
+   + /EZTrace/ -- easy to use trace generator
+     + Focado em aplicações MPI e OpenMP
+     + http://eztrace.gforge.inria.fr/
+   + Desenvolvido na França
+   + Implementa rastreamento
+     + Exporta rastros em Pajé e OTF
+   + Extensível (novos tipos de eventos)
+   + Interceptação dinâmica
+** Akypuera
+   + /Akypuera/ (rastro em guarani)
+     + Desenvolvido em Porto Alegre, foco em aplicações MPI
+     + https://github.com/schnorr/akypuera
+   + Utiliza a /librastro/ (formato binário conciso)
+   + Conversores de TAU, OTF, OTF2 para Pajé
+** SimGrid
+   + /SimGrid/ -- Versatile Simulation of Distributed Systems
+     + Desenvolvido na França
+     + http://simgrid.gforge.inria.fr/
+   + Módulo de rastreamento
+** Vampir
+   + Ferramenta comercial oriunda de laboratório de pesquisa
+     + TU-Dresden, Germany
+     + http://vampir.eu/
+   + Visualização de rastros, perfis de execução, agrupamento
+   + Altamente escalável com distribuição
+   #+BEGIN_CENTER
+   [[./vampir-18-121002-Nagel-CEA-Toools12.pdf]]
+   #+END_CENTER
+** Scalasca
+   + Scalasca
+     + Forschungszentrum Jülich (Alemanha)
+     + http://www.scalasca.org/
+   + Análise automática, perfis de execução
+     + Algoritmos de mineração de dados
+     + Uma centena de padrões de desempenho ruim
+   + Formato CUBE4 (gerado por Score-P)
+** Vite
+   + Vite
+     + Desenvolvido pelo INRIA Bordeaux
+     + http://vite.gforge.inria.fr/
+   + Visualização de rastros
+     + Formato Pajé e OTF
+   #+BEGIN_CENTER
+   [[./vite_macosx_trace.png]]
+   #+END_CENTER
+** PajéNG
+   + PajéNG
+     + Desenvolvido em Porto Alegre
+     + https://github.com/schnorr/pajeng
+     + Reimplementação em C++ do Pajé original (http://paje.sf.net)
+   + Visualização comportamental de rastros
+     + pajeng, pj\_dump
+   + Utiliza exclusivamente o formato Pajé
+     + Exporta para formato CSV
+** Viva
+   + Viva
+     + Desenvolvido em Porto Alegre
+     + https://github.com/schnorr/viva
+   + Visualização estrutural, agregação espaço-temporal
+     + Topologia da rede (posicionamento dinâmico)
+     + Treemaps
+   + Simbiose com rastros gerados pelo SimGrid
+   #+BEGIN_CENTER
+   \includegraphics[height=1.3cm]{./synthetic/large-scale_2.pdf}\hfill
+   \includegraphics[height=1.3cm]{./synthetic/large-scale_3.pdf}\hfill
+   \includegraphics[height=1.3cm]{./synthetic/large-scale_4.pdf}\hfill
+   \includegraphics[height=1.3cm]{./synthetic/large-scale_5.pdf}
+   #+END_CENTER
+* Conclusão e discussão
+**  
+   \vfill
+   \centering
+   \LARGE Conclusão e discussão
+   \vfill
+** Conclusão
+   + Desenvolvimento de aplicações paralelas de alto desempenho \linebreak
+     \rightarrow Tarefa complexa
+   \vfill
+   + Análise de desempenho
+     + Etapa crucial no desempenho de aplicações de alto desempenho
+       + Portabilidade
+     + Processo cíclico
+       + Execução e coleta, seguidas por análise
+** Discussão
+   + Como utilizar estes conceitos na prática?
+   + Dificuldades possíveis?
