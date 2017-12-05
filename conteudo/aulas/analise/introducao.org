@@ -22,7 +22,7 @@
 + [[./apresentacao.org][Análise de Desempenho: do experimento até a visualização]]
   + Introdução do livro de Raj Jain 1991
 
-+ Análise de Desempenho de Programas Paralelos
++ [[./analise-desempenho.org][Análise de Desempenho de Programas Paralelos]]
   + Análise de Desempenho de Programas Paralelos. Lucas Mello
     Schnorr. Short course ERAD/RS 2014. Alegrete, RS.
 
