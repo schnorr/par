@@ -32,8 +32,9 @@ disciplina, podem variar em abrangência e profundidade.
 | OpenMP  | [[./aulas/openmp/topicos.org][Tópicos de pesquisa]]                   |         8 |
 | OpenMP  | Prática em laboratório #1: PI         |         9 |
 | OpenMP  | Prática em laboratório #2: VADD GPU   |        10 |
+| Análise | Introdução a Análise de Desempenho    |        11 |
 | StarPU  | Introdução, DAG                       |           |
-| Análise | Introdução a Análise de Desempenho    |           |
+
 
 ** Arquitetura
 
