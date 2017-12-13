@@ -1,0 +1,141 @@
+#+LATEX_HEADER: \usepackage[utf8]{inputenc}
+#+TITLE: Introduction to High Performance Computing
+#+AUTHOR: Lucas Mello Schnorr and Philippe Olivier Alexandre Navaux
+#+OPTIONS: toc:nil
+#+LATEX_HEADER: \usepackage[utf8]{inputenc}
+#+LATEX_HEADER: \usepackage[T1]{fontenc}
+#+LATEX_HEADER: \usepackage[portuguese]{babel}
+#+LATEX_HEADER: \usepackage[margin=1cm]{geometry}
+
+* Semestre
+
+Uma edição por ano, em /1.
+
+Primeira edição em 2018/1.
+
+* Código: CMPXXX
+
+A ser definido pelo PPGC.
+
+* Nome da Disciplina
+
+Introduction to High Performance Computing.
+
+Site da disciplina: https://github.com/schnorr/par/
+
+* Quantidade de créditos
+
+4
+
+* Carga Horária
+
+60 horas-aula
+
+* Responsável
+
+Lucas Mello Schnorr
+Philippe Olivier Alexandre Navaux
+
+* Súmula
+
+Parallel Algorithms (domain decomposition);
+Tools for Parallel Programming (MPI, OpenMP, ...)
+Parallel Programming Models;
+Superscalar architectures;
+Vector and multi/many-core processors;
+
+* Objetivo
+
+The aim of this course is to present a general introduction to High
+Performance Computing, including architectural details of modern
+supercomputing platforms and how to efficiently program them using
+traditional and innovative programming models. Every lecture is backed
+up with practical sessions and worked out examples using the
+supercomputing infrastructure of the research group.
+
+* Conteúdo Programático
+
+| Sector      | Description                                  |
+|-------------+----------------------------------------------|
+| Geral       | Apresentação da disciplina                   |
+| Geral       | Introdução geral                             |
+| Geral       | Supercomputadores                            |
+| Geral       | Programando supercomputadores?               |
+| Modelos     | Resolvendo em Paralelo                       |
+| Modelos     | Decomposição e Balanceamento                 |
+| Modelos     | Prática em laboratório #1                    |
+| MPI         | Introdução                                   |
+| MPI         | Operações ponto a ponto                      |
+| MPI         | SimGrid's SMPI                               |
+| MPI         | Prática em laboratório #2                    |
+| MPI         | Operações coletivas                          |
+| MPI         | Operações assíncronas, modos de envio        |
+| MPI         | Prática em laboratório #3                    |
+| MPI         | Topologias virtuais                          |
+| MPI         | Processos dinâmicos                          |
+| MPI         | Tópicos de pesquisa                          |
+| OpenMP      | Introdução                                   |
+| OpenMP      | Prática em laboratório #4                    |
+| OpenMP      | Algoritmos de escalonamento                  |
+| OpenMP      | Compartilhamento de Variáveis                |
+| OpenMP      | Paralelismo de tarefas                       |
+| OpenMP      | Prática em laboratório #5                    |
+| OpenMP      | Sincronização                                |
+| OpenMP      | Tópicos de pesquisa                          |
+| OpenMP      | Prática em laboratório #6                    |
+| Análise     | Introdução                                   |
+| Análise     | Do experimento até a visualização            |
+| Análise     | Prática em laboratório #7                    |
+| Análise     | Análise de Desempenho de Programas Paralelos |
+| Análise     | Prática em laboratório #8                    |
+| StarPU      | Introdução, DAG                              |
+| StarPU      | Prática em laboratório #9                    |
+| Arquitetura | Introdução Exascale                          |
+| Arquitetura | Revisão Pipeline                             |
+| Arquitetura | Superescalar                                 |
+| Arquitetura | Stream Processing                            |
+| Arquitetura | Gerenciamento de desvios                     |
+| Arquitetura | Dependências e Escalonamento                 |
+| Arquitetura | Superpipeline e VLIW                         |
+| Arquitetura | Arquiteturas Multithread                     |
+| Arquitetura | Multicore                                    |
+| Arquitetura | Virtualização                                |
+| Arquitetura | Interconexão                                 |
+| Arquitetura | Arquitetura SIMD                             |
+
+* Método de Trabalho / Horário
+
+Terças e Quintas, 10h30 às 12h10.
+
+A carga horária é dividida da seguinte forma: 50% teórico com
+encontros expositivos; e 50% prático em laboratório utilizando os
+recursos computacionais do grupo.
+
+* Bibliografia
+
+Principal
+
+- Casanova and Legrand and Robert. Parallel Algorithms.
+- Jajá. An Introduction to Parallel Algorithms.
+- Foster. Designing and building parallel programs.
+
+Auxiliar
+
+- HWANG, K., FAYE, A. B. Computer Architecture and Paralel Processing. McGraw-Hill, 1984.
+- STONE, H. S. High Performance Computer Architecture. Addison Wesley, 1987.
+- PATTERSON, HENNESSY. Computer Architecture: a Quantitative Approach. Morgan Kaufmann, 1995.
+- HWANG, K. Advanced Computer Architecture: Parallism, Scalability, Programmability. McGraw Hill, 1993
+- BAL, H. E. Programming Distributed Systems. Prentice Hall, 1990.
+- SILBERSCHATZ, A., PETERSON, J. L., GALVIN, P. B. Operating Systems Concepts. Addison-Wesley, 1992.
+- TANENBAUM, A. S. Modern Operating Systems. Prentice Hall, 1992.
+- FOSTER, I. Designing and Building Paralllel Programs. Addison Weley, 1995.
+- JAJA, Joseph. An Introduction to Parallel Algorithms. Addison Weley, 1992.
+
+Pontual
+
+- Artigos selecionados.
+
+* Aluno Especial
+
+Permite a inscrição de qualquer aluno não matriculado no PPGC a
+frequentar as aulas mediante matrícula como aluno especial.
