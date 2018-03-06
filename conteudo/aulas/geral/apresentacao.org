@@ -6,7 +6,7 @@
 #+EXPORT_EXCLUDE_TAGS: noexport
 #+EXPORT_SELECT_TAGS: export
 
-#+Title: Apresentação da Disciplina CMP134
+#+Title: Apresentação da Disciplina
 #+Author: Prof. Lucas M. Schnorr (UFRGS)
 #+Date: \copyleft
 
@@ -61,15 +61,12 @@ Em campo
 
 Em dúvidas
 - [[https://github.com/schnorr/par/issues][Abra uma Issue no Github]]
-- Envie um e-mail para o professor
+- Envie um e-mail, e converse com o professor
 * Avaliação
 + 50%: trabalho sobre arquitetura (com Prof. Navaux)
 + 50%: trabalho sobre programação (com Prof. Lucas)
-  + Escolher um problema
-  + Paralelizar o problema escolhido
-    + Relatório + Código + Avaliação de desempenho
 \vfill
-+ Exemplos de problemas
++ Exemplos de problemas (para prog.)
   + Cálculo do PI
   + Ordenação
   + Make distribuído
