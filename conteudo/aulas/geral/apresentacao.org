@@ -63,18 +63,9 @@ Em dúvidas
 - [[https://github.com/schnorr/par/issues][Abra uma Issue no Github]]
 - Envie um e-mail, e converse com o professor
 * Avaliação
-+ 50%: trabalho sobre arquitetura (com Prof. Navaux)
-+ 50%: trabalho sobre programação (com Prof. Lucas)
-\vfill
-+ Exemplos de problemas (para prog.)
-  + Cálculo do PI
-  + Ordenação
-  + Make distribuído
-  + Casamento de padrões
-  + Compressão de dados (gzip, MP3, MPEG)
-  + Computação com grafos
-  + Operações sobre matrizes
-  + ...
++ Um único trabalho na área de interesse do aluno
+  + Envolve a redação de um artigo a ser submetido
++ Mini-trabalhos de programação ao longo do semestre
 * Cronograma preliminar de aulas (Programação)
 - Introdução (2 - 3)
 - MPI (3 - 4)
@@ -82,6 +73,6 @@ Em dúvidas
 - Análise de desempenho (1 - 2)
 - StarPU (1 - 2)
 - Análise de dados (1 - 2)
-\vfill
+#+Latex: \vfill
 - Algumas aulas em laboratório
   - Parte do trabalho a ser realizado durante estas aulas
