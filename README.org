@@ -16,7 +16,7 @@
 #+CREATOR: <a href="http://www.gnu.org/software/emacs/">Emacs</a> 25.2.2 (<a href="http://orgmode.org">Org</a> mode 9.0.1)
 #+LATEX_HEADER:
 
-* Introdução ao Proc. Paralelo e Distribuído (CMP134)
+* Introduction to High Performance Computing (CMP270)
 
 #+begin_html
 <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="img/88x31.png" /></a>
@@ -39,22 +39,12 @@ com o objetivo de melhorar o aprendizado da disciplina.
 
 ** Plano e Cronograma
 
-- Veja a [[http://www.inf.ufrgs.br/ppgc/disciplinas/lista-de-disciplinas/cmp134/][Súmula da disciplina]].
+- Veja a [[http://www.inf.ufrgs.br/ppgc/disciplinas/lista-de-disciplinas/cmp270/][Súmula da disciplina]]
+- [[./cronograma/index.org][Cronograma]] (Edição 2018/1, Terças e Quintas, 10:30 – 12:10)
 
-- [[./cronograma/index.org][Cronograma]] (ainda por ser definido)
-  - Edição 2017/2 - Turma Única
-  - Terças e Quintas, 10:30 – 12:10
-
-** Principal
+** Elementos Pedagógicos
 
 - [[./conteudo/README.org][Acesse o conteúdo da disciplina]]
-  - Aulas
-  - Exercícios
-  - Leituras para discussão
-
-** Projeto
-
-Aguarde
 
 ** Bibliografia
 
