@@ -84,8 +84,8 @@ Baseado no rank, cada processo pode
 
 * Seis operações básicas de MPI
 - =MPI_Init= (&argc, &argv)
-- =MPI_Comm_rank= (&rank, comunicador)
-- =MPI_Comm_size= (&p, comunicador)
+- =MPI_Comm_rank= (comunicador, &rank)
+- =MPI_Comm_size= (comunicador, &p)
 - =MPI_Send= (...)
 - =MPI_Recv= (...)
 - =MPI_Finalize= ()
