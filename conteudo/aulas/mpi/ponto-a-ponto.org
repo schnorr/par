@@ -97,12 +97,12 @@ int main(int argc, char* argv[]) {
 
    printf("Comeca %d\n",r);
 
-   if (r==0) {
+   if (r == 0) {
       dado = 3.14 ;
       printf("Processo 0 manda uma mensagem a 1\n");
       MPI_Send(&dado, 1, MPI_DOUBLE, 1, tag1, MPI_COMM_WORLD);
       dado = 0;
-   } else if (r==1) {
+   } else if (r == 1) {
       printf("Processo %d - Vai receber uma mensagem de 0 (dado eh %f)\n", r, dado);
       MPI_Recv(&dado, 1, MPI_DOUBLE, 0, tag1, MPI_COMM_WORLD, &stat);
       printf("Processo %d - O dado recebido vale %.2lf\n", r, dado);
