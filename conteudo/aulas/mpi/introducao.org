@@ -62,7 +62,8 @@ Conferências internacionais
 
 Ao executar o programa:
 #+BEGIN_EXAMPLE
-mpirun -NP 64 ./binario_do_programa
+mpicc x.c -o ./binario_do_programa
+mpirun -machinefile arquivo -np 64000 ./binario_do_programa 1 2
 #+END_EXAMPLE
 
 No lançamento do programa
