@@ -123,11 +123,9 @@ mpirun -np 2 ./exemplo_completo
 #+RESULTS:
 : Comeca 0
 : Processo 0 manda uma mensagem a 1
-: Comeca 2
-: Termina 2
 : Comeca 1
-: Termina 0
 : Processo 1 - Vai receber uma mensagem de 0 (dado eh -1.000000)
+: Termina 0
 : Processo 1 - O dado recebido vale 3.14
 : Termina 1
 
