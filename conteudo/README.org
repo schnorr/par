@@ -70,5 +70,5 @@ disciplina, podem variar em abrangência e profundidade.
 
 * Tarefas
 
-- Completar o Tópico #1 até a Atividade #2
+- Completar o Tópico #1 do /hands-on/
   - [[https://simgrid.github.io/SMPI_CourseWare/topic_basics_of_distributed_memory_programming/julia_set/][SMPI CourseWare]]
