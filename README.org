@@ -45,7 +45,14 @@ com o objetivo de melhorar o aprendizado da disciplina.
 ** Elementos Pedagógicos
 
 - [[./conteudo/README.org][Acesse o conteúdo da disciplina]]
-
+- Trabalho final da disciplina
+  - Data limite da definição de problemas: 24/04
+  - [[http://github.com/schnorr/ieeeorg/][Template Recomendado]]
+  - Entregar
+    - Title
+    - Introduction
+    - Related Work
+    - Schedule (finish by 14/06)
 ** Bibliografia
 
 - Casanova and Legrand and Robert. Parallel Algorithms.
