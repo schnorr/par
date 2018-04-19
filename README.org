@@ -53,6 +53,9 @@ com o objetivo de melhorar o aprendizado da disciplina.
     - Introduction
     - Related Work
     - Schedule (finish by 14/06)
+  - No dia 24/04, apresentações de 5 minutos por grupo
+    - Em poucos slides, apresentar o problema
+    - Qual a ideia do trabalho, potencial de se tornar artigo
 ** Bibliografia
 
 - Casanova and Legrand and Robert. Parallel Algorithms.
