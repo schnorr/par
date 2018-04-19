@@ -93,9 +93,8 @@ MPI_Bcast (dados, n, MPI_DOUBLE, RAIZ, MPI_COMM_WORLD);
      //...
      if (rank == mestre){
        rbuf = malloc (p*10*sizeof double);
-     }else{
-       sbuf = malloc (10*sizeof double);
      }
+     sbuf = malloc (10*sizeof double);
      MPI_Gather (sbuf, 10, MPI_DOUBLE, //envio
                  rbuf, 10, MPI_DOUBLE, //recepção
                  mestre, MPI_COMM_WORLD);
