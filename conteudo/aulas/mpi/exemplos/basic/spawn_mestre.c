@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
  
   //choose_worker_program(worker_program); 
-  snprintf (worker_program, 100, "trabalhador");
+  snprintf (worker_program, 100, "./trabalhador");
   MPI_Comm_spawn(worker_program, MPI_ARGV_NULL, 10,  
 		 MPI_INFO_NULL, 0, MPI_COMM_SELF, &everyone,  
 		 MPI_ERRCODES_IGNORE); 
@@ -23,9 +23,8 @@ int main(int argc, char *argv[])
    * "everyone". 
    */
 
-  printf ("%d: pai terminando\n", rank);
-  MPI_Finalize();
-  return 0;
+  /* MPI_Finalize(); */
+  /* return 0; */
   
   MPI_Barrier (everyone);
   
@@ -34,7 +33,7 @@ int main(int argc, char *argv[])
     MPI_Send (&i, 1, MPI_INT, i, 123456, everyone);
   }
 
-
+  printf ("%d: pai terminando\n", rank);
 
   MPI_Finalize(); 
   return 0; 

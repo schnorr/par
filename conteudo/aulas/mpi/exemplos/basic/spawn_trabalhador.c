@@ -25,16 +25,21 @@ int main(int argc, char *argv[])
    */
 
   printf ("%d: Oi\n", rank);
-  /* MPI_Barrier (parent); */
+  MPI_Barrier (parent);
 
-  /* int buffer; */
-  /* MPI_Status status; */
-  /* MPI_Recv (&buffer, 1, MPI_INT, 0, 123456, parent, &status); */
+  int buffer;
+  MPI_Status status;
+  MPI_Recv (&buffer, 1, MPI_INT, 0, 123456, parent, &status);
 
-  /* printf ("%d: Recebi o dado %d do pai\n", rank, buffer); */
+  printf ("%d: Recebi o dado %d do pai\n", rank, buffer);
 
   MPI_Barrier (MPI_COMM_WORLD);
+
+  printf("filho terminou\n");
   
-  MPI_Finalize(); 
+  MPI_Finalize();
+
+  printf("filho terminou mesmo\n");
+
   return 0; 
 } 

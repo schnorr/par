@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 
   printf ("oi %s\n",parametros[0]);
   
-  MPI_Comm_spawn("fib", parametros, 1,  
+  MPI_Comm_spawn("./fib", parametros, 1,  
 		 MPI_INFO_NULL, 0, MPI_COMM_SELF, &everyone,  
 		 MPI_ERRCODES_IGNORE); 
 
