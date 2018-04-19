@@ -1,0 +1,20 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Resolução de SUDOKU por força bruta
+
+Para ser paralelizado preferencialmente com paralelismo de
+tarefas. Implemente a versão paralela com /backtracking/, onde a cada
+nível uma nova tarefa é criada, de maneira recursiva.
+
+Consulte os slides sobre o método:
+- http://openmp.org/wp-content/uploads/sc15-openmp-CT-MK-tasking.pdf
+
+Wikipedia:
+- https://en.wikipedia.org/wiki/Sudoku_solving_algorithms#Brute-force_algorithm
+
+Implementações sequenciais recursivas:
+- https://gist.github.com/bopbi/c9f94b1b981b84bcb02b
+- https://github.com/mattrajca/sudoku-solver

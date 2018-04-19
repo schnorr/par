@@ -1,0 +1,16 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Placa Aquecida
+
+Consulte o código sequencial em C disponível:
+- https://people.sc.fsu.edu/~jburkardt/c_src/heated_plate/heated_plate.html
+
+Link direto para o código fonte (C, sequencial):
+- https://people.sc.fsu.edu/~jburkardt/c_src/heated_plate/heated_plate.c
+
+Realize a paralelização do programa.
+
+Procure verificar qual parte do programa é mais custosa.
