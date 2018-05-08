@@ -45,8 +45,6 @@
      + Sistemas Distribuídos
      + Análise de Desempenho
      + Visualização de Rastros
-   + Ferramentas: PajeNG, Viva, SimGrid, Akypuera, Poti, Tupi
-   + Professor de Compiladores e MLP
    + Contato
      + UFRGS, Prédio 43425, Sala 202
      + \murl{http}{www.inf.ufrgs.br/$\sim$schnorr/}
