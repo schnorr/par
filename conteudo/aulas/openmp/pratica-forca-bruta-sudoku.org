@@ -18,3 +18,4 @@ Wikipedia:
 Implementações sequenciais recursivas:
 - https://gist.github.com/bopbi/c9f94b1b981b84bcb02b
 - https://github.com/mattrajca/sudoku-solver
+
