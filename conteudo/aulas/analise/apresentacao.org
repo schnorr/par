@@ -77,22 +77,22 @@
    \vfill
    + <4->Técnica conhecida como \alert{jogos da razão}
 ** O Livro
-*** 							 :B_alertblock:BMCOL:
+*** 
     :PROPERTIES:
     :BEAMER_env: alertblock
     :BEAMER_col: 0.4
     :END:
     \includegraphics[width=\linewidth]{./img/raj.pdf}
-*** 							 :B_alertblock:BMCOL:
+*** 
     :PROPERTIES:
     :BEAMER_env: alertblock
     :BEAMER_col: 0.6
     :END:
-   + Técnicas e ferramentas de medição
-   + Teoria probabilística e estatística
-   + Análise e projeto experimental
-   + Simulação
-   + Modelos de filas
+  + Técnicas e ferramentas de medição
+  + Teoria probabilística e estatística
+  + Análise e projeto experimental
+  + Simulação
+  + Modelos de filas
 * Experimentos
 ** 
    \vfill
@@ -185,7 +185,7 @@
 ** Ferramentas de análise e visualização
    + It's all there \rightarrow http://github.com/schnorr/
      + GPL!
-     + Viva, PajeNG, Akypuera, Poti and friends
+     + StarVZ, PajeNG, Akypuera, Poti and friends
    + Esforço de institucionalização
 * Conclusão
 ** Qual a proposta? \small Conclusão
