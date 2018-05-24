@@ -20,3 +20,4 @@
 * Introdução
 
 - Veja este site: https://developer.nvidia.com/cuda-education
+  - Introduction to CUDA C (by Mark Harris)
