@@ -4,7 +4,7 @@
 PCAD is here:
 http://gppd-hpc.inf.ufrgs.br/
 
-Slurm script
+Slurm script as registered in [[./hello.slurm]].
 
 #+BEGIN_SRC bash :tangle hello.slurm
 #!/bin/bash
@@ -49,3 +49,32 @@ mpirun \
 	-machinefile $MACHINEFILE \
 	./hello
 #+END_SRC
+
+Steps to use it:
+1. Copy this file to the gppd-hpc frontend
+   #+BEGIN_SRC bash
+   scp hello.slurm gppd-hpc.inf.ufrgs.br:.
+   #+END_SRC
+2. Connect to the frontend
+   #+BEGIN_SRC bash
+   ssh gppd-hpc.inf.ufrgs.br
+   #+END_SRC
+3. Submit the script and take note of the JobID
+   #+BEGIN_SRC bash
+   sbatch hello.slurm   
+   #+END_SRC
+4. Assuming your JobId is 58876, verify the contents of the file
+   #+BEGIN_SRC bash
+   cat nodes.58876
+   #+END_SRC
+5. Then, check the stdout log
+   #+BEGIN_SRC bash
+   cat draco.slurm_58876.out
+   #+END_SRC
+6. Make sure you have something that looks like this
+   #+BEGIN_EXAMPLE
+   ...
+   Oi pessoal, do processo 19 dentro de 80!
+   Oi pessoal, do processo 76 dentro de 80!
+   ...
+   #+END_EXAMPLE
