@@ -78,3 +78,124 @@ Steps to use it:
    Oi pessoal, do processo 76 dentro de 80!
    ...
    #+END_EXAMPLE
+** MPI + Mandelbrot Problem
+
+All code in this section is inspired from:
+- http://rosettacode.org/wiki/Mandelbrot_set
+- and [[https://gist.githubusercontent.com/andrejbauer/7919569/raw/258d9ec48ee2f676f0104f496c489eb9e64dca19/mandelbrot.c][this GIST]]
+
+Let's use the Mandelbrot problem to observe the *load imbalance among
+homogeneous cores* in multiple machines of the PCAD platform. The
+ultimate goal is to create a parallel computer program based on MPI
+where the maestro defines many mandelbrot coordinates that are
+distributed equaly among players. Each player then compute the
+coordinates it received from the maestro, and send back the results so
+the mandelbrot image can be reconstructed. These are the steps in this
+tutorial:
+
+1. Understand how to compute one mandelbrot point
+2. Understand how to compute many mandelbrot coordinates
+3. Implement a MPI application
+   - Maestro distributes these coordinates among players
+   - Player receive coordinates, computes, send results back to the maestro
+4. Run the experiment in the PCAD platform
+5. Trace the behavior of the MPI application using [[https://github.com/schnorr/akypuera/][akypuera]].
+6. Compute and visualize the load of each entity (maestro and players)
+
+*** Step #1: Compute one Mandelbrot point
+
+Each (x,y) mandelbrot coordinate is computed as follows:
+
+ #+BEGIN_SRC C
+int compute_mandelbrot_point (double x, double y, int maxiter)
+{
+  int k; /* Iteration counter */
+  double u = 0.0;
+  double v = 0.0;
+  double u2 = u * u;
+  double v2 = v * v;
+  /* iterate the point */
+  for (k = 1; k < maxiter && (u2 + v2 < 4.0); k++) {
+    v = 2 * u * v + y;
+    u = u2 - v2 + x;
+    u2 = u * u;
+    v2 = v * v;
+  }
+  return k;
+}
+ #+END_SRC
+
+*** Step #2: Compute many mandelbrot coordinates
+
+#+begin_src C :results output :session :exports both
+const double xmin = 0.27085;
+const double xmax = 0.27100;
+const double ymin = 0.004640;
+const double ymax = 0.004810;
+const int maxiter = 1000;
+const int xres = 1024;
+const int yres = (xres*(ymax-ymin))/(xmax-xmin);
+
+/* Precompute pixel width and height. */
+double dx=(xmax-xmin)/xres;
+double dy=(ymax-ymin)/yres;
+
+/* Coordinates of the current point in the complex plane. */
+double x, y; 
+/* Pixel counters */
+int i,j;
+/* Coordinate Position counter */
+int p = 0;
+
+/* Vectors to keep x and y mandelbrot coordinates */
+double xs[xres*yres];
+double ys[xres*yres];
+
+for (j = 0; j < yres; j++) {
+  y = ymax - j * dy;
+  for(i = 0; i < xres; i++) {
+    x = xmin + i * dx;
+    xs[p] = x;
+    ys[p] = y;
+    p++;
+  }
+}
+printf ("%d points created.\n", p-1);
+#+END_SRC
+
+#+RESULTS:
+
+
+*** Step #3: Implement a MPI application
+
+#+BEGIN_SRC C
+#include <mpi.h>
+#include <stdio.h>
+
+int main (int argc, char **argv) {
+  int NP, rank;
+  MPI_Init (&argc, &argv);
+  MPI_Comm_size (MPI_COMM_WORLD, &NP);
+  MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+
+  if (rank == 0) {
+    /* Maestro code */
+  }else{
+    /* Player code */
+  }
+  MPI_Finalize ();
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+
+Run some local tests with =mpicc= and =mpirun=.
+
+*** Step #4: Run the experiment in the PCAD platform
+
+See section "MPI + Slurm in PCAD" (above) on how to prepare your SLURM
+script to make it work there.
+
+*** Step #5: Trace the behavior of the MPI application
+*** Step #6: Compute and visualize the load of maestro/players
