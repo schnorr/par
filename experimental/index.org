@@ -106,7 +106,8 @@ tutorial:
 
 Each (x,y) mandelbrot coordinate is computed as follows:
 
- #+BEGIN_SRC C
+#+BEGIN_SRC C :tangle compute_one_mandelbrot_point.c :main no
+#include <stdio.h>
 int compute_mandelbrot_point (double x, double y, int maxiter)
 {
   int k; /* Iteration counter */
@@ -123,54 +124,70 @@ int compute_mandelbrot_point (double x, double y, int maxiter)
   }
   return k;
 }
- #+END_SRC
+#+END_SRC
 
 *** Step #2: Compute many mandelbrot coordinates
 
-#+begin_src C :results output :session :exports both
-const double xmin = 0.27085;
-const double xmax = 0.27100;
-const double ymin = 0.004640;
-const double ymax = 0.004810;
-const int maxiter = 1000;
-const int xres = 100;
-const int yres = (xres*(ymax-ymin))/(xmax-xmin);
+#+begin_src C :results output :session :exports both :tangle compute_mandelbrot_coordinates.c :main no
+void compute_mandelbrot_coordinates (
+  const double xmin,
+  const double xmax,
+  const double ymin,
+  const double ymax,
+  const int maxiter,
+  const int xres,
+  const int yres,
+  double *xs, // vector of x coordinates
+  double *ys  // vector of y coordinates
+  )
+{
+  /* Precompute pixel width and height. */
+  double dx=(xmax-xmin)/xres;
+  double dy=(ymax-ymin)/yres;
 
-/* Precompute pixel width and height. */
-double dx=(xmax-xmin)/xres;
-double dy=(ymax-ymin)/yres;
+  /* Coordinates of the current point in the complex plane. */
+  double x, y; 
+  /* Pixel counters */
+  int i,j;
 
-/* Coordinates of the current point in the complex plane. */
-double x, y; 
-/* Pixel counters */
-int i,j;
-/* Coordinate Position counter */
-int p = 0;
-
-/* Vectors to keep x and y mandelbrot coordinates */
-double xs[xres*yres];
-double ys[xres*yres];
-
-for (j = 0; j < yres; j++) {
-  y = ymax - j * dy;
-  for(i = 0; i < xres; i++) {
-    x = xmin + i * dx;
-    xs[p] = x;
-    ys[p] = y;
-    p++;
+  for (j = 0; j < yres; j++) {
+    y = ymax - j * dy;
+    for(i = 0; i < xres; i++) {
+      x = xmin + i * dx;
+      ,*xs = x;
+      xs++;
+      ,*ys = y;
+      ys++;
+    }
   }
 }
-printf ("%d points created.\n", p-1);
 #+END_SRC
 
-#+RESULTS:
-
-
 *** Step #3: Implement a MPI application
+**** #3.1 (the MPI application)
 
-#+BEGIN_SRC C
+The following implementation has three files:
+ - ~mandelbrot-mpi.c~ (where the ~main~ function resides, see code below)
+ - ~compute_mandelbrot_coordinates.c~ (function to compute mandelbrot coordinates)
+ - ~compute_one_mandelbrot_point.c~ (computes the mandelbrot function)
+
+ #+BEGIN_SRC C :tangle mandelbrot-mpi.c :main no
 #include <mpi.h>
 #include <stdio.h>
+#include <stdlib.h>
+
+/* function prototypes implemented in other files */
+double gettime (void);
+int compute_mandelbrot_point (double x, double y, int maxiter);
+void compute_mandelbrot_coordinates (const double xmin,
+				     const double xmax,
+				     const double ymin,
+				     const double ymax,
+				     const int maxiter,
+				     const int xres,
+				     const int yres,
+				     double *xs,   // vector of x coordinates
+				     double *ys);  // vector of y coordinates
 
 int main (int argc, char **argv) {
   int NP, rank;
@@ -178,24 +195,253 @@ int main (int argc, char **argv) {
   MPI_Comm_size (MPI_COMM_WORLD, &NP);
   MPI_Comm_rank (MPI_COMM_WORLD, &rank);
 
-  if (rank == 0) {
-    /* Maestro code */
-  }else{
-    /* Player code */
+  /* Parse the command line arguments. */
+  if (argc != 7) {
+    if (rank == 0){
+      printf("Usage:   %s <xmin> <xmax> <ymin> <ymax> <maxiter> <xres>\n", argv[0]);
+      printf("Example: %s 0.27085 0.27100 0.004640 0.004810 100 1024\n", argv[0]);
+    }
+    MPI_Finalize();
+    return 0;
   }
+
+  /* timing variables */
+  double t0, t1;
+
+  /* The window in the plane. */
+  const double xmin = atof(argv[1]);
+  const double xmax = atof(argv[2]);
+  const double ymin = atof(argv[3]);
+  const double ymax = atof(argv[4]);
+
+  /* Maximum number of iterations. */
+  const int maxiter = atoi(argv[5]);
+
+  /* Image size, width is given, height is computed. */
+  const int xres = atoi(argv[6]);
+  const int yres = (xres*(ymax-ymin))/(xmax-xmin);
+
+  int points = xres*yres;
+  if (points % NP != 0){
+    printf("Error: number of points (%d) is "
+	   "not perfectly divisible by number "
+	   "of players (%d)\n",
+	   points, NP);
+    MPI_Finalize();
+  }
+
+  /* Maestro print data read from parameters, for validation purposes */
+  if (rank == 0){
+    printf("(%f, %f) -> (%f, %f) resolution (%d, %d) maxiter %d\n",
+	   xmin, ymin, xmax, ymax, xres, yres, maxiter);
+  }
+
+  /* Compute how many points per player */
+  int points_per_player = -1;
+  if (rank == 0){
+    points_per_player = points / NP;
+  }
+  MPI_Bcast (&points_per_player, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  printf("[%d] points_per_player = %d\n", rank, points_per_player);
+
+  printf("Broadcast OKAY\n");
+
+  /* Malloc vectors to receive points from maestro */
+  double *xs_player;
+  double *ys_player;
+  xs_player = malloc (points_per_player * sizeof(double));
+  ys_player = malloc (points_per_player * sizeof(double));
+
+  /* Malloc output vector for players */
+  int *k_player;
+  k_player = malloc (points_per_player * sizeof(int));
+
+  double *xs = NULL, *ys = NULL, *k = NULL;
+  if (rank == 0){
+    /* Malloc vectors to keep ALL x and y mandelbrot coordinates */
+    xs = malloc(xres*yres * sizeof(double));
+    ys = malloc(xres*yres * sizeof(double));
+    /* Malloc vector to get results from all players */
+    k = malloc(xres*yres * sizeof(int));
+
+    compute_mandelbrot_coordinates(xmin, xmax, ymin, ymax, maxiter, xres, yres, xs, ys);
+  }
+
+  /* scatter x coordinates among players */
+  MPI_Scatter (xs, points_per_player, MPI_DOUBLE, 
+	       xs_player, points_per_player, MPI_DOUBLE, 
+	       0, MPI_COMM_WORLD);
+
+  /* scatter y coordinates among players */
+  MPI_Scatter (ys, points_per_player, MPI_DOUBLE,
+	       ys_player, points_per_player, MPI_DOUBLE,
+	       0, MPI_COMM_WORLD);
+
+  printf("Scatter OKAY\n");
+
+  /* Computation section (both in maestro and player) */
+  t0 = gettime();
+  for (int i = 0; i < points_per_player; i++){
+    int k = compute_mandelbrot_point (*xs_player, *ys_player, maxiter);
+    //register k in the output vector
+    xs_player++;
+    ys_player++;
+  }
+  t1 = gettime();
+
+  printf("[%d] Compute OKAY %.6f secs\n", rank, t1-t0);
+
+  MPI_Gather (k_player, points_per_player, MPI_INT,
+	      k, points_per_player, MPI_INT,
+	      0, MPI_COMM_WORLD);
+
+  printf("Gather OKAY\n");
+  
   MPI_Finalize ();
   return 0;
 }
+ #+END_SRC
+
+**** #3.2 (timing functions)
+
+ #+BEGIN_SRC C :tangle timing_functions.c :main no
+#include <sys/time.h>
+#include <stddef.h>
+
+double gettime (void)
+{
+  struct timeval tr;
+  gettimeofday(&tr, NULL);
+  return (double)tr.tv_sec+(double)tr.tv_usec/1000000;
+}
+ #+END_SRC
+
+**** #3.3 (the Makefile)
+
+There is a Makefile to compile all of them in an application:
+
+#+BEGIN_SRC makefile :tangle Makefile
+CC = mpicc
+CFLAGS = -O3 -g
+OBJ = timing_functions.o \
+      compute_mandelbrot_coordinates.o \
+      compute_one_mandelbrot_point.o \
+      mandelbrot-mpi.o \
+
+%.o:%.c
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+mandelbrot-mpi: $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS)
+
+clean:
+	rm -f *.o
 #+END_SRC
 
-#+RESULTS:
+**** #3.4 (Copy all these files to the PCAD platform)
 
-Run some local tests with =mpicc= and =mpirun=.
+#+BEGIN_SRC bash
+ssh gppd-hpc.inf.ufrgs.br mkdir -p mandelbrot
+scp compute_mandelbrot_coordinates.c \
+    mandelbrot-mpi.c \
+    timing_functions.c \
+    compute_one_mandelbrot_point.c \
+    Makefile gppd-hpc.inf.ufrgs.br:./mandelbrot
+ssh gppd-hpc.inf.ufrgs.br make -C mandelbrot/
+#+END_SRC
 
 *** Step #4: Run the experiment in the PCAD platform
+**** #4.1 The ~mandelbrot.slurm~ script
 
-See section "MPI + Slurm in PCAD" (above) on how to prepare your SLURM
-script to make it work there.
+#+BEGIN_SRC bash :tangle mandelbrot.slurm
+#!/bin/bash
+#SBATCH --nodes=5
+#SBATCH --ntasks=80
+#SBATCH --time=02:00:00
+#SBATCH --partition=draco
+#SBATCH --workdir=.
+#SBATCH --output=%x_%j.out
+#SBATCH --error=%x_%j.err
 
-*** Step #5: Trace the behavior of the MPI application
+# The mandelbrot-mpi binary location
+BINARY=$HOME/mandelbrot/mandelbrot-mpi
+
+# Application parameters
+XMIN=0.27085
+XMAX=0.27100
+YMIN=0.004640
+YMAX=0.004810
+MAXITER=64000
+XRES=10240
+
+# Prepare the machine file
+MACHINEFILE="nodes.$SLURM_JOB_ID"
+srun -l /bin/hostname | sort -n | awk '{print $2}' > $MACHINEFILE
+
+# Get number of cores available
+NP=$(cat $MACHINEFILE | wc -l)
+
+# Execute the program
+mpirun \
+	--mca oob_tcp_if_include 192.168.30.0/24 \
+	--mca btl_tcp_if_include 192.168.30.0/24 \
+	--mca btl_base_warn_component_unused 0 \
+	-np $NP \
+	-machinefile $MACHINEFILE \
+	$BINARY $XMIN $XMAX $YMIN $YMAX $MAXITER $XRES
+#+END_SRC
+**** #4.2 Run the experiment
+
+Steps to use it:
+1. Copy this file to the gppd-hpc frontend
+   #+BEGIN_SRC bash
+   ssh gppd-hpc.inf.ufrgs.br mkdir -p mandelbrot
+   scp mandelbrot.slurm gppd-hpc.inf.ufrgs.br:./mandelbrot/
+   #+END_SRC
+2. Connect to the frontend
+   #+BEGIN_SRC bash
+   ssh gppd-hpc.inf.ufrgs.br
+   #+END_SRC
+3. Submit the script and take note of the JobID
+   #+BEGIN_SRC bash
+   sbatch mandelbrot/mandelbrot.slurm   
+   #+END_SRC
+4. Assuming your JobId is 58876, verify the contents of the file
+   #+BEGIN_SRC bash
+   cat nodes.58876
+   #+END_SRC
+5. Then, check the stdout log
+   #+BEGIN_SRC bash
+   cat draco.slurm_58876.out
+   #+END_SRC
+6. Make sure you have something that looks like this
+   #+BEGIN_EXAMPLE
+
+   #+END_EXAMPLE
+**** #4.3 Observe the load imbalance
+
+Verify a file ~mandelbrot.slurm_JOBID.out~.
+
+Observe the compute time per rank.
+
+#+begin_src shell :results both
+ssh gppd-hpc.inf.ufrgs.br "cat mandelbrot.slurm_58943.out | grep Compute | head -n10"
+#+end_src
+
+#+RESULTS:
+#+begin_example
+[3] Compute OKAY 0.546264 secs
+[4] Compute OKAY 0.579614 secs
+[5] Compute OKAY 0.600088 secs
+[6] Compute OKAY 0.652515 secs
+[9] Compute OKAY 0.626929 secs
+[8] Compute OKAY 0.650330 secs
+[7] Compute OKAY 0.665047 secs
+[10] Compute OKAY 0.647199 secs
+[11] Compute OKAY 0.660925 secs
+[12] Compute OKAY 0.654586 secs
+#+end_example
+
+*** Step #5:Trace the behavior of the MPI application
 *** Step #6: Compute and visualize the load of maestro/players
