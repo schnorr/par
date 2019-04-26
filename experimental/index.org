@@ -1,4 +1,4 @@
-#+Title: Experimental Tutorials for CPM270
+#+Title: Experimental Tutorials
 
 | *Tutorial*                                    |
 |---------------------------------------------|
