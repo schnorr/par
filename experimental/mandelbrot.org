@@ -1,0 +1,688 @@
+* MPI + Mandelbrot Problem
+
+All code in this section is inspired from:
+- http://rosettacode.org/wiki/Mandelbrot_set
+- and [[https://gist.githubusercontent.com/andrejbauer/7919569/raw/258d9ec48ee2f676f0104f496c489eb9e64dca19/mandelbrot.c][this GIST]]
+
+Let's use the Mandelbrot problem to observe the *load imbalance among
+homogeneous cores* in multiple machines of the PCAD platform. The
+ultimate goal is to create a parallel computer program based on MPI
+where the maestro defines many mandelbrot coordinates that are
+distributed equaly among players. Each player then compute the
+coordinates it received from the maestro, and send back the results so
+the mandelbrot image can be reconstructed. These are the steps in this
+tutorial:
+
+1. Understand how to compute one mandelbrot point
+2. Understand how to compute many mandelbrot coordinates
+3. Implement a MPI application
+   - Maestro distributes these coordinates among players
+   - Player receive coordinates, computes, send results back to the maestro
+4. Run the experiment in the PCAD platform
+5. Trace the behavior of the MPI application using [[https://github.com/schnorr/akypuera/][akypuera]].
+6. Compute and visualize the load of each entity (maestro and players)
+
+** Step #1: Compute one Mandelbrot point
+
+Each (x,y) mandelbrot coordinate is computed as follows:
+
+#+BEGIN_SRC C :tangle compute_one_mandelbrot_point.c :main no
+#include <stdio.h>
+int compute_mandelbrot_point (double x, double y, int maxiter)
+{
+  int k; /* Iteration counter */
+  double u = 0.0;
+  double v = 0.0;
+  double u2 = u * u;
+  double v2 = v * v;
+  /* iterate the point */
+  for (k = 1; k < maxiter && (u2 + v2 < 4.0); k++) {
+    v = 2 * u * v + y;
+    u = u2 - v2 + x;
+    u2 = u * u;
+    v2 = v * v;
+  }
+  return k;
+}
+#+END_SRC
+
+** Step #2: Compute many mandelbrot coordinates
+
+#+begin_src C :results output :session :exports both :tangle compute_mandelbrot_coordinates.c :main no
+void compute_mandelbrot_coordinates (
+  const double xmin,
+  const double xmax,
+  const double ymin,
+  const double ymax,
+  const int maxiter,
+  const int xres,
+  const int yres,
+  double *xs, // vector of x coordinates
+  double *ys  // vector of y coordinates
+  )
+{
+  /* Precompute pixel width and height. */
+  double dx=(xmax-xmin)/xres;
+  double dy=(ymax-ymin)/yres;
+
+  /* Coordinates of the current point in the complex plane. */
+  double x, y; 
+  /* Pixel counters */
+  int i,j;
+
+  for (j = 0; j < yres; j++) {
+    y = ymax - j * dy;
+    for(i = 0; i < xres; i++) {
+      x = xmin + i * dx;
+      ,*xs = x;
+      xs++;
+      ,*ys = y;
+      ys++;
+    }
+  }
+}
+#+END_SRC
+
+** Step #3: Implement a MPI application
+*** #3.1 (the MPI application)
+
+The following implementation has three files:
+ - ~mandelbrot-mpi.c~ (where the ~main~ function resides, see code below)
+ - ~compute_mandelbrot_coordinates.c~ (function to compute mandelbrot coordinates)
+ - ~compute_one_mandelbrot_point.c~ (computes the mandelbrot function)
+
+ #+BEGIN_SRC C :tangle mandelbrot-mpi.c :main no
+#include <mpi.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+/* function prototypes implemented in other files */
+double gettime (void);
+int compute_mandelbrot_point (double x, double y, int maxiter);
+void compute_mandelbrot_coordinates (const double xmin,
+				     const double xmax,
+				     const double ymin,
+				     const double ymax,
+				     const int maxiter,
+				     const int xres,
+				     const int yres,
+				     double *xs,   // vector of x coordinates
+				     double *ys);  // vector of y coordinates
+
+int main (int argc, char **argv) {
+  int NP, rank;
+  MPI_Init (&argc, &argv);
+  MPI_Comm_size (MPI_COMM_WORLD, &NP);
+  MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+
+  /* Parse the command line arguments. */
+  if (argc != 7) {
+    if (rank == 0){
+      printf("Usage:   %s <xmin> <xmax> <ymin> <ymax> <maxiter> <xres>\n", argv[0]);
+      printf("Example: %s 0.27085 0.27100 0.004640 0.004810 100 1024\n", argv[0]);
+    }
+    MPI_Finalize();
+    return 0;
+  }
+
+  /* timing variables */
+  double t0, t1;
+
+  /* The window in the plane. */
+  const double xmin = atof(argv[1]);
+  const double xmax = atof(argv[2]);
+  const double ymin = atof(argv[3]);
+  const double ymax = atof(argv[4]);
+
+  /* Maximum number of iterations. */
+  const int maxiter = atoi(argv[5]);
+
+  /* Image size, width is given, height is computed. */
+  const int xres = atoi(argv[6]);
+  const int yres = (xres*(ymax-ymin))/(xmax-xmin);
+
+  int points = xres*yres;
+  if (points % NP != 0){
+    printf("Error: number of points (%d) is "
+	   "not perfectly divisible by number "
+	   "of players (%d)\n",
+	   points, NP);
+    MPI_Finalize();
+  }
+
+  /* Maestro print data read from parameters, for validation purposes */
+  if (rank == 0){
+    printf("(%f, %f) -> (%f, %f) resolution (%d, %d) maxiter %d\n",
+	   xmin, ymin, xmax, ymax, xres, yres, maxiter);
+  }
+
+  /* Compute how many points per player */
+  int points_per_player = -1;
+  if (rank == 0){
+    points_per_player = points / NP;
+  }
+  MPI_Bcast (&points_per_player, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  printf("[%d] points_per_player = %d\n", rank, points_per_player);
+
+  printf("Broadcast OKAY\n");
+
+  /* Malloc vectors to receive points from maestro */
+  double *xs_player;
+  double *ys_player;
+  xs_player = malloc (points_per_player * sizeof(double));
+  ys_player = malloc (points_per_player * sizeof(double));
+
+  /* Malloc output vector for players */
+  int *k_player;
+  k_player = malloc (points_per_player * sizeof(int));
+
+  double *xs = NULL, *ys = NULL, *k = NULL;
+  if (rank == 0){
+    /* Malloc vectors to keep ALL x and y mandelbrot coordinates */
+    xs = malloc(xres*yres * sizeof(double));
+    ys = malloc(xres*yres * sizeof(double));
+    /* Malloc vector to get results from all players */
+    k = malloc(xres*yres * sizeof(int));
+
+    compute_mandelbrot_coordinates(xmin, xmax, ymin, ymax, maxiter, xres, yres, xs, ys);
+  }
+
+  /* scatter x coordinates among players */
+  MPI_Scatter (xs, points_per_player, MPI_DOUBLE, 
+	       xs_player, points_per_player, MPI_DOUBLE, 
+	       0, MPI_COMM_WORLD);
+
+  /* scatter y coordinates among players */
+  MPI_Scatter (ys, points_per_player, MPI_DOUBLE,
+	       ys_player, points_per_player, MPI_DOUBLE,
+	       0, MPI_COMM_WORLD);
+
+  printf("Scatter OKAY\n");
+
+  /* Computation section (both in maestro and player) */
+  t0 = gettime();
+  for (int i = 0; i < points_per_player; i++){
+    int k = compute_mandelbrot_point (*xs_player, *ys_player, maxiter);
+    //register k in the output vector
+    xs_player++;
+    ys_player++;
+  }
+  t1 = gettime();
+
+  printf("[%d] Compute OKAY %.6f secs\n", rank, t1-t0);
+
+  MPI_Gather (k_player, points_per_player, MPI_INT,
+	      k, points_per_player, MPI_INT,
+	      0, MPI_COMM_WORLD);
+
+  printf("Gather OKAY\n");
+  
+  MPI_Finalize ();
+  return 0;
+}
+ #+END_SRC
+
+*** #3.2 (timing functions)
+
+#+BEGIN_SRC C :tangle timing_functions.c :main no
+#include <sys/time.h>
+#include <stddef.h>
+
+double gettime (void)
+{
+  struct timeval tr;
+  gettimeofday(&tr, NULL);
+  return (double)tr.tv_sec+(double)tr.tv_usec/1000000;
+}
+#+END_SRC
+
+*** #3.3 (the Makefile)
+
+There is a Makefile to compile all of them in an application:
+
+#+BEGIN_SRC makefile :tangle Makefile
+CC = mpicc
+CFLAGS = -O3 -g
+OBJ = timing_functions.o \
+      compute_mandelbrot_coordinates.o \
+      compute_one_mandelbrot_point.o \
+      mandelbrot-mpi.o \
+
+%.o:%.c
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+mandelbrot-mpi: $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS)
+
+clean:
+	rm -f *.o
+#+END_SRC
+
+*** #3.4 (Copy all these files to the PCAD platform)
+
+#+BEGIN_SRC bash
+ssh gppd-hpc.inf.ufrgs.br mkdir -p mandelbrot
+scp compute_mandelbrot_coordinates.c \
+    mandelbrot-mpi.c \
+    timing_functions.c \
+    compute_one_mandelbrot_point.c \
+    Makefile gppd-hpc.inf.ufrgs.br:./mandelbrot
+ssh gppd-hpc.inf.ufrgs.br make -C mandelbrot/
+#+END_SRC
+
+** Step #4: Run the experiment in the PCAD platform
+*** #4.1 The ~mandelbrot.slurm~ script
+
+#+BEGIN_SRC bash :tangle mandelbrot.slurm
+#!/bin/bash
+#SBATCH --nodes=5
+#SBATCH --ntasks=80
+#SBATCH --time=02:00:00
+#SBATCH --partition=draco
+#SBATCH --workdir=.
+#SBATCH --output=%x_%j.out
+#SBATCH --error=%x_%j.err
+
+# The mandelbrot-mpi binary location
+BINARY=$HOME/mandelbrot/mandelbrot-mpi
+
+# Application parameters
+XMIN=0.27085
+XMAX=0.27100
+YMIN=0.004640
+YMAX=0.004810
+MAXITER=64000
+XRES=10240
+
+# Prepare the machine file
+MACHINEFILE="nodes.$SLURM_JOB_ID"
+srun -l /bin/hostname | sort -n | awk '{print $2}' > $MACHINEFILE
+
+# Get number of cores available
+NP=$(cat $MACHINEFILE | wc -l)
+
+# Execute the program
+mpirun \
+	--mca oob_tcp_if_include 192.168.30.0/24 \
+	--mca btl_tcp_if_include 192.168.30.0/24 \
+	--mca btl_base_warn_component_unused 0 \
+	-np $NP \
+	-machinefile $MACHINEFILE \
+	$BINARY $XMIN $XMAX $YMIN $YMAX $MAXITER $XRES
+#+END_SRC
+*** #4.2 Run the experiment
+
+Steps to use it:
+1. Copy this file to the gppd-hpc frontend
+   #+BEGIN_SRC bash
+   ssh gppd-hpc.inf.ufrgs.br mkdir -p mandelbrot
+   scp mandelbrot.slurm gppd-hpc.inf.ufrgs.br:./mandelbrot/
+   #+END_SRC
+2. Connect to the frontend
+   #+BEGIN_SRC bash
+   ssh gppd-hpc.inf.ufrgs.br
+   #+END_SRC
+3. Submit the script and take note of the JobID
+   #+BEGIN_SRC bash
+   sbatch mandelbrot/mandelbrot.slurm   
+   #+END_SRC
+4. Assuming your JobId is 58876, verify the contents of the file
+   #+BEGIN_SRC bash
+   cat nodes.58876
+   #+END_SRC
+5. Then, check the stdout log
+   #+BEGIN_SRC bash
+   cat draco.slurm_58876.out
+   #+END_SRC
+6. Make sure you have something that looks like this
+   #+BEGIN_EXAMPLE
+
+   #+END_EXAMPLE
+*** #4.3 Observe the load imbalance
+
+Verify a file ~mandelbrot.slurm_JOBID.out~.
+
+Observe the compute time per rank.
+
+#+begin_src shell :results both :exports both
+ssh gppd-hpc.inf.ufrgs.br "cat mandelbrot.slurm_58943.out | grep Compute | head -n10"
+#+end_src
+
+#+RESULTS:
+#+begin_example
+[3] Compute OKAY 0.546264 secs
+[4] Compute OKAY 0.579614 secs
+[5] Compute OKAY 0.600088 secs
+[6] Compute OKAY 0.652515 secs
+[9] Compute OKAY 0.626929 secs
+[8] Compute OKAY 0.650330 secs
+[7] Compute OKAY 0.665047 secs
+[10] Compute OKAY 0.647199 secs
+[11] Compute OKAY 0.660925 secs
+[12] Compute OKAY 0.654586 secs
+#+end_example
+
+** Step #5: Trace the behavior of the MPI application
+*** #5.1 Introduction
+
+We have observed the load imbalance among ranks, but we have not yet
+traced the communication time. So, let's trace the MPI application so
+we can compute, per rank, the ratio between computation and
+communication to inspire us to attempt to remove all the communication
+footprint by masking them with computation (with asynchronous
+communication). Let's employ [[https://github.com/schnorr/akypuera/][akypuera]].
+
+*** #5.2 Akypuera Installation (PCAD)
+
+Run the following commands in the PCAD platform since akypuera must
+link against the MPI library that is installed there. Make sure you
+=salloc= one node because cmake is not installed in the frontend.
+
+ #+begin_src shell :results output :exports both
+git clone --recursive git://github.com/schnorr/akypuera.git
+cd akypuera
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=$HOME/install/akypuera ..
+make install
+ #+end_src
+
+*** #5.3 PajeNG Installation (PCAD)
+
+Run the following commands in the PCAD platform since ~pj_dump~ must be
+available in the following steps. Make sure you =salloc= one node
+because cmake is not installed in the frontend.
+
+#+begin_src shell :results output
+git clone git://github.com/schnorr/pajeng.git
+mkdir -p pajeng/b
+cd pajeng/b
+cmake -DCMAKE_INSTALL_PREFIX=$HOME/install/pajeng/ ..
+make install
+#+end_src
+
+*** #5.4 Update Makefile to link against akypuera
+
+There is a new akypuera-enabled Makefile to compile all of them in an application:
+
+#+BEGIN_SRC makefile :tangle Makefile.akypuera
+CC = mpicc
+CFLAGS = -O3 -g
+LDFLAGS = -L$(HOME)/install/akypuera/lib/ -L$(HOME)/akypuera/lib/ -laky -lrastro
+OBJ = timing_functions.o \
+      compute_mandelbrot_coordinates.o \
+      compute_one_mandelbrot_point.o \
+      mandelbrot-mpi.o \
+
+%.o:%.c
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+mandelbrot-mpi: $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+
+clean:
+	rm -f *.o
+#+END_SRC
+
+To compile, do:
+
+#+begin_src shell :results output :exports both
+make clean
+make -f Makefile.akypuera
+#+end_src
+
+#+RESULTS:
+: rm -f *.o
+: mpicc -c -o timing_functions.o timing_functions.c -O3 -g
+: mpicc -c -o compute_mandelbrot_coordinates.o compute_mandelbrot_coordinates.c -O3 -g
+: mpicc -c -o compute_one_mandelbrot_point.o compute_one_mandelbrot_point.c -O3 -g
+: mpicc -c -o mandelbrot-mpi.o mandelbrot-mpi.c -O3 -g
+: mpicc -o mandelbrot-mpi timing_functions.o compute_mandelbrot_coordinates.o compute_one_mandelbrot_point.o mandelbrot-mpi.o -O3 -g -L/home/schnorr/install/akypuera/lib -laky -lrastro
+
+*** #5.5 (Copy all these files to the PCAD platform)
+
+#+BEGIN_SRC bash
+ssh gppd-hpc.inf.ufrgs.br mkdir -p mandelbrot
+scp -r \
+    compute_mandelbrot_coordinates.c \
+    mandelbrot-mpi.c \
+    timing_functions.c \
+    compute_one_mandelbrot_point.c \
+    Makefile.akypuera gppd-hpc.inf.ufrgs.br:./mandelbrot
+rsync --recursive $HOME/install/akypuera gppd-hpc.inf.ufrgs.br:./
+ssh gppd-hpc.inf.ufrgs.br make -C mandelbrot/ -f Makefile.akypuera
+#+END_SRC
+
+*** #5.6 The ~mandelbrot-akypuera.slurm~ script
+
+#+BEGIN_SRC bash :tangle mandelbrot-akypuera.slurm
+#!/bin/bash
+#SBATCH --nodes=5
+#SBATCH --ntasks=80
+#SBATCH --time=02:00:00
+#SBATCH --partition=draco
+#SBATCH --workdir=.
+#SBATCH --output=%x_%j.out
+#SBATCH --error=%x_%j.err
+
+# The mandelbrot-mpi binary location
+BINARY=$HOME/mandelbrot/mandelbrot-mpi
+
+# Application parameters
+XMIN=0.27085
+XMAX=0.27100
+YMIN=0.004640
+YMAX=0.004810
+MAXITER=64000
+XRES=10240
+
+# Akypuera
+export LD_LIBRARY_PATH=$HOME/install/akypuera/lib/
+
+# Prepare the machine file
+MACHINEFILE="nodes.$SLURM_JOB_ID"
+srun -l /bin/hostname | sort -n | awk '{print $2}' > $MACHINEFILE
+
+# Get number of cores available
+NP=$(cat $MACHINEFILE | wc -l)
+
+# Execute the program
+mpirun \
+	--mca oob_tcp_if_include 192.168.30.0/24 \
+	--mca btl_tcp_if_include 192.168.30.0/24 \
+	--mca btl_base_warn_component_unused 0 \
+	-np $NP \
+	-machinefile $MACHINEFILE \
+	$BINARY $XMIN $XMAX $YMIN $YMAX $MAXITER $XRES
+#+END_SRC
+
+*** #5.7 Run the experiment
+
+Steps to use it:
+1. Copy this file to the gppd-hpc frontend
+   #+BEGIN_SRC bash
+   ssh gppd-hpc.inf.ufrgs.br mkdir -p mandelbrot
+   scp mandelbrot-akypuera.slurm gppd-hpc.inf.ufrgs.br:./mandelbrot/
+   #+END_SRC
+2. Connect to the frontend
+   #+BEGIN_SRC bash
+   ssh gppd-hpc.inf.ufrgs.br
+   #+END_SRC
+3. Submit the script and take note of the JobID
+   #+BEGIN_SRC bash
+   sbatch mandelbrot/mandelbrot-akypuera.slurm   
+   #+END_SRC
+4. Assuming your JobId is 58876, verify the contents of the file
+   #+BEGIN_SRC bash
+   cat nodes.58876
+   #+END_SRC
+5. Then, check the stdout log
+   #+BEGIN_SRC bash
+   cat draco.slurm_58876.out
+   #+END_SRC
+6. Make sure you have something that looks like this
+
+*** #5.8 Convert trace files to a CSV
+
+Run the following commands in a ~salloc~ allocation.
+
+#+begin_src shell :results output
+$HOME/install/akypuera/bin/aky_converter rastro*.rst > rastro.paje
+$HOME/install/pajeng/bin/pj_dump rastro.paje | grep ^State > rastro.csv
+#+end_src
+
+Copy the ~rastro.csv~ to your laptop.
+
+** Step #6: Compute and visualize the load of maestro/players
+*** #6.1 Compute MPI time
+
+Read data
+
+#+begin_src R :results output :session :exports both
+library(tidyverse)
+df <- read_csv("rastro.csv", col_names = FALSE) %>%
+    mutate(Rank = gsub("rank", "", X2)) %>%
+    select(-X1, -X2, -X3, -X7) %>%
+    rename(Start = X4,
+           End = X5,
+           Duration = X6,
+           Value = X8) %>%
+    select(Rank, everything())
+df
+#+end_src
+
+#+RESULTS:
+#+begin_example
+
+Parsed with column specification:
+cols(
+  X1 = col_character(),
+  X2 = col_character(),
+  X3 = col_character(),
+  X4 = col_double(),
+  X5 = col_double(),
+  X6 = col_double(),
+  X7 = col_double(),
+  X8 = col_character()
+)
+
+# A tibble: 560 x 5
+   Rank     Start      End Duration Value        
+   <chr>    <dbl>    <dbl>    <dbl> <chr>        
+ 1 9      0.00182  0.00182 0.000001 MPI_Comm_size
+ 2 9      0.00182  0.00182 0        MPI_Comm_rank
+ 3 9      0.00182  0.0140  0.0122   MPI_Bcast    
+ 4 9      0.0140   1.13    1.12     MPI_Scatter  
+ 5 9      1.13     7.95    6.81     MPI_Scatter  
+ 6 9      8.57    15.0     6.46     MPI_Gather   
+ 7 9     15.0     18.4     3.40     MPI_Finalize 
+ 8 8      0.00322  0.00322 0.000001 MPI_Comm_size
+ 9 8      0.00322  0.00322 0        MPI_Comm_rank
+10 8      0.00323  0.00694 0.00371  MPI_Bcast    
+# … with 550 more rows
+#+end_example
+
+Compute MPI Time
+
+#+begin_src R :results output :session :exports both
+df %>% pull(Value) %>% unique
+df %>%
+    filter(Value != "MPI_Finalize") %>%
+    group_by(Rank) %>%
+    summarize(MPI.Time = sum(Duration),
+              Full.Time = max(End) - min(Start)) %>%
+    mutate(Comm.Ratio = MPI.Time / Full.Time * 100) %>%
+    arrange(Rank) %>%
+    as.data.frame
+#+end_src
+
+#+RESULTS:
+#+begin_example
+[1] "MPI_Comm_size" "MPI_Comm_rank" "MPI_Bcast"     "MPI_Scatter"  
+[5] "MPI_Gather"    "MPI_Finalize"
+
+   Rank MPI.Time Full.Time Comm.Ratio
+1     0 16.89721  18.42630   91.70159
+2     1 13.25432  15.00132   88.35437
+3    10 14.38390  15.03168   95.69052
+4    11 14.37355  15.03437   95.60460
+5    12 14.37913  15.03625   95.62977
+6    13 14.37017  15.04266   95.52946
+7    14 14.36900  15.04420   95.51187
+8    15 14.39585  15.05084   95.64818
+9    16 14.91147  15.56866   95.77873
+10   17 14.94039  15.60341   95.75075
+11   18 14.87198  15.61215   95.25904
+12   19 14.96866  15.61923   95.83482
+13    2 13.56968  15.00343   90.44385
+14   20 15.01104  15.62837   96.04992
+15   21 15.00064  15.63135   95.96504
+16   22 14.96626  15.63326   95.73346
+17   23 14.95226  15.64021   95.60138
+18   24 14.91828  15.63946   95.38870
+19   25 14.92076  15.63974   95.40286
+20   26 14.88767  15.64602   95.15311
+21   27 14.75200  15.64740   94.27763
+22   28 11.36632  17.77349   63.95100
+23   29 13.00547  17.53652   74.16219
+24    3 14.45914  15.00674   96.35099
+25   30 17.00437  17.99491   94.49547
+26   31 15.97819  16.94684   94.28423
+27   32 17.46713  18.42552   94.79858
+28   33 16.38456  17.30216   94.69658
+29   34 15.71431  16.57329   94.81712
+30   35 15.79382  16.58762   95.21449
+31   36 16.66091  17.37114   95.91144
+32   37 16.82047  17.51370   96.04175
+33   38 16.29847  16.93521   96.24012
+34   39 17.34528  17.96559   96.54724
+35    4 14.43021  15.01158   96.12718
+36   40 16.23310  16.91623   95.96167
+37   41 17.59945  18.25668   96.40007
+38   42 17.45736  18.10608   96.41714
+39   43 16.10031  16.73772   96.19175
+40   44 15.63227  16.25385   96.17583
+41   45 17.32601  17.91950   96.68798
+42   46 16.95617  17.56374   96.54078
+43   47 16.91820  17.54898   96.40560
+44   48 17.13777  17.78553   96.35795
+45   49 17.27886  18.16786   95.10673
+46    5 14.41176  15.01223   96.00011
+47   50 17.07666  17.79119   95.98383
+48   51 17.35395  18.04346   96.17863
+49   52 17.49782  18.23655   95.94918
+50   53 17.53321  18.23935   96.12851
+51   54 17.60582  18.35647   95.91071
+52   55 17.52871  18.35384   95.50432
+53   56 16.92842  17.67442   95.77919
+54   57 17.68745  18.37512   96.25764
+55   58 17.32082  18.02708   96.08227
+56   59 17.48468  18.22714   95.92662
+57    6 14.36666  15.01914   95.65566
+58   60 17.52071  18.32757   95.59760
+59   61 17.20006  17.99121   95.60259
+60   62 16.91217  17.71362   95.47551
+61   63 17.32505  18.08519   95.79692
+62   64 16.73924  17.48236   95.74929
+63   65 17.37288  18.10385   95.96239
+64   66 17.55332  18.26232   96.11768
+65   67 17.56473  18.29350   96.01625
+66   68 17.57691  18.34205   95.82852
+67   69 17.55360  18.33672   95.72921
+68    7 14.35810  15.02327   95.57240
+69   70 17.53769  18.31058   95.77897
+70   71 17.36330  18.08892   95.98861
+71   72 17.53501  18.21158   96.28494
+72   73 17.70436  18.29881   96.75140
+73   74 17.51095  18.03872   97.07423
+74   75 17.81377  18.29473   97.37105
+75   76 17.84126  18.26883   97.65957
+76   77 17.89535  18.26772   97.96163
+77   78 17.60593  17.94512   98.10987
+78   79 17.96199  18.23671   98.49358
+79    8 14.37426  15.02358   95.67803
+80    9 14.40146  15.02846   95.82794
+#+end_example
+
+Clearly there is too much communication in this run.
