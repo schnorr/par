@@ -425,7 +425,7 @@ Verify a file ~mandelbrot.slurm_JOBID.out~.
 
 Observe the compute time per rank.
 
-#+begin_src shell :results both
+#+begin_src shell :results both :export both
 ssh gppd-hpc.inf.ufrgs.br "cat mandelbrot.slurm_58943.out | grep Compute | head -n10"
 #+end_src
 
@@ -443,5 +443,175 @@ ssh gppd-hpc.inf.ufrgs.br "cat mandelbrot.slurm_58943.out | grep Compute | head 
 [12] Compute OKAY 0.654586 secs
 #+end_example
 
-*** Step #5:Trace the behavior of the MPI application
+*** Step #5: Trace the behavior of the MPI application
+**** #5.1 Introduction
+
+ We have observed the load imbalance among ranks, but we have not yet
+ traced the communication time. So, let's trace the MPI application so
+ we can compute, per rank, the ratio between computation and
+ communication to inspire us to attempt to remove all the communication
+ footprint by masking them with computation (with asynchronous
+ communication). Let's employ [[https://github.com/schnorr/akypuera/][akypuera]].
+
+**** #5.2 Akypuera Installation (PCAD)
+
+Run the following commands in the PCAD platform since akypuera must
+link against the MPI library that is installed there. Make sure you
+=salloc= one node because cmake is not installed in the frontend.
+
+ #+begin_src shell :results output :export both
+git clone --recursive git://github.com/schnorr/akypuera.git
+cd akypuera
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=$HOME/install/akypuera ..
+make install
+ #+end_src
+
+**** #5.3 PajeNG Installation (PCAD)
+
+Run the following commands in the PCAD platform since ~pj_dump~ must be
+available in the following steps. Make sure you =salloc= one node
+because cmake is not installed in the frontend.
+
+#+begin_src shell :results output
+git clone git://github.com/schnorr/pajeng.git
+mkdir -p pajeng/b
+cd pajeng/b
+cmake -DCMAKE_INSTALL_PREFIX=$HOME/install/pajeng/ ..
+make install
+#+end_src
+
+**** #5.4 Update Makefile to link against akypuera
+
+There is a new akypuera-enabled Makefile to compile all of them in an application:
+
+#+BEGIN_SRC makefile :tangle Makefile.akypuera
+CC = mpicc
+CFLAGS = -O3 -g
+LDFLAGS = -L$(HOME)/install/akypuera/lib/ -L$(HOME)/akypuera/lib/ -laky -lrastro
+OBJ = timing_functions.o \
+      compute_mandelbrot_coordinates.o \
+      compute_one_mandelbrot_point.o \
+      mandelbrot-mpi.o \
+
+%.o:%.c
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+mandelbrot-mpi: $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+
+clean:
+	rm -f *.o
+#+END_SRC
+
+To compile, do:
+
+#+begin_src shell :results output :export
+make clean
+make -f Makefile.akypuera
+#+end_src
+
+#+RESULTS:
+: rm -f *.o
+: mpicc -c -o timing_functions.o timing_functions.c -O3 -g
+: mpicc -c -o compute_mandelbrot_coordinates.o compute_mandelbrot_coordinates.c -O3 -g
+: mpicc -c -o compute_one_mandelbrot_point.o compute_one_mandelbrot_point.c -O3 -g
+: mpicc -c -o mandelbrot-mpi.o mandelbrot-mpi.c -O3 -g
+: mpicc -o mandelbrot-mpi timing_functions.o compute_mandelbrot_coordinates.o compute_one_mandelbrot_point.o mandelbrot-mpi.o -O3 -g -L/home/schnorr/install/akypuera/lib -laky -lrastro
+
+**** #5.5 (Copy all these files to the PCAD platform)
+
+#+BEGIN_SRC bash
+ssh gppd-hpc.inf.ufrgs.br mkdir -p mandelbrot
+scp -r \
+    compute_mandelbrot_coordinates.c \
+    mandelbrot-mpi.c \
+    timing_functions.c \
+    compute_one_mandelbrot_point.c \
+    Makefile.akypuera gppd-hpc.inf.ufrgs.br:./mandelbrot
+rsync --recursive $HOME/install/akypuera gppd-hpc.inf.ufrgs.br:./
+ssh gppd-hpc.inf.ufrgs.br make -C mandelbrot/ -f Makefile.akypuera
+#+END_SRC
+
+**** #5.6 The ~mandelbrot-akypuera.slurm~ script
+
+#+BEGIN_SRC bash :tangle mandelbrot-akypuera.slurm
+#!/bin/bash
+#SBATCH --nodes=5
+#SBATCH --ntasks=80
+#SBATCH --time=02:00:00
+#SBATCH --partition=draco
+#SBATCH --workdir=.
+#SBATCH --output=%x_%j.out
+#SBATCH --error=%x_%j.err
+
+# The mandelbrot-mpi binary location
+BINARY=$HOME/mandelbrot/mandelbrot-mpi
+
+# Application parameters
+XMIN=0.27085
+XMAX=0.27100
+YMIN=0.004640
+YMAX=0.004810
+MAXITER=64000
+XRES=10240
+
+# Akypuera
+export LD_LIBRARY_PATH=$HOME/install/akypuera/lib/
+
+# Prepare the machine file
+MACHINEFILE="nodes.$SLURM_JOB_ID"
+srun -l /bin/hostname | sort -n | awk '{print $2}' > $MACHINEFILE
+
+# Get number of cores available
+NP=$(cat $MACHINEFILE | wc -l)
+
+# Execute the program
+mpirun \
+	--mca oob_tcp_if_include 192.168.30.0/24 \
+	--mca btl_tcp_if_include 192.168.30.0/24 \
+	--mca btl_base_warn_component_unused 0 \
+	-np $NP \
+	-machinefile $MACHINEFILE \
+	$BINARY $XMIN $XMAX $YMIN $YMAX $MAXITER $XRES
+#+END_SRC
+
+**** #5.7 Run the experiment
+
+Steps to use it:
+1. Copy this file to the gppd-hpc frontend
+   #+BEGIN_SRC bash
+   ssh gppd-hpc.inf.ufrgs.br mkdir -p mandelbrot
+   scp mandelbrot-akypuera.slurm gppd-hpc.inf.ufrgs.br:./mandelbrot/
+   #+END_SRC
+2. Connect to the frontend
+   #+BEGIN_SRC bash
+   ssh gppd-hpc.inf.ufrgs.br
+   #+END_SRC
+3. Submit the script and take note of the JobID
+   #+BEGIN_SRC bash
+   sbatch mandelbrot/mandelbrot-akypuera.slurm   
+   #+END_SRC
+4. Assuming your JobId is 58876, verify the contents of the file
+   #+BEGIN_SRC bash
+   cat nodes.58876
+   #+END_SRC
+5. Then, check the stdout log
+   #+BEGIN_SRC bash
+   cat draco.slurm_58876.out
+   #+END_SRC
+6. Make sure you have something that looks like this
+
+**** #5.8 Convert trace files to a CSV
+
+Run the following commands in a ~salloc~ allocation.
+
+#+begin_src shell :results output
+$HOME/install/akypuera/bin/aky_converter rastro*.rst > rastro.paje
+$HOME/install/pajeng/bin/pj_dump rastro.paje | grep ^State > rastro.csv
+#+end_src
+
+Copy the ~rastro.csv~ to your laptop.
+
 *** Step #6: Compute and visualize the load of maestro/players
