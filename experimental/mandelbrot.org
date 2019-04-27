@@ -843,28 +843,6 @@ There are some disparities among ranks as well.
 
 Run the previous code block (see #6.1) to read data.
 
-#+begin_src R :results output :session :exports both
-df
-#+end_src
-
-#+RESULTS:
-#+begin_example
-# A tibble: 560 x 5
-    Rank    Start      End Duration Value        
-   <int>    <dbl>    <dbl>    <dbl> <chr>        
- 1     9  0.00182  0.00182 0.000001 MPI_Comm_size
- 2     9  0.00182  0.00182 0        MPI_Comm_rank
- 3     9  0.00182  0.0140  0.0122   MPI_Bcast    
- 4     9  0.0140   1.13    1.12     MPI_Scatter  
- 5     9  1.13     7.95    6.81     MPI_Scatter  
- 6     9  8.57    15.0     6.46     MPI_Gather   
- 7     9 15.0     18.4     3.40     MPI_Finalize 
- 8     8  0.00322  0.00322 0.000001 MPI_Comm_size
- 9     8  0.00322  0.00322 0        MPI_Comm_rank
-10     8  0.00323  0.00694 0.00371  MPI_Bcast    
-# … with 550 more rows
-#+end_example
-
 #+begin_src R :results output graphics :file img/mandelbrot-per-communication-aky.png :exports both :width 800 :height 400 :session
 df %>%
     group_by(Rank, Value) %>%
@@ -959,4 +937,30 @@ df.compute %>%
 Well, colors have changed from previous plot (~MPI_Scatter~ is now
 brown), but we can see the compute time (as the red color).
 
+** Step #7: Do something yourself
 
+Some suggestions to go forward.
+
+*** Simple
+
+1. What should be the parameters to make the compute time larger than
+   the communication time? Is that even possible?
+2. Change the problem size
+   - By increasing the resolution (xres)
+   - By increasing the selected mandelbrot square (xmin, ymin, xmax, ymax)
+   - By increasing the max iteration (maxiter)
+3. Change the number of cores
+   - Using more machines
+   - Attempt an heterogeneous allocation (multi-partition in PCAD)
+
+Then analyze everything once again.
+
+*** Intermediary
+
+1. Design an experiment Weak scaling analysis
+
+*** Advanced
+
+1. For a scenario where compute time is larger the communication time,
+   mask all communications by using asynchronous operations. Is this
+   possible with collective operations?
