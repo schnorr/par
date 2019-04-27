@@ -1,7 +1,7 @@
 * MPI + Mandelbrot Problem
 
 All code in this section is inspired from:
-- http://rosettacode.org/wiki/Mandelbrot_set
+- [[http://rosettacode.org/wiki/Mandelbrot_set][Mandelbrot Set @ Rosetta Code]]
 - and [[https://gist.githubusercontent.com/andrejbauer/7919569/raw/258d9ec48ee2f676f0104f496c489eb9e64dca19/mandelbrot.c][this GIST]]
 
 Let's use the Mandelbrot problem to observe the *load imbalance among
@@ -83,7 +83,7 @@ void compute_mandelbrot_coordinates (
 }
 #+END_SRC
 
-** Step #3: Implement a MPI application
+** Step #3: Implement the Mandelbrot MPI application
 *** #3.1 (the MPI application)
 
 The following implementation has three files:
@@ -139,7 +139,7 @@ int main (int argc, char **argv) {
 
   /* Image size, width is given, height is computed. */
   const int xres = atoi(argv[6]);
-  const int yres = (xres*(ymax-ymin))/(xmax-xmin);
+  const int yres = xres; //squared area
 
   int points = xres*yres;
   if (points % NP != 0){
@@ -259,20 +259,7 @@ clean:
 	rm -f *.o
 #+END_SRC
 
-*** #3.4 (Copy all these files to the PCAD platform)
-
-#+BEGIN_SRC bash
-ssh gppd-hpc.inf.ufrgs.br mkdir -p mandelbrot
-scp compute_mandelbrot_coordinates.c \
-    mandelbrot-mpi.c \
-    timing_functions.c \
-    compute_one_mandelbrot_point.c \
-    Makefile gppd-hpc.inf.ufrgs.br:./mandelbrot
-ssh gppd-hpc.inf.ufrgs.br make -C mandelbrot/
-#+END_SRC
-
-** Step #4: Run the experiment in the PCAD platform
-*** #4.1 The ~mandelbrot.slurm~ script
+*** #3.4 The ~mandelbrot.slurm~ script
 
 #+BEGIN_SRC bash :tangle mandelbrot.slurm
 #!/bin/bash
@@ -286,6 +273,13 @@ ssh gppd-hpc.inf.ufrgs.br make -C mandelbrot/
 
 # The mandelbrot-mpi binary location
 BINARY=$HOME/mandelbrot/mandelbrot-mpi
+
+# Compile mandelbrot-mpi-akypuera
+pushd $HOME/mandelbrot
+rm -f $BINARY
+make -f Makefile clean
+make
+popd
 
 # Application parameters
 XMIN=0.27085
@@ -310,42 +304,62 @@ mpirun \
 	-np $NP \
 	-machinefile $MACHINEFILE \
 	$BINARY $XMIN $XMAX $YMIN $YMAX $MAXITER $XRES
+
+echo "The SLURM script has finished (mpirun return code $?)".
 #+END_SRC
-*** #4.2 Run the experiment
+*** #3.5 (Copy all these files to the PCAD platform)
+
+Create the destination directory in PCAD
+
+#+begin_src bash :results output :session :exports both
+ssh gppd-hpc.inf.ufrgs.br mkdir -p mandelbrot
+#+END_SRC
+
+#+RESULTS:
+
+Copy files
+
+#+begin_src shell :results output
+rsync -v \
+    mandelbrot.slurm \
+    compute_mandelbrot_coordinates.c \
+    mandelbrot-mpi.c \
+    timing_functions.c \
+    compute_one_mandelbrot_point.c \
+    Makefile.akypuera gppd-hpc.inf.ufrgs.br:./mandelbrot
+#+end_src
+
+#+RESULTS:
+: Makefile.akypuera
+: compute_mandelbrot_coordinates.c
+: compute_one_mandelbrot_point.c
+: mandelbrot-mpi.c
+: mandelbrot.slurm
+: timing_functions.c
+: 
+: sent 1,194 bytes  received 202 bytes  930.67 bytes/sec
+: total size is 6,234  speedup is 4.47
+
+** Step #4: Run the experiment in the PCAD platform
+*** #4.1 Run the experiment
 
 Steps to use it:
-1. Copy this file to the gppd-hpc frontend
-   #+BEGIN_SRC bash
-   ssh gppd-hpc.inf.ufrgs.br mkdir -p mandelbrot
-   scp mandelbrot.slurm gppd-hpc.inf.ufrgs.br:./mandelbrot/
-   #+END_SRC
-2. Connect to the frontend
+1. Connect to the frontend
    #+BEGIN_SRC bash
    ssh gppd-hpc.inf.ufrgs.br
    #+END_SRC
-3. Submit the script and take note of the JobID
+2. Submit the script and take note of the JobID
    #+BEGIN_SRC bash
-   sbatch mandelbrot/mandelbrot.slurm   
+   sbatch mandelbrot/mandelbrot.slurm
    #+END_SRC
-4. Assuming your JobId is 58876, verify the contents of the file
-   #+BEGIN_SRC bash
-   cat nodes.58876
-   #+END_SRC
-5. Then, check the stdout log
-   #+BEGIN_SRC bash
-   cat draco.slurm_58876.out
-   #+END_SRC
-6. Make sure you have something that looks like this
-   #+BEGIN_EXAMPLE
 
-   #+END_EXAMPLE
-*** #4.3 Observe the load imbalance
+*** #4.2 Observe the load imbalance
 
 Verify a file ~mandelbrot.slurm_JOBID.out~.
 
 Observe the compute time per rank.
 
-#+begin_src shell :results both :exports both
+#+begin_src shell :results output :exports both
 ssh gppd-hpc.inf.ufrgs.br "cat mandelbrot.slurm_58943.out | grep Compute | head -n10"
 #+end_src
 
@@ -363,6 +377,146 @@ ssh gppd-hpc.inf.ufrgs.br "cat mandelbrot.slurm_58943.out | grep Compute | head 
 [12] Compute OKAY 0.654586 secs
 #+end_example
 
+Compute time (as measured by the application code itself) is about 0.6
+secs for each rank. Let's see with more details:
+
+#+name: dados_exp_mandelbrot
+#+begin_src shell :results table :cache yes :exports both
+ssh gppd-hpc.inf.ufrgs.br "cat mandelbrot.slurm_58976.out | grep Compute" | cut -d" " -f1,4
+#+end_src
+
+#+RESULTS[6530bfb8cf60375d573935ff0c2d3bf730e09e6d]: dados_exp_mandelbrot
+| [3]  | 0.504004 |
+| [4]  | 0.534869 |
+| [5]  | 0.553545 |
+| [6]  | 0.602988 |
+| [8]  | 0.600034 |
+| [7]  |  0.61875 |
+| [10] |  0.59518 |
+| [9]  | 0.604677 |
+| [11] |  0.61089 |
+| [12] | 0.605045 |
+| [13] |  0.61146 |
+| [14] | 0.621112 |
+| [15] | 0.605549 |
+| [16] | 0.608218 |
+| [17] | 0.610561 |
+| [18] | 0.683535 |
+| [19] | 0.601911 |
+| [20] | 0.568051 |
+| [2]  | 1.263168 |
+| [21] | 0.563423 |
+| [22] | 0.614667 |
+| [1]  |  1.52322 |
+| [23] |  0.66368 |
+| [24] | 0.669606 |
+| [25] | 0.667163 |
+| [26] | 0.705303 |
+| [27] | 0.831506 |
+| [30] | 0.929757 |
+| [31] | 0.905309 |
+| [32] | 0.898833 |
+| [33] | 0.839686 |
+| [34] | 0.801935 |
+| [35] | 0.738701 |
+| [36] | 0.657487 |
+| [37] | 0.640754 |
+| [38] | 0.581757 |
+| [39] | 0.571014 |
+| [40] | 0.642998 |
+| [41] | 0.603952 |
+| [42] |  0.59883 |
+| [43] | 0.598321 |
+| [44] | 0.572983 |
+| [45] | 0.546224 |
+| [46] | 0.559873 |
+| [47] | 0.583018 |
+| [48] | 0.598696 |
+| [50] | 0.658176 |
+| [51] | 0.639027 |
+| [49] | 0.836836 |
+| [52] | 0.682719 |
+| [53] | 0.655541 |
+| [54] | 0.691714 |
+| [55] | 0.769031 |
+| [56] | 0.681904 |
+| [57] | 0.628135 |
+| [58] | 0.656533 |
+| [59] | 0.691172 |
+| [60] | 0.751239 |
+| [61] | 0.737485 |
+| [62] | 0.745788 |
+| [63] | 0.708546 |
+| [64] | 0.689502 |
+| [65] |  0.67995 |
+| [29] | 3.949362 |
+| [66] | 0.660264 |
+| [67] | 0.682319 |
+| [68] | 0.714628 |
+| [69] | 0.767195 |
+| [70] | 0.721229 |
+| [71] | 0.676566 |
+| [72] | 0.628858 |
+| [73] | 0.552046 |
+| [74] | 0.487409 |
+| [75] | 0.440149 |
+| [76] | 0.388893 |
+| [77] | 0.335209 |
+| [78] | 0.302255 |
+| [79] | 0.244106 |
+| [0]  | 0.447721 |
+| [28] | 5.530829 |
+
+Let's read this data in R and create a plot
+- The X axis is the rank
+- The Y axis is the compute time
+
+But first, let's make some data handling
+
+#+header: :var dep0=dados_exp_mandelbrot
+#+begin_src R :results output :session :exports both
+suppressMessages(library(tidyverse));
+dep0 %>%
+    as_tibble %>%
+    mutate(V1 = as.integer(gsub('\\D+','', V1))) %>%
+    rename(Rank = V1, Compute.Time = V2) -> df;
+df;
+#+end_src
+
+#+RESULTS:
+#+begin_example
+
+# A tibble: 80 x 2
+    Rank Compute.Time
+   <int>        <dbl>
+ 1     3        0.504
+ 2     4        0.535
+ 3     5        0.554
+ 4     6        0.603
+ 5     8        0.600
+ 6     7        0.619
+ 7    10        0.595
+ 8     9        0.605
+ 9    11        0.611
+10    12        0.605
+# … with 70 more rows
+#+end_example
+
+Now, the plot
+
+#+begin_src R :results output graphics :file img/mandelbrot-compute.png :exports both :width 600 :height 400 :session
+df %>%
+    ggplot(aes(x = Rank, y=Compute.Time)) +
+    geom_point() +
+    theme_bw(base_size = 22) +
+    xlim(0,NA)
+#+end_src
+
+#+RESULTS:
+[[file:img/mandelbrot-compute.png]]
+
+Ow! There are some ranks with much larger compute time.
+
 ** Step #5: Trace the behavior of the MPI application
 *** #5.1 Introduction
 
@@ -373,26 +527,35 @@ communication to inspire us to attempt to remove all the communication
 footprint by masking them with computation (with asynchronous
 communication). Let's employ [[https://github.com/schnorr/akypuera/][akypuera]].
 
-*** #5.2 Akypuera Installation (PCAD)
+*** #5.2 Installation of tracing tools (in PCAD)
+**** Akypuera
 
-Run the following commands in the PCAD platform since akypuera must
-link against the MPI library that is installed there. Make sure you
+Akypuera has been designed to intercept all calls to MPI and trace
+when each MPI operation starts and ends. The resulting trace files
+(one per process) is in the rastro binary format. You can use
+=aky_converter= to generate (textual) Paje trace files.  Run the
+following commands in the PCAD platform since akypuera must link
+against the MPI library that is installed there. Please, make sure you
 =salloc= one node because cmake is not installed in the frontend.
 
- #+begin_src shell :results output :exports both
+  #+begin_src shell :results output :exports both
 git clone --recursive git://github.com/schnorr/akypuera.git
 cd akypuera
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=$HOME/install/akypuera ..
 make install
- #+end_src
+  #+end_src
 
-*** #5.3 PajeNG Installation (PCAD)
+**** PajeNG
 
+PajeNG is a framework to deal with Paje traces, such as the ones
+generated by Akypuera. The =pj_dump= application enables one to
+transform the (textual) file in the Paje format to a CSV-like file.
 Run the following commands in the PCAD platform since ~pj_dump~ must be
-available in the following steps. Make sure you =salloc= one node
-because cmake is not installed in the frontend.
+available in the following steps of this tutorial. Once again, please,
+make sure you =salloc= one node because cmake is not installed in the
+frontend.
 
 #+begin_src shell :results output
 git clone git://github.com/schnorr/pajeng.git
@@ -402,7 +565,7 @@ cmake -DCMAKE_INSTALL_PREFIX=$HOME/install/pajeng/ ..
 make install
 #+end_src
 
-*** #5.4 Update Makefile to link against akypuera
+*** #5.3 Update Makefile to link against akypuera
 
 There is a new akypuera-enabled Makefile to compile all of them in an application:
 
@@ -418,7 +581,7 @@ OBJ = timing_functions.o \
 %.o:%.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-mandelbrot-mpi: $(OBJ)
+mandelbrot-mpi-akypuera: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 clean:
@@ -440,21 +603,7 @@ make -f Makefile.akypuera
 : mpicc -c -o mandelbrot-mpi.o mandelbrot-mpi.c -O3 -g
 : mpicc -o mandelbrot-mpi timing_functions.o compute_mandelbrot_coordinates.o compute_one_mandelbrot_point.o mandelbrot-mpi.o -O3 -g -L/home/schnorr/install/akypuera/lib -laky -lrastro
 
-*** #5.5 (Copy all these files to the PCAD platform)
-
-#+BEGIN_SRC bash
-ssh gppd-hpc.inf.ufrgs.br mkdir -p mandelbrot
-scp -r \
-    compute_mandelbrot_coordinates.c \
-    mandelbrot-mpi.c \
-    timing_functions.c \
-    compute_one_mandelbrot_point.c \
-    Makefile.akypuera gppd-hpc.inf.ufrgs.br:./mandelbrot
-rsync --recursive $HOME/install/akypuera gppd-hpc.inf.ufrgs.br:./
-ssh gppd-hpc.inf.ufrgs.br make -C mandelbrot/ -f Makefile.akypuera
-#+END_SRC
-
-*** #5.6 The ~mandelbrot-akypuera.slurm~ script
+*** #5.4 The ~mandelbrot-akypuera.slurm~ script
 
 #+BEGIN_SRC bash :tangle mandelbrot-akypuera.slurm
 #!/bin/bash
@@ -467,7 +616,14 @@ ssh gppd-hpc.inf.ufrgs.br make -C mandelbrot/ -f Makefile.akypuera
 #SBATCH --error=%x_%j.err
 
 # The mandelbrot-mpi binary location
-BINARY=$HOME/mandelbrot/mandelbrot-mpi
+BINARY=$HOME/mandelbrot/mandelbrot-mpi-akypuera
+
+# Compile mandelbrot-mpi-akypuera
+pushd $HOME/mandelbrot
+rm -f $BINARY
+make -f Makefile.akypuera clean
+make
+popd
 
 # Application parameters
 XMIN=0.27085
@@ -495,42 +651,64 @@ mpirun \
 	-np $NP \
 	-machinefile $MACHINEFILE \
 	$BINARY $XMIN $XMAX $YMIN $YMAX $MAXITER $XRES
+
+echo "mpirun return code is $?".
+
+# Convert trace files to a CSV
+$HOME/install/akypuera/bin/aky_converter rastro*.rst > rastro.paje
+$HOME/install/pajeng/bin/pj_dump rastro.paje | grep ^State > rastro.csv
+
+echo "The SLURM script (with akypuera) has finished."
 #+END_SRC
 
-*** #5.7 Run the experiment
+*** #5.5 (Copy all these files to the PCAD platform)
+
+Create the destination directory in PCAD
+
+#+begin_src bash :results output :session :exports both
+ssh gppd-hpc.inf.ufrgs.br mkdir -p mandelbrot
+#+END_SRC
+
+#+RESULTS:
+
+Copy files
+
+#+begin_src shell :results output
+rsync -v \
+    mandelbrot.slurm \
+    mandelbrot-akypuera.slurm \
+    compute_mandelbrot_coordinates.c \
+    mandelbrot-mpi.c \
+    timing_functions.c \
+    compute_one_mandelbrot_point.c \
+    Makefile.akypuera gppd-hpc.inf.ufrgs.br:./mandelbrot
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Makefile.akypuera
+compute_mandelbrot_coordinates.c
+compute_one_mandelbrot_point.c
+mandelbrot-akypuera.slurm
+mandelbrot-mpi.c
+mandelbrot.slurm
+timing_functions.c
+
+sent 833 bytes  received 233 bytes  710.67 bytes/sec
+total size is 7,540  speedup is 7.07
+#+end_example
+
+*** #5.6 Run the experiment
 
 Steps to use it:
-1. Copy this file to the gppd-hpc frontend
-   #+BEGIN_SRC bash
-   ssh gppd-hpc.inf.ufrgs.br mkdir -p mandelbrot
-   scp mandelbrot-akypuera.slurm gppd-hpc.inf.ufrgs.br:./mandelbrot/
-   #+END_SRC
-2. Connect to the frontend
+1. Connect to the frontend
    #+BEGIN_SRC bash
    ssh gppd-hpc.inf.ufrgs.br
    #+END_SRC
-3. Submit the script and take note of the JobID
+2. Submit the script and take note of the JobID
    #+BEGIN_SRC bash
    sbatch mandelbrot/mandelbrot-akypuera.slurm   
    #+END_SRC
-4. Assuming your JobId is 58876, verify the contents of the file
-   #+BEGIN_SRC bash
-   cat nodes.58876
-   #+END_SRC
-5. Then, check the stdout log
-   #+BEGIN_SRC bash
-   cat draco.slurm_58876.out
-   #+END_SRC
-6. Make sure you have something that looks like this
-
-*** #5.8 Convert trace files to a CSV
-
-Run the following commands in a ~salloc~ allocation.
-
-#+begin_src shell :results output
-$HOME/install/akypuera/bin/aky_converter rastro*.rst > rastro.paje
-$HOME/install/pajeng/bin/pj_dump rastro.paje | grep ^State > rastro.csv
-#+end_src
 
 Copy the ~rastro.csv~ to your laptop.
 
