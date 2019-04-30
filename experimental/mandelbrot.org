@@ -24,7 +24,9 @@ tutorial:
 
 ** Step #1: Compute one Mandelbrot point
 
-Each (x,y) mandelbrot coordinate is computed as follows:
+Each (x,y) mandelbrot coordinate is computed as follows.
+
+*Task*: filename ~compute_one_mandelbrot_point.c~
 
 #+BEGIN_SRC C :tangle compute_one_mandelbrot_point.c :main no
 #include <stdio.h>
@@ -46,9 +48,11 @@ int compute_mandelbrot_point (double x, double y, int maxiter)
 }
 #+END_SRC
 
-*Task*: filename ~compute_one_mandelbrot_point.c~
-
 ** Step #2: Compute many mandelbrot coordinates
+
+Many (x, y) mandelbrot coordinates can be calculated as follows.
+
+*Task*: filename ~compute_mandelbrot_coordinates.c~
 
 #+begin_src C :results output :session :exports both :tangle compute_mandelbrot_coordinates.c :main no
 void compute_mandelbrot_coordinates (
@@ -92,6 +96,8 @@ The following implementation has three files:
  - ~mandelbrot-mpi.c~ (where the ~main~ function resides, see code below)
  - ~compute_mandelbrot_coordinates.c~ (function to compute mandelbrot coordinates)
  - ~compute_one_mandelbrot_point.c~ (computes the mandelbrot function)
+
+*Task*: filename ~mandelbrot-mpi.c~
 
  #+BEGIN_SRC C :tangle mandelbrot-mpi.c :main no
 #include <mpi.h>
@@ -227,6 +233,8 @@ int main (int argc, char **argv) {
 
 *** #3.2 (timing functions)
 
+*Task*: filename ~timing_functions.c~
+
 #+BEGIN_SRC C :tangle timing_functions.c :main no
 #include <sys/time.h>
 #include <stddef.h>
@@ -241,7 +249,9 @@ double gettime (void)
 
 *** #3.3 (the Makefile)
 
-There is a Makefile to compile all of them in an application:
+There is a Makefile to compile all of them in an application.
+
+*Task*: filename ~Makefile~
 
 #+BEGIN_SRC makefile :tangle Makefile
 CC = mpicc
@@ -262,6 +272,10 @@ clean:
 #+END_SRC
 
 *** #3.4 The ~mandelbrot.slurm~ script
+
+We should have a SLURM script to submit the job to PCAD.
+
+*Task*: filename ~mandelbrot.slurm~
 
 #+BEGIN_SRC bash :tangle mandelbrot.slurm
 #!/bin/bash
@@ -319,7 +333,7 @@ ssh gppd-hpc.inf.ufrgs.br mkdir -p mandelbrot
 
 #+RESULTS:
 
-Copy files
+Copy files with rsync
 
 #+begin_src shell :results output
 rsync -v \
