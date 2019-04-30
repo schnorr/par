@@ -964,3 +964,7 @@ Then analyze everything once again.
 1. For a scenario where compute time is larger the communication time,
    mask all communications by using asynchronous operations. Is this
    possible with collective operations?
+2. Make all ranks compute their own coordinates to avoid communication
+   of points. So by doing this, the application will end up with a
+   single ~MPI_Gather~ and the end to collect results in a single rank
+   (the maestro).
