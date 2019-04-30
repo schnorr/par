@@ -382,7 +382,7 @@ secs for each rank. Let's see with more details:
 
 #+name: dados_exp_mandelbrot
 #+begin_src shell :results table :cache yes :exports both
-ssh gppd-hpc.inf.ufrgs.br "cat mandelbrot.slurm_58976.out | grep Compute" | cut -d" " -f1,4
+ssh gppd-hpc.inf.ufrgs.br "cat mandelbrot.slurm_58976.out | grep Compute | cut -d\" \" -f1,4"
 #+end_src
 
 #+RESULTS[6530bfb8cf60375d573935ff0c2d3bf730e09e6d]: dados_exp_mandelbrot
