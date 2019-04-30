@@ -46,6 +46,8 @@ int compute_mandelbrot_point (double x, double y, int maxiter)
 }
 #+END_SRC
 
+*Task*: filename ~compute_one_mandelbrot_point.c~
+
 ** Step #2: Compute many mandelbrot coordinates
 
 #+begin_src C :results output :session :exports both :tangle compute_mandelbrot_coordinates.c :main no
