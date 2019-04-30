@@ -326,7 +326,7 @@ rsync -v \
     mandelbrot-mpi.c \
     timing_functions.c \
     compute_one_mandelbrot_point.c \
-    Makefile.akypuera gppd-hpc.inf.ufrgs.br:./mandelbrot
+    Makefile gppd-hpc.inf.ufrgs.br:./mandelbrot
 #+end_src
 
 #+RESULTS:
