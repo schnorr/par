@@ -330,15 +330,15 @@ rsync -v \
 #+end_src
 
 #+RESULTS:
-: Makefile.akypuera
+: Makefile
 : compute_mandelbrot_coordinates.c
 : compute_one_mandelbrot_point.c
 : mandelbrot-mpi.c
 : mandelbrot.slurm
 : timing_functions.c
 : 
-: sent 1,194 bytes  received 202 bytes  930.67 bytes/sec
-: total size is 6,234  speedup is 4.47
+: sent 1,878 bytes  received 202 bytes  1,386.67 bytes/sec
+: total size is 6,178  speedup is 2.97
 
 ** Step #4: Run the experiment in the PCAD platform
 *** #4.1 Run the experiment
