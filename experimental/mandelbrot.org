@@ -148,6 +148,7 @@ int main (int argc, char **argv) {
 	   "of players (%d)\n",
 	   points, NP);
     MPI_Finalize();
+    return 0;
   }
 
   /* Maestro print data read from parameters, for validation purposes */
