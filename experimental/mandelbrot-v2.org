@@ -27,7 +27,7 @@ This is strongly inspired by: [[./mandelbrot.org][Mandelbrot Load Balancing & Co
    total size is 8,281  speedup is 2.42
    #+end_example
 
-3. Launch the SLURM script in PCAD
+3. Review [[./mb-dir/mb-aky.slurm]]. Launch the SLURM script in PCAD
    #+begin_src shell :results output
    sbatch mb-dir/mb-aky.slurm
    #+end_src
