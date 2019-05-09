@@ -1,0 +1,6 @@
+* Mandelbrot LB ++ Revisited
+
+This is strongly inspired by: [[./mandelbrot.org][Mandelbrot Load Balancing & Comm/Comp Ratio]].
+
+
+

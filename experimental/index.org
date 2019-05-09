@@ -4,5 +4,6 @@
 |---------------------------------------------|
 | [[./slurm-pcad.org][Slurm in PCAD]]                               |
 | [[./mandelbrot.org][Mandelbrot Load Balancing & Comm/Comp Ratio]] |
+| [[./mandelbrot-v2.org][Mandelbrot LB ++ Revisited]]                  |
 | TBD                                         |
 
