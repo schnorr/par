@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
   MPI_Comm_remote_size(parent, &size);
   MPI_Comm_rank(parent, &rank);
    
-  if (size != 1) error("Something's wrong with the parent"); 
+  if (size != 1) perror("Something's wrong with the parent"); 
  
   /* 
    * Parallel code here.  
@@ -28,7 +28,9 @@ int main(int argc, char *argv[])
 
   printf ("sou fib %d\n", n);
 
-  if (n < 2){
+  if (n == 0){
+    MPI_Send (&n, 1, MPI_INT, 0, 123, parent);
+  }else if (n == 1) {
     MPI_Send (&n, 1, MPI_INT, 0, 123, parent);
   }else{
     //lançar fib (n-1)
