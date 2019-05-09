@@ -129,4 +129,8 @@ This is strongly inspired by: [[./mandelbrot.org][Mandelbrot Load Balancing & Co
 
      #+RESULTS:
      [[file:img/mb-aky-comp-comm-per-rank.png]]
-6. 
+6. There are load imbalances, and most of the time is spent in
+   communication. Discuss with your colleagues on how to improve the
+   application code to mitigate such LB and excessive communication
+   time. Are synchronous collective operations the best way to do?
+   Could we use asynchronous point-to-point operations to do it?
