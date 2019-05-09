@@ -51,17 +51,26 @@ int main(int argc, char *argv[])  {
     outbuf = rank;
 
     //comunicação assíncrona com os vizinhos
+    int c = 0;
     for (i=0; i<4; i++) {
-      dest = nbrs[i];
-      source = nbrs[i];
-      MPI_Isend(&outbuf, 1, MPI_INT, dest, tag, 
-		MPI_COMM_WORLD, &reqs[i]);
-      MPI_Irecv(&inbuf[i], 1, MPI_INT, source, tag, 
-		MPI_COMM_WORLD, &reqs[i+4]);
+      if (nbrs[i] >= 0){
+	dest = nbrs[i];
+	source = nbrs[i];
+	
+	MPI_Isend(&outbuf, 1, MPI_INT, dest, tag, 
+		  MPI_COMM_WORLD, &reqs[c++]);
+	MPI_Irecv(&inbuf[i], 1, MPI_INT, source, tag, 
+		  MPI_COMM_WORLD, &reqs[c++]);
+      }
     }
 
-    MPI_Waitall(8, reqs, stats);
-   
+    MPI_Waitall(c-1, reqs, stats);
+
+    for(i=0;i<c;i++){
+      MPI_Status *p = &stats[i];
+      printf("[%d] %d %d\n", rank, p->MPI_SOURCE, p->_ucount);
+    }
+    
     printf("rank= %d                  inbuf(u,d,l,r)= %d %d %d %d\n",
 	   rank,inbuf[UP],inbuf[DOWN],inbuf[LEFT],inbuf[RIGHT]);  
   } else {
