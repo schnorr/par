@@ -1,4 +1,5 @@
 #+startup: overview indent
+#+EXPORT_EXCLUDE_TAGS: noexport
 
 * Mandelbrot LB ++ Revisited
 
