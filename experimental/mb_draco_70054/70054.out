@@ -1,0 +1,355 @@
+I am the script running at draco1
+~/mb_draco_70054 ~
+draco1
+draco3
+draco4
+draco5
+Compile the application at /home/users/schnorr/mb-dir/
+make: Entering directory '/home/users/schnorr/mb-dir'
+mpicc -c -o timing_functions.o timing_functions.c -O3 -g
+mpicc -c -o compute_mandelbrot_coordinates.o compute_mandelbrot_coordinates.c -O3 -g
+mpicc -c -o compute_one_mandelbrot_point.o compute_one_mandelbrot_point.c -O3 -g
+mpicc -c -o mandelbrot-mpi.o mandelbrot-mpi.c -O3 -g
+mpicc -o mandelbrot-mpi-akypuera timing_functions.o compute_mandelbrot_coordinates.o compute_one_mandelbrot_point.o mandelbrot-mpi.o -O3 -g -L/home/users/schnorr/install/akypuera/lib/ -laky -lrastro
+make: Leaving directory '/home/users/schnorr/mb-dir'
+'/home/users/schnorr/mb-dir/' -> './mb-dir'
+'/home/users/schnorr/mb-dir/compute_one_mandelbrot_point.c' -> './mb-dir/compute_one_mandelbrot_point.c'
+'/home/users/schnorr/mb-dir/mandelbrot-mpi.c' -> './mb-dir/mandelbrot-mpi.c'
+'/home/users/schnorr/mb-dir/mb-aky.slurm' -> './mb-dir/mb-aky.slurm'
+'/home/users/schnorr/mb-dir/timing_functions.c' -> './mb-dir/timing_functions.c'
+'/home/users/schnorr/mb-dir/timing_functions.o' -> './mb-dir/timing_functions.o'
+'/home/users/schnorr/mb-dir/Makefile' -> './mb-dir/Makefile'
+'/home/users/schnorr/mb-dir/compute_mandelbrot_coordinates.c' -> './mb-dir/compute_mandelbrot_coordinates.c'
+'/home/users/schnorr/mb-dir/compute_mandelbrot_coordinates.o' -> './mb-dir/compute_mandelbrot_coordinates.o'
+'/home/users/schnorr/mb-dir/compute_one_mandelbrot_point.o' -> './mb-dir/compute_one_mandelbrot_point.o'
+'/home/users/schnorr/mb-dir/mandelbrot-mpi.o' -> './mb-dir/mandelbrot-mpi.o'
+'/home/users/schnorr/mb-dir/mandelbrot-mpi-akypuera' -> './mb-dir/mandelbrot-mpi-akypuera'
+Define the resolution based on the number of NP == 64
+Resolution is 19600
+Let's launch the /home/users/schnorr/mb-dir//mandelbrot-mpi-akypuera application...
+Let's execute 'mpirun 	--mca oob_tcp_if_include 192.168.30.0/24 	--mca btl_tcp_if_include 192.168.30.0/24 	--mca btl_base_warn_component_unused 0 	-np 64 	-machinefile nodes.70054 	/home/users/schnorr/mb-dir//mandelbrot-mpi-akypuera 0.27085 0.27100 0.004640 0.004810 64000 19600'
+(0.270850, 0.004640) -> (0.271000, 0.004810) resolution (19600, 19600) maxiter 64000
+[4] points_per_player = 6002500
+Broadcast OKAY
+[36] points_per_player = 6002500
+Broadcast OKAY
+[12] points_per_player = 6002500
+Broadcast OKAY
+[20] points_per_player = 6002500
+Broadcast OKAY
+[52] points_per_player = 6002500
+Broadcast OKAY
+[44] points_per_player = 6002500
+Broadcast OKAY
+[43] points_per_player = 6002500
+Broadcast OKAY
+[41] points_per_player = 6002500
+Broadcast OKAY
+[6] points_per_player = 6002500
+Broadcast OKAY
+[38] points_per_player = 6002500
+Broadcast OKAY
+[11] points_per_player = 6002500
+Broadcast OKAY
+[14] points_per_player = 6002500
+Broadcast OKAY
+[46] points_per_player = 6002500
+Broadcast OKAY
+[34] points_per_player = 6002500
+Broadcast OKAY
+[21] points_per_player = 6002500
+Broadcast OKAY
+[3] points_per_player = 6002500
+Broadcast OKAY
+[53] points_per_player = 6002500
+Broadcast OKAY
+[35] points_per_player = 6002500
+Broadcast OKAY
+[2] points_per_player = 6002500
+Broadcast OKAY
+[45] points_per_player = 6002500
+Broadcast OKAY
+[28] points_per_player = 6002500
+Broadcast OKAY
+[60] points_per_player = 6002500
+Broadcast OKAY
+[32] points_per_player = 6002500
+Broadcast OKAY
+[9] points_per_player = 6002500
+Broadcast OKAY
+[42] points_per_player = 6002500
+Broadcast OKAY
+[0] points_per_player = 6002500
+Broadcast OKAY
+[8] points_per_player = 6002500
+Broadcast OKAY
+[10] points_per_player = 6002500
+Broadcast OKAY
+[17] points_per_player = 6002500
+Broadcast OKAY
+[40] points_per_player = 6002500
+Broadcast OKAY
+[27] points_per_player = 6002500
+Broadcast OKAY
+[49] points_per_player = 6002500
+Broadcast OKAY
+[59] points_per_player = 6002500
+Broadcast OKAY
+[1] points_per_player = 6002500
+Broadcast OKAY
+[33] points_per_player = 6002500
+Broadcast OKAY
+[39] points_per_player = 6002500
+Broadcast OKAY
+[13] points_per_player = 6002500
+Broadcast OKAY
+[54] points_per_player = 6002500
+Broadcast OKAY
+[22] points_per_player = 6002500
+Broadcast OKAY
+[30] points_per_player = 6002500
+Broadcast OKAY
+[62] points_per_player = 6002500
+Broadcast OKAY
+[15] points_per_player = 6002500
+Broadcast OKAY
+[56] points_per_player = 6002500
+Broadcast OKAY
+[24] points_per_player = 6002500
+Broadcast OKAY
+[47] points_per_player = 6002500
+Broadcast OKAY
+[7] points_per_player = 6002500
+Broadcast OKAY
+[5] points_per_player = 6002500
+Broadcast OKAY
+[37] points_per_player = 6002500
+Broadcast OKAY
+[48] points_per_player = 6002500
+Broadcast OKAY
+[16] points_per_player = 6002500
+Broadcast OKAY
+[58] points_per_player = 6002500
+Broadcast OKAY
+[26] points_per_player = 6002500
+Broadcast OKAY
+[29] points_per_player = 6002500
+Broadcast OKAY
+[61] points_per_player = 6002500
+Broadcast OKAY
+[23] points_per_player = 6002500
+Broadcast OKAY
+[55] points_per_player = 6002500
+Broadcast OKAY
+[31] points_per_player = 6002500
+Broadcast OKAY
+[63] points_per_player = 6002500
+Broadcast OKAY
+[25] points_per_player = 6002500
+Broadcast OKAY
+[57] points_per_player = 6002500
+Broadcast OKAY
+[19] points_per_player = 6002500
+Broadcast OKAY
+[51] points_per_player = 6002500
+Broadcast OKAY
+[18] points_per_player = 6002500
+Broadcast OKAY
+[50] points_per_player = 6002500
+Broadcast OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+[2] Compute OKAY 2.231169 secs
+[3] Compute OKAY 2.341985 secs
+Scatter OKAY
+[4] Compute OKAY 2.484637 secs
+Scatter OKAY
+[5] Compute OKAY 2.700434 secs
+[7] Compute OKAY 2.602819 secs
+[6] Compute OKAY 2.696952 secs
+[8] Compute OKAY 2.757465 secs
+[9] Compute OKAY 2.688057 secs
+[10] Compute OKAY 2.706484 secs
+[12] Compute OKAY 2.659713 secs
+Scatter OKAY
+[11] Compute OKAY 2.752728 secs
+[13] Compute OKAY 2.713686 secs
+[15] Compute OKAY 2.707693 secs
+[14] Compute OKAY 2.931674 secs
+Scatter OKAY
+[16] Compute OKAY 2.520309 secs
+Scatter OKAY
+[17] Compute OKAY 2.577101 secs
+Scatter OKAY
+[18] Compute OKAY 2.778476 secs
+Scatter OKAY
+Scatter OKAY
+[19] Compute OKAY 2.962425 secs
+Scatter OKAY
+[20] Compute OKAY 2.963944 secs
+Scatter OKAY
+Scatter OKAY
+[21] Compute OKAY 3.492839 secs
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+[24] Compute OKAY 4.021491 secs
+Scatter OKAY
+[1] Compute OKAY 8.860849 secs
+[25] Compute OKAY 4.011524 secs
+Scatter OKAY
+[26] Compute OKAY 3.753899 secs
+[27] Compute OKAY 3.556012 secs
+[28] Compute OKAY 3.224720 secs
+[29] Compute OKAY 2.839108 secs
+Scatter OKAY
+[30] Compute OKAY 2.688294 secs
+Scatter OKAY
+[31] Compute OKAY 2.540008 secs
+Scatter OKAY
+[32] Compute OKAY 2.758545 secs
+Scatter OKAY
+[33] Compute OKAY 2.688440 secs
+Scatter OKAY
+[34] Compute OKAY 2.626853 secs
+Scatter OKAY
+[35] Compute OKAY 2.569189 secs
+[36] Compute OKAY 2.427376 secs
+Scatter OKAY
+Scatter OKAY
+[37] Compute OKAY 2.552381 secs
+Scatter OKAY
+[38] Compute OKAY 2.595069 secs
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+[40] Compute OKAY 2.910932 secs
+[39] Compute OKAY 3.449095 secs
+[41] Compute OKAY 2.810668 secs
+Scatter OKAY
+Scatter OKAY
+[42] Compute OKAY 3.001743 secs
+Scatter OKAY
+[43] Compute OKAY 3.046371 secs
+Scatter OKAY
+[45] Compute OKAY 2.853839 secs
+Scatter OKAY
+[44] Compute OKAY 3.408862 secs
+[46] Compute OKAY 2.821248 secs
+Scatter OKAY
+Scatter OKAY
+[47] Compute OKAY 3.038799 secs
+Scatter OKAY
+Scatter OKAY
+[22] Compute OKAY 13.939408 secs
+[48] Compute OKAY 3.311835 secs
+[49] Compute OKAY 3.252216 secs
+Scatter OKAY
+[50] Compute OKAY 3.178986 secs
+Scatter OKAY
+[51] Compute OKAY 3.172976 secs
+Scatter OKAY
+[52] Compute OKAY 3.169966 secs
+Scatter OKAY
+[53] Compute OKAY 2.908943 secs
+Scatter OKAY
+[54] Compute OKAY 3.070710 secs
+Scatter OKAY
+[55] Compute OKAY 3.260217 secs
+Scatter OKAY
+Scatter OKAY
+[56] Compute OKAY 3.150811 secs
+[57] Compute OKAY 2.904418 secs
+[58] Compute OKAY 2.579302 secs
+[59] Compute OKAY 2.185575 secs
+[60] Compute OKAY 1.950107 secs
+[61] Compute OKAY 1.653967 secs
+[62] Compute OKAY 1.428762 secs
+[63] Compute OKAY 1.164219 secs
+[0] Compute OKAY 2.003272 secs
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+[23] Compute OKAY 22.202245 secs
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+mpirun return code is 0.
+Post-processing trace files...
+The SLURM script (with akypuera) has finished.
+~
