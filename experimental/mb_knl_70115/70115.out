@@ -1,0 +1,1392 @@
+I am the script running at knl1
+~/mb_knl_70115 ~
+knl1
+knl2
+knl3
+knl4
+Compile the application at /home/users/schnorr/mb-dir/
+make: Entering directory '/home/users/schnorr/mb-dir'
+mpicc -o mandelbrot-mpi-akypuera timing_functions.o compute_mandelbrot_coordinates.o compute_one_mandelbrot_point.o mandelbrot-mpi.o -O3 -g -L/home/users/schnorr/install/akypuera/lib/ -laky -lrastro
+make: Leaving directory '/home/users/schnorr/mb-dir'
+'/home/users/schnorr/mb-dir/' -> './mb-dir'
+'/home/users/schnorr/mb-dir/compute_one_mandelbrot_point.c' -> './mb-dir/compute_one_mandelbrot_point.c'
+'/home/users/schnorr/mb-dir/mandelbrot-mpi.c' -> './mb-dir/mandelbrot-mpi.c'
+'/home/users/schnorr/mb-dir/mb-aky.slurm~' -> './mb-dir/mb-aky.slurm~'
+'/home/users/schnorr/mb-dir/timing_functions.c' -> './mb-dir/timing_functions.c'
+'/home/users/schnorr/mb-dir/timing_functions.o' -> './mb-dir/timing_functions.o'
+'/home/users/schnorr/mb-dir/Makefile' -> './mb-dir/Makefile'
+'/home/users/schnorr/mb-dir/compute_mandelbrot_coordinates.c' -> './mb-dir/compute_mandelbrot_coordinates.c'
+'/home/users/schnorr/mb-dir/compute_mandelbrot_coordinates.o' -> './mb-dir/compute_mandelbrot_coordinates.o'
+'/home/users/schnorr/mb-dir/compute_one_mandelbrot_point.o' -> './mb-dir/compute_one_mandelbrot_point.o'
+'/home/users/schnorr/mb-dir/mandelbrot-mpi.o' -> './mb-dir/mandelbrot-mpi.o'
+'/home/users/schnorr/mb-dir/mandelbrot-mpi-akypuera' -> './mb-dir/mandelbrot-mpi-akypuera'
+'/home/users/schnorr/mb-dir/mb-aky.slurm' -> './mb-dir/mb-aky.slurm'
+Define the resolution based on the number of NP == 272
+Resolution is 40460
+Let's launch the /home/users/schnorr/mb-dir//mandelbrot-mpi-akypuera application...
+Let's execute 'mpirun 	--mca oob_tcp_if_include 192.168.30.0/24 	--mca btl_tcp_if_include 192.168.30.0/24 	--mca btl_base_warn_component_unused 0 	-np 272 	-machinefile nodes.70115 	/home/users/schnorr/mb-dir//mandelbrot-mpi-akypuera 0.27085 0.27100 0.004640 0.004810 64000 40460'
+(0.270850, 0.004640) -> (0.271000, 0.004810) resolution (40460, 40460) maxiter 64000
+[260] points_per_player = 6018425
+Broadcast OKAY
+[132] points_per_player = 6018425
+Broadcast OKAY
+[128] points_per_player = 6018425
+Broadcast OKAY
+[265] points_per_player = 6018425
+Broadcast OKAY
+[135] points_per_player = 6018425
+Broadcast OKAY
+[183] points_per_player = 6018425
+Broadcast OKAY
+[263] points_per_player = 6018425
+Broadcast OKAY
+[164] points_per_player = 6018425
+Broadcast OKAY
+[155] points_per_player = 6018425
+Broadcast OKAY
+[267] points_per_player = 6018425
+Broadcast OKAY
+[9] points_per_player = 6018425
+Broadcast OKAY
+[16] points_per_player = 6018425
+Broadcast OKAY
+[33] points_per_player = 6018425
+Broadcast OKAY
+[137] points_per_player = 6018425
+Broadcast OKAY
+[4] points_per_player = 6018425
+Broadcast OKAY
+[7] points_per_player = 6018425
+Broadcast OKAY
+[144] points_per_player = 6018425
+Broadcast OKAY
+[161] points_per_player = 6018425
+Broadcast OKAY
+[27] points_per_player = 6018425
+Broadcast OKAY
+[55] points_per_player = 6018425
+Broadcast OKAY
+[67] points_per_player = 6018425
+Broadcast OKAY
+[195] points_per_player = 6018425
+Broadcast OKAY
+[257] points_per_player = 6018425
+Broadcast OKAY
+[73] points_per_player = 6018425
+Broadcast OKAY
+[24] points_per_player = 6018425
+Broadcast OKAY
+[66] points_per_player = 6018425
+Broadcast OKAY
+[201] points_per_player = 6018425
+Broadcast OKAY
+[152] points_per_player = 6018425
+Broadcast OKAY
+[194] points_per_player = 6018425
+Broadcast OKAY
+[2] points_per_player = 6018425
+Broadcast OKAY
+[170] points_per_player = 6018425
+Broadcast OKAY
+[258] points_per_player = 6018425
+Broadcast OKAY
+[42] points_per_player = 6018425
+Broadcast OKAY
+[65] points_per_player = 6018425
+Broadcast OKAY
+[264] points_per_player = 6018425
+Broadcast OKAY
+[133] points_per_player = 6018425
+Broadcast OKAY
+[199] points_per_player = 6018425
+Broadcast OKAY
+[219] points_per_player = 6018425
+Broadcast OKAY
+[130] points_per_player = 6018425
+Broadcast OKAY
+[48] points_per_player = 6018425
+Broadcast OKAY
+[193] points_per_player = 6018425
+Broadcast OKAY
+[247] points_per_player = 6018425
+Broadcast OKAY
+[71] points_per_player = 6018425
+Broadcast OKAY
+[139] points_per_player = 6018425
+Broadcast OKAY
+[225] points_per_player = 6018425
+Broadcast OKAY
+[91] points_per_player = 6018425
+Broadcast OKAY
+[1] points_per_player = 6018425
+Broadcast OKAY
+[3] points_per_player = 6018425
+Broadcast OKAY
+[59] points_per_player = 6018425
+Broadcast OKAY
+[176] points_per_player = 6018425
+Broadcast OKAY
+[119] points_per_player = 6018425
+Broadcast OKAY
+[64] points_per_player = 6018425
+Broadcast OKAY
+[168] points_per_player = 6018425
+Broadcast OKAY
+[259] points_per_player = 6018425
+Broadcast OKAY
+[97] points_per_player = 6018425
+Broadcast OKAY
+[21] points_per_player = 6018425
+Broadcast OKAY
+[23] points_per_player = 6018425
+Broadcast OKAY
+[26] points_per_player = 6018425
+Broadcast OKAY
+[40] points_per_player = 6018425
+Broadcast OKAY
+[196] points_per_player = 6018425
+Broadcast OKAY
+[261] points_per_player = 6018425
+Broadcast OKAY
+[131] points_per_player = 6018425
+Broadcast OKAY
+[5] points_per_player = 6018425
+Broadcast OKAY
+[36] points_per_player = 6018425
+Broadcast OKAY
+[138] points_per_player = 6018425
+Broadcast OKAY
+[269] points_per_player = 6018425
+Broadcast OKAY
+[129] points_per_player = 6018425
+Broadcast OKAY
+[10] points_per_player = 6018425
+Broadcast OKAY
+[187] points_per_player = 6018425
+Broadcast OKAY
+[218] points_per_player = 6018425
+Broadcast OKAY
+[68] points_per_player = 6018425
+Broadcast OKAY
+[50] points_per_player = 6018425
+Broadcast OKAY
+[192] points_per_player = 6018425
+Broadcast OKAY
+[244] points_per_player = 6018425
+Broadcast OKAY
+[90] points_per_player = 6018425
+Broadcast OKAY
+[6] points_per_player = 6018425
+Broadcast OKAY
+[141] points_per_player = 6018425
+Broadcast OKAY
+[213] points_per_player = 6018425
+Broadcast OKAY
+[116] points_per_player = 6018425
+Broadcast OKAY
+[140] points_per_player = 6018425
+Broadcast OKAY
+[266] points_per_player = 6018425
+Broadcast OKAY
+[85] points_per_player = 6018425
+Broadcast OKAY
+[11] points_per_player = 6018425
+Broadcast OKAY
+[151] points_per_player = 6018425
+Broadcast OKAY
+[226] points_per_player = 6018425
+Broadcast OKAY
+[134] points_per_player = 6018425
+Broadcast OKAY
+[44] points_per_player = 6018425
+Broadcast OKAY
+[216] points_per_player = 6018425
+Broadcast OKAY
+[98] points_per_player = 6018425
+Broadcast OKAY
+[20] points_per_player = 6018425
+Broadcast OKAY
+[0] points_per_player = 6018425
+Broadcast OKAY
+[149] points_per_player = 6018425
+Broadcast OKAY
+[262] points_per_player = 6018425
+Broadcast OKAY
+[88] points_per_player = 6018425
+Broadcast OKAY
+[38] points_per_player = 6018425
+Broadcast OKAY
+[39] points_per_player = 6018425
+Broadcast OKAY
+[57] points_per_player = 6018425
+Broadcast OKAY
+[154] points_per_player = 6018425
+Broadcast OKAY
+[210] points_per_player = 6018425
+Broadcast OKAY
+[69] points_per_player = 6018425
+Broadcast OKAY
+[52] points_per_player = 6018425
+Broadcast OKAY
+[172] points_per_player = 6018425
+Broadcast OKAY
+[234] points_per_player = 6018425
+Broadcast OKAY
+[82] points_per_player = 6018425
+Broadcast OKAY
+[12] points_per_player = 6018425
+Broadcast OKAY
+[13] points_per_player = 6018425
+Broadcast OKAY
+[145] points_per_player = 6018425
+Broadcast OKAY
+[106] points_per_player = 6018425
+Broadcast OKAY
+[25] points_per_player = 6018425
+Broadcast OKAY
+[45] points_per_player = 6018425
+Broadcast OKAY
+[178] points_per_player = 6018425
+Broadcast OKAY
+[102] points_per_player = 6018425
+Broadcast OKAY
+[47] points_per_player = 6018425
+Broadcast OKAY
+[174] points_per_player = 6018425
+Broadcast OKAY
+[256] points_per_player = 6018425
+Broadcast OKAY
+[123] points_per_player = 6018425
+Broadcast OKAY
+[29] points_per_player = 6018425
+Broadcast OKAY
+[167] points_per_player = 6018425
+Broadcast OKAY
+[230] points_per_player = 6018425
+Broadcast OKAY
+[112] points_per_player = 6018425
+Broadcast OKAY
+[32] points_per_player = 6018425
+Broadcast OKAY
+[160] points_per_player = 6018425
+Broadcast OKAY
+[251] points_per_player = 6018425
+Broadcast OKAY
+[104] points_per_player = 6018425
+Broadcast OKAY
+[197] points_per_player = 6018425
+Broadcast OKAY
+[240] points_per_player = 6018425
+Broadcast OKAY
+[78] points_per_player = 6018425
+Broadcast OKAY
+[185] points_per_player = 6018425
+Broadcast OKAY
+[232] points_per_player = 6018425
+Broadcast OKAY
+[101] points_per_player = 6018425
+Broadcast OKAY
+[61] points_per_player = 6018425
+Broadcast OKAY
+[181] points_per_player = 6018425
+Broadcast OKAY
+[268] points_per_player = 6018425
+Broadcast OKAY
+[108] points_per_player = 6018425
+Broadcast OKAY
+[148] points_per_player = 6018425
+Broadcast OKAY
+[271] points_per_player = 6018425
+Broadcast OKAY
+[84] points_per_player = 6018425
+Broadcast OKAY
+[166] points_per_player = 6018425
+Broadcast OKAY
+[206] points_per_player = 6018425
+Broadcast OKAY
+[74] points_per_player = 6018425
+Broadcast OKAY
+[15] points_per_player = 6018425
+Broadcast OKAY
+[53] points_per_player = 6018425
+Broadcast OKAY
+[63] points_per_player = 6018425
+Broadcast OKAY
+[180] points_per_player = 6018425
+Broadcast OKAY
+[229] points_per_player = 6018425
+Broadcast OKAY
+[77] points_per_player = 6018425
+Broadcast OKAY
+[43] points_per_player = 6018425
+Broadcast OKAY
+[58] points_per_player = 6018425
+Broadcast OKAY
+[173] points_per_player = 6018425
+Broadcast OKAY
+[236] points_per_player = 6018425
+Broadcast OKAY
+[109] points_per_player = 6018425
+Broadcast OKAY
+[37] points_per_player = 6018425
+Broadcast OKAY
+[175] points_per_player = 6018425
+Broadcast OKAY
+[212] points_per_player = 6018425
+Broadcast OKAY
+[114] points_per_player = 6018425
+Broadcast OKAY
+[17] points_per_player = 6018425
+Broadcast OKAY
+[153] points_per_player = 6018425
+Broadcast OKAY
+[205] points_per_player = 6018425
+Broadcast OKAY
+[89] points_per_player = 6018425
+Broadcast OKAY
+[171] points_per_player = 6018425
+Broadcast OKAY
+[237] points_per_player = 6018425
+Broadcast OKAY
+[75] points_per_player = 6018425
+Broadcast OKAY
+[142] points_per_player = 6018425
+Broadcast OKAY
+[242] points_per_player = 6018425
+Broadcast OKAY
+[100] points_per_player = 6018425
+Broadcast OKAY
+[157] points_per_player = 6018425
+Broadcast OKAY
+[217] points_per_player = 6018425
+Broadcast OKAY
+[70] points_per_player = 6018425
+Broadcast OKAY
+[189] points_per_player = 6018425
+Broadcast OKAY
+[228] points_per_player = 6018425
+Broadcast OKAY
+[127] points_per_player = 6018425
+Broadcast OKAY
+[202] points_per_player = 6018425
+Broadcast OKAY
+[255] points_per_player = 6018425
+Broadcast OKAY
+[76] points_per_player = 6018425
+Broadcast OKAY
+[186] points_per_player = 6018425
+Broadcast OKAY
+[204] points_per_player = 6018425
+Broadcast OKAY
+[79] points_per_player = 6018425
+Broadcast OKAY
+[203] points_per_player = 6018425
+Broadcast OKAY
+[207] points_per_player = 6018425
+Broadcast OKAY
+[96] points_per_player = 6018425
+Broadcast OKAY
+[46] points_per_player = 6018425
+Broadcast OKAY
+[56] points_per_player = 6018425
+Broadcast OKAY
+[191] points_per_player = 6018425
+Broadcast OKAY
+[224] points_per_player = 6018425
+Broadcast OKAY
+[93] points_per_player = 6018425
+Broadcast OKAY
+[8] points_per_player = 6018425
+Broadcast OKAY
+[221] points_per_player = 6018425
+Broadcast OKAY
+[103] points_per_player = 6018425
+Broadcast OKAY
+[18] points_per_player = 6018425
+Broadcast OKAY
+[62] points_per_player = 6018425
+Broadcast OKAY
+[215] points_per_player = 6018425
+Broadcast OKAY
+[87] points_per_player = 6018425
+Broadcast OKAY
+[30] points_per_player = 6018425
+Broadcast OKAY
+[231] points_per_player = 6018425
+Broadcast OKAY
+[107] points_per_player = 6018425
+Broadcast OKAY
+[19] points_per_player = 6018425
+Broadcast OKAY
+[235] points_per_player = 6018425
+Broadcast OKAY
+[125] points_per_player = 6018425
+Broadcast OKAY
+[35] points_per_player = 6018425
+Broadcast OKAY
+[51] points_per_player = 6018425
+Broadcast OKAY
+[253] points_per_player = 6018425
+Broadcast OKAY
+[95] points_per_player = 6018425
+Broadcast OKAY
+[223] points_per_player = 6018425
+Broadcast OKAY
+[80] points_per_player = 6018425
+Broadcast OKAY
+[31] points_per_player = 6018425
+Broadcast OKAY
+[208] points_per_player = 6018425
+Broadcast OKAY
+[121] points_per_player = 6018425
+Broadcast OKAY
+[249] points_per_player = 6018425
+Broadcast OKAY
+[99] points_per_player = 6018425
+Broadcast OKAY
+[227] points_per_player = 6018425
+Broadcast OKAY
+[120] points_per_player = 6018425
+Broadcast OKAY
+[248] points_per_player = 6018425
+Broadcast OKAY
+[111] points_per_player = 6018425
+Broadcast OKAY
+[239] points_per_player = 6018425
+Broadcast OKAY
+[34] points_per_player = 6018425
+Broadcast OKAY
+[41] points_per_player = 6018425
+Broadcast OKAY
+[222] points_per_player = 6018425
+Broadcast OKAY
+[94] points_per_player = 6018425
+Broadcast OKAY
+[238] points_per_player = 6018425
+Broadcast OKAY
+[110] points_per_player = 6018425
+Broadcast OKAY
+[250] points_per_player = 6018425
+Broadcast OKAY
+[122] points_per_player = 6018425
+Broadcast OKAY
+[209] points_per_player = 6018425
+Broadcast OKAY
+[81] points_per_player = 6018425
+Broadcast OKAY
+[211] points_per_player = 6018425
+Broadcast OKAY
+[83] points_per_player = 6018425
+Broadcast OKAY
+[245] points_per_player = 6018425
+Broadcast OKAY
+[117] points_per_player = 6018425
+Broadcast OKAY
+[254] points_per_player = 6018425
+Broadcast OKAY
+[126] points_per_player = 6018425
+Broadcast OKAY
+[143] points_per_player = 6018425
+Broadcast OKAY
+[136] points_per_player = 6018425
+Broadcast OKAY
+[146] points_per_player = 6018425
+Broadcast OKAY
+[147] points_per_player = 6018425
+Broadcast OKAY
+[158] points_per_player = 6018425
+Broadcast OKAY
+[159] points_per_player = 6018425
+Broadcast OKAY
+[162] points_per_player = 6018425
+Broadcast OKAY
+[54] points_per_player = 6018425
+Broadcast OKAY
+[163] points_per_player = 6018425
+Broadcast OKAY
+[165] points_per_player = 6018425
+Broadcast OKAY
+[169] points_per_player = 6018425
+Broadcast OKAY
+[179] points_per_player = 6018425
+Broadcast OKAY
+[184] points_per_player = 6018425
+Broadcast OKAY
+[190] points_per_player = 6018425
+Broadcast OKAY
+[198] points_per_player = 6018425
+Broadcast OKAY
+[200] points_per_player = 6018425
+Broadcast OKAY
+[182] points_per_player = 6018425
+Broadcast OKAY
+[156] points_per_player = 6018425
+Broadcast OKAY
+[14] points_per_player = 6018425
+Broadcast OKAY
+[28] points_per_player = 6018425
+Broadcast OKAY
+[22] points_per_player = 6018425
+Broadcast OKAY
+[49] points_per_player = 6018425
+Broadcast OKAY
+[60] points_per_player = 6018425
+Broadcast OKAY
+[188] points_per_player = 6018425
+Broadcast OKAY
+[214] points_per_player = 6018425
+Broadcast OKAY
+[72] points_per_player = 6018425
+Broadcast OKAY
+[150] points_per_player = 6018425
+Broadcast OKAY
+[246] points_per_player = 6018425
+Broadcast OKAY
+[86] points_per_player = 6018425
+Broadcast OKAY
+[177] points_per_player = 6018425
+Broadcast OKAY
+[270] points_per_player = 6018425
+Broadcast OKAY
+[118] points_per_player = 6018425
+Broadcast OKAY
+[220] points_per_player = 6018425
+Broadcast OKAY
+[92] points_per_player = 6018425
+Broadcast OKAY
+[243] points_per_player = 6018425
+Broadcast OKAY
+[115] points_per_player = 6018425
+Broadcast OKAY
+[124] points_per_player = 6018425
+Broadcast OKAY
+[233] points_per_player = 6018425
+Broadcast OKAY
+[241] points_per_player = 6018425
+Broadcast OKAY
+[252] points_per_player = 6018425
+Broadcast OKAY
+[105] points_per_player = 6018425
+Broadcast OKAY
+[113] points_per_player = 6018425
+Broadcast OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+[1] Compute OKAY 5.303522 secs
+Scatter OKAY
+[2] Compute OKAY 5.456378 secs
+[4] Compute OKAY 5.370386 secs
+[3] Compute OKAY 5.483451 secs
+Scatter OKAY
+Scatter OKAY
+[8] Compute OKAY 5.931258 secs
+[9] Compute OKAY 6.012726 secs
+[10] Compute OKAY 6.029158 secs
+Scatter OKAY
+[12] Compute OKAY 6.037827 secs
+[11] Compute OKAY 6.121020 secs
+[13] Compute OKAY 6.072943 secs
+Scatter OKAY
+[14] Compute OKAY 6.367305 secs
+[15] Compute OKAY 6.518540 secs
+[16] Compute OKAY 6.516362 secs
+[17] Compute OKAY 6.517907 secs
+Scatter OKAY
+[18] Compute OKAY 6.563530 secs
+[19] Compute OKAY 6.815125 secs
+Scatter OKAY
+[20] Compute OKAY 6.992993 secs
+Scatter OKAY
+[21] Compute OKAY 7.176417 secs
+[23] Compute OKAY 7.318930 secs
+[32] Compute OKAY 6.839890 secs
+Scatter OKAY
+[33] Compute OKAY 6.866435 secs
+[24] Compute OKAY 7.378914 secs
+[28] Compute OKAY 7.164328 secs
+[27] Compute OKAY 7.220764 secs
+[31] Compute OKAY 7.089380 secs
+[25] Compute OKAY 7.460220 secs
+[26] Compute OKAY 7.413425 secs
+[22] Compute OKAY 7.653053 secs
+[29] Compute OKAY 7.256769 secs
+[34] Compute OKAY 7.005081 secs
+[30] Compute OKAY 7.248452 secs
+Scatter OKAY
+[36] Compute OKAY 7.259680 secs
+[35] Compute OKAY 7.420472 secs
+[40] Compute OKAY 7.203346 secs
+[37] Compute OKAY 7.413079 secs
+[39] Compute OKAY 7.302800 secs
+Scatter OKAY
+[41] Compute OKAY 7.238883 secs
+[38] Compute OKAY 7.446936 secs
+[44] Compute OKAY 7.148318 secs
+[42] Compute OKAY 7.331883 secs
+[43] Compute OKAY 7.312856 secs
+[46] Compute OKAY 7.298254 secs
+Scatter OKAY
+[47] Compute OKAY 7.331311 secs
+[52] Compute OKAY 7.155331 secs
+[48] Compute OKAY 7.406001 secs
+[54] Compute OKAY 7.085676 secs
+[45] Compute OKAY 7.598646 secs
+[51] Compute OKAY 7.349655 secs
+[49] Compute OKAY 7.539551 secs
+[55] Compute OKAY 7.202518 secs
+[50] Compute OKAY 7.488124 secs
+[53] Compute OKAY 7.344830 secs
+Scatter OKAY
+[58] Compute OKAY 7.220062 secs
+[5] Compute OKAY 10.272584 secs
+[57] Compute OKAY 7.381679 secs
+[56] Compute OKAY 7.560653 secs
+[59] Compute OKAY 7.405434 secs
+Scatter OKAY
+[60] Compute OKAY 7.397282 secs
+[65] Compute OKAY 7.258558 secs
+[67] Compute OKAY 7.181290 secs
+[66] Compute OKAY 7.311991 secs
+[68] Compute OKAY 6.892031 secs
+[63] Compute OKAY 7.548258 secs
+Scatter OKAY
+[64] Compute OKAY 7.611024 secs
+[62] Compute OKAY 7.777114 secs
+[69] Compute OKAY 6.813823 secs
+Scatter OKAY
+[70] Compute OKAY 6.838036 secs
+Scatter OKAY
+[71] Compute OKAY 6.772466 secs
+Scatter OKAY
+[72] Compute OKAY 6.600462 secs
+Scatter OKAY
+[73] Compute OKAY 6.807402 secs
+Scatter OKAY
+[61] Compute OKAY 9.930327 secs
+Scatter OKAY
+[74] Compute OKAY 7.036998 secs
+Scatter OKAY
+[75] Compute OKAY 7.243247 secs
+Scatter OKAY
+Scatter OKAY
+[76] Compute OKAY 7.386420 secs
+Scatter OKAY
+[77] Compute OKAY 7.538349 secs
+Scatter OKAY
+[78] Compute OKAY 7.501752 secs
+Scatter OKAY
+[79] Compute OKAY 7.572710 secs
+Scatter OKAY
+[80] Compute OKAY 7.674397 secs
+Scatter OKAY
+Scatter OKAY
+[81] Compute OKAY 7.943544 secs
+Scatter OKAY
+[82] Compute OKAY 7.827252 secs
+Scatter OKAY
+[83] Compute OKAY 8.017319 secs
+Scatter OKAY
+Scatter OKAY
+[84] Compute OKAY 8.264118 secs
+[85] Compute OKAY 8.117798 secs
+Scatter OKAY
+[86] Compute OKAY 7.978295 secs
+Scatter OKAY
+Scatter OKAY
+[87] Compute OKAY 8.375796 secs
+[88] Compute OKAY 7.989813 secs
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+[89] Compute OKAY 8.663302 secs
+Scatter OKAY
+[90] Compute OKAY 8.977543 secs
+Scatter OKAY
+[91] Compute OKAY 8.863039 secs
+Scatter OKAY
+Scatter OKAY
+[92] Compute OKAY 9.390756 secs
+Scatter OKAY
+Scatter OKAY
+[93] Compute OKAY 9.826783 secs
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+[94] Compute OKAY 10.338646 secs
+Scatter OKAY
+Scatter OKAY
+[95] Compute OKAY 10.747396 secs
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+[7] Compute OKAY 28.594836 secs
+[101] Compute OKAY 11.272279 secs
+Scatter OKAY
+[102] Compute OKAY 11.276060 secs
+Scatter OKAY
+[104] Compute OKAY 10.742781 secs
+[105] Compute OKAY 10.463212 secs
+[103] Compute OKAY 11.303398 secs
+Scatter OKAY
+[106] Compute OKAY 10.618086 secs
+Scatter OKAY
+Scatter OKAY
+[107] Compute OKAY 10.845100 secs
+Scatter OKAY
+Scatter OKAY
+[108] Compute OKAY 11.147102 secs
+[109] Compute OKAY 10.940567 secs
+[110] Compute OKAY 10.593053 secs
+Scatter OKAY
+[112] Compute OKAY 10.049229 secs
+[111] Compute OKAY 10.566943 secs
+Scatter OKAY
+[113] Compute OKAY 9.945534 secs
+Scatter OKAY
+[114] Compute OKAY 9.983395 secs
+Scatter OKAY
+[115] Compute OKAY 9.927370 secs
+[116] Compute OKAY 9.574835 secs
+Scatter OKAY
+[117] Compute OKAY 9.533820 secs
+Scatter OKAY
+[118] Compute OKAY 9.534004 secs
+[119] Compute OKAY 9.124287 secs
+[120] Compute OKAY 8.890491 secs
+Scatter OKAY
+[121] Compute OKAY 8.608563 secs
+[124] Compute OKAY 7.574002 secs
+[122] Compute OKAY 8.395696 secs
+[123] Compute OKAY 8.171387 secs
+Scatter OKAY
+[125] Compute OKAY 7.595294 secs
+Scatter OKAY
+[126] Compute OKAY 7.646991 secs
+Scatter OKAY
+[127] Compute OKAY 7.715033 secs
+Scatter OKAY
+[129] Compute OKAY 7.255605 secs
+[130] Compute OKAY 6.951217 secs
+Scatter OKAY
+[128] Compute OKAY 7.928541 secs
+Scatter OKAY
+[131] Compute OKAY 6.982373 secs
+Scatter OKAY
+[132] Compute OKAY 7.005824 secs
+[133] Compute OKAY 6.880026 secs
+Scatter OKAY
+[134] Compute OKAY 6.814960 secs
+Scatter OKAY
+[135] Compute OKAY 6.932256 secs
+Scatter OKAY
+[136] Compute OKAY 6.963120 secs
+Scatter OKAY
+Scatter OKAY
+[137] Compute OKAY 7.104295 secs
+Scatter OKAY
+[138] Compute OKAY 7.275661 secs
+Scatter OKAY
+Scatter OKAY
+[140] Compute OKAY 7.315829 secs
+Scatter OKAY
+[141] Compute OKAY 7.326830 secs
+Scatter OKAY
+[142] Compute OKAY 7.254626 secs
+Scatter OKAY
+[139] Compute OKAY 8.667744 secs
+[143] Compute OKAY 7.319774 secs
+Scatter OKAY
+Scatter OKAY
+[144] Compute OKAY 7.407265 secs
+Scatter OKAY
+[146] Compute OKAY 7.043674 secs
+[145] Compute OKAY 7.482325 secs
+Scatter OKAY
+[147] Compute OKAY 7.069532 secs
+Scatter OKAY
+[148] Compute OKAY 7.194911 secs
+Scatter OKAY
+[149] Compute OKAY 7.100892 secs
+Scatter OKAY
+[150] Compute OKAY 7.090956 secs
+Scatter OKAY
+[152] Compute OKAY 6.808463 secs
+[151] Compute OKAY 7.223414 secs
+[153] Compute OKAY 6.532474 secs
+Scatter OKAY
+Scatter OKAY
+[154] Compute OKAY 6.641423 secs
+Scatter OKAY
+[155] Compute OKAY 6.674161 secs
+Scatter OKAY
+[156] Compute OKAY 6.601655 secs
+Scatter OKAY
+[157] Compute OKAY 6.633632 secs
+Scatter OKAY
+[158] Compute OKAY 6.884286 secs
+Scatter OKAY
+Scatter OKAY
+[159] Compute OKAY 6.990554 secs
+Scatter OKAY
+[160] Compute OKAY 7.055550 secs
+Scatter OKAY
+[161] Compute OKAY 7.068784 secs
+Scatter OKAY
+[162] Compute OKAY 7.021312 secs
+[163] Compute OKAY 6.898353 secs
+Scatter OKAY
+Scatter OKAY
+[164] Compute OKAY 7.047703 secs
+Scatter OKAY
+Scatter OKAY
+[165] Compute OKAY 7.393867 secs
+Scatter OKAY
+[166] Compute OKAY 7.774564 secs
+Scatter OKAY
+[167] Compute OKAY 7.521540 secs
+[100] Compute OKAY 35.189129 secs
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+[168] Compute OKAY 8.512779 secs
+Scatter OKAY
+[170] Compute OKAY 7.817096 secs
+Scatter OKAY
+[171] Compute OKAY 7.875092 secs
+Scatter OKAY
+[172] Compute OKAY 8.044059 secs
+Scatter OKAY
+[6] Compute OKAY 54.721154 secs
+[173] Compute OKAY 8.033383 secs
+Scatter OKAY
+[175] Compute OKAY 7.617025 secs
+[174] Compute OKAY 8.076146 secs
+Scatter OKAY
+[176] Compute OKAY 7.598302 secs
+Scatter OKAY
+[177] Compute OKAY 7.620343 secs
+Scatter OKAY
+[178] Compute OKAY 7.681081 secs
+Scatter OKAY
+Scatter OKAY
+[180] Compute OKAY 7.744501 secs
+Scatter OKAY
+[181] Compute OKAY 7.708731 secs
+Scatter OKAY
+Scatter OKAY
+[182] Compute OKAY 7.993154 secs
+Scatter OKAY
+[179] Compute OKAY 9.564974 secs
+[183] Compute OKAY 8.106256 secs
+Scatter OKAY
+[169] Compute OKAY 14.089116 secs
+[184] Compute OKAY 7.978111 secs
+Scatter OKAY
+Scatter OKAY
+[185] Compute OKAY 8.289761 secs
+Scatter OKAY
+Scatter OKAY
+[186] Compute OKAY 8.837609 secs
+[188] Compute OKAY 8.116422 secs
+[187] Compute OKAY 8.535485 secs
+Scatter OKAY
+[189] Compute OKAY 8.019533 secs
+Scatter OKAY
+[191] Compute OKAY 7.700313 secs
+Scatter OKAY
+[96] Compute OKAY 46.699428 secs
+[192] Compute OKAY 7.771194 secs
+Scatter OKAY
+Scatter OKAY
+[193] Compute OKAY 7.999490 secs
+[194] Compute OKAY 7.661026 secs
+Scatter OKAY
+[195] Compute OKAY 7.441248 secs
+Scatter OKAY
+[196] Compute OKAY 7.487374 secs
+Scatter OKAY
+Scatter OKAY
+[197] Compute OKAY 7.802482 secs
+Scatter OKAY
+[198] Compute OKAY 7.806368 secs
+Scatter OKAY
+[199] Compute OKAY 8.099056 secs
+Scatter OKAY
+[200] Compute OKAY 7.991784 secs
+Scatter OKAY
+[201] Compute OKAY 7.897189 secs
+Scatter OKAY
+[190] Compute OKAY 12.887543 secs
+Scatter OKAY
+[202] Compute OKAY 8.552059 secs
+Scatter OKAY
+Scatter OKAY
+[203] Compute OKAY 8.739622 secs
+Scatter OKAY
+[204] Compute OKAY 8.886394 secs
+Scatter OKAY
+Scatter OKAY
+[205] Compute OKAY 9.165767 secs
+Scatter OKAY
+[206] Compute OKAY 9.125709 secs
+[207] Compute OKAY 8.972896 secs
+Scatter OKAY
+Scatter OKAY
+[208] Compute OKAY 9.071366 secs
+[209] Compute OKAY 8.784283 secs
+Scatter OKAY
+[210] Compute OKAY 8.658202 secs
+Scatter OKAY
+[211] Compute OKAY 8.915919 secs
+Scatter OKAY
+Scatter OKAY
+[212] Compute OKAY 9.015834 secs
+[214] Compute OKAY 8.571183 secs
+Scatter OKAY
+[213] Compute OKAY 9.105741 secs
+[215] Compute OKAY 8.578727 secs
+Scatter OKAY
+[216] Compute OKAY 8.563298 secs
+Scatter OKAY
+Scatter OKAY
+[218] Compute OKAY 8.302467 secs
+[219] Compute OKAY 8.133579 secs
+Scatter OKAY
+[217] Compute OKAY 9.212552 secs
+Scatter OKAY
+[220] Compute OKAY 8.401088 secs
+Scatter OKAY
+[221] Compute OKAY 8.432645 secs
+[222] Compute OKAY 8.138952 secs
+Scatter OKAY
+[223] Compute OKAY 8.134856 secs
+Scatter OKAY
+Scatter OKAY
+[224] Compute OKAY 8.223922 secs
+[225] Compute OKAY 7.992128 secs
+Scatter OKAY
+[226] Compute OKAY 7.948437 secs
+Scatter OKAY
+[227] Compute OKAY 7.894959 secs
+Scatter OKAY
+[228] Compute OKAY 8.097438 secs
+Scatter OKAY
+[229] Compute OKAY 8.155030 secs
+Scatter OKAY
+[230] Compute OKAY 8.116848 secs
+Scatter OKAY
+Scatter OKAY
+Scatter OKAY
+[231] Compute OKAY 8.680634 secs
+Scatter OKAY
+Scatter OKAY
+[232] Compute OKAY 9.029639 secs
+[233] Compute OKAY 8.846935 secs
+Scatter OKAY
+[234] Compute OKAY 9.007075 secs
+Scatter OKAY
+[235] Compute OKAY 8.748390 secs
+Scatter OKAY
+[236] Compute OKAY 8.777556 secs
+Scatter OKAY
+[237] Compute OKAY 8.944521 secs
+Scatter OKAY
+[238] Compute OKAY 8.791071 secs
+Scatter OKAY
+[239] Compute OKAY 8.867074 secs
+Scatter OKAY
+[240] Compute OKAY 8.610843 secs
+[241] Compute OKAY 8.551271 secs
+[242] Compute OKAY 8.189773 secs
+Scatter OKAY
+[243] Compute OKAY 8.122823 secs
+Scatter OKAY
+[244] Compute OKAY 8.077585 secs
+Scatter OKAY
+[245] Compute OKAY 7.815490 secs
+[246] Compute OKAY 7.735219 secs
+Scatter OKAY
+[247] Compute OKAY 7.458218 secs
+[248] Compute OKAY 7.119983 secs
+Scatter OKAY
+[250] Compute OKAY 6.582840 secs
+[251] Compute OKAY 6.292196 secs
+[249] Compute OKAY 7.266358 secs
+Scatter OKAY
+[252] Compute OKAY 6.180121 secs
+[253] Compute OKAY 5.920231 secs
+Scatter OKAY
+[254] Compute OKAY 5.860279 secs
+[255] Compute OKAY 5.601757 secs
+Scatter OKAY
+[256] Compute OKAY 5.494000 secs
+Scatter OKAY
+[257] Compute OKAY 5.435790 secs
+[258] Compute OKAY 5.299950 secs
+Scatter OKAY
+Scatter OKAY
+[260] Compute OKAY 4.710487 secs
+[259] Compute OKAY 5.206416 secs
+[261] Compute OKAY 4.657841 secs
+[262] Compute OKAY 4.426461 secs
+[263] Compute OKAY 4.260893 secs
+[264] Compute OKAY 4.118268 secs
+[265] Compute OKAY 4.074157 secs
+[266] Compute OKAY 3.953917 secs
+[267] Compute OKAY 3.913861 secs
+[268] Compute OKAY 3.569449 secs
+[269] Compute OKAY 3.268865 secs
+[270] Compute OKAY 3.192194 secs
+[271] Compute OKAY 3.180608 secs
+[0] Compute OKAY 5.299581 secs
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+[99] Compute OKAY 77.900437 secs
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+[98] Compute OKAY 97.472727 secs
+[97] Compute OKAY 115.681609 secs
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+Gather OKAY
+mpirun return code is 0.
+Post-processing trace files...
+The SLURM script (with akypuera) has finished.
+~
