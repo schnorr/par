@@ -1,3 +1,5 @@
+#+startup: overview indent
+
 * Mandelbrot LB ++ Revisited
 
 This is strongly inspired by: [[./mandelbrot.org][Mandelbrot Load Balancing & Comm/Comp Ratio]].
@@ -98,3 +100,33 @@ This is strongly inspired by: [[./mandelbrot.org][Mandelbrot Load Balancing & Co
      #+end_src
 
      #+RESULTS:
+
+     Per-rank compute and communication time
+
+     #+begin_src R :results output :session :exports both
+     df %>%
+         group_by(Rank) %>%
+         summarize(Time = max(End) - min(Start) - sum(Duration)) %>%
+         mutate(Value = "Compute") -> df.compute
+     df %>%
+         group_by(Rank, Value) %>%
+         summarize(Time = sum(Duration)) -> df.communication;
+     #+end_src
+
+     #+RESULTS:
+
+     Plot
+
+     #+begin_src R :results output graphics :file img/mb-aky-comp-comm-per-rank.png :exports both :width 800 :height 400 :session
+     df.compute %>%
+         bind_rows(df.communication) %>%
+         ggplot(aes(x = Rank, y = Time, fill=Value)) +
+         geom_bar(stat='identity', width=1) +
+         scale_fill_brewer(palette="Set1") +
+         theme_bw(base_size = 22) +
+         ylim(0,NA)
+     #+end_src
+
+     #+RESULTS:
+     [[file:img/mb-aky-comp-comm-per-rank.png]]
+6. 
