@@ -58,17 +58,18 @@ MPI_Comm_spawn (
 * Sequência de Fibonacci
 Cálculo do i-ésimo elemento da sequência de Fibonacci
 
-| Posição | 1 | 2 | 3 | 4 | 5 | 6 | 7 |  8 |  9 | 10 | 11 | 12 |     |
-|---------+---+---+---+---+---+---+---+----+----+----+----+----+-----|
-| Valor   | 0 | 1 | 1 | 2 | 3 | 5 | 8 | 13 | 21 | 34 | 55 | 89 | ... |
+| Posição | 0 | 1 | 2 | 3 | 4 | 5 | 6 |  7 |  8 |  9 | 10 | 11 |  12 |   |
+|---------+---+---+---+---+---+---+---+----+----+----+----+----+-----+---|
+| Valor   | 0 | 1 | 1 | 2 | 3 | 5 | 8 | 13 | 21 | 34 | 55 | 89 | ... |   |
 
 Um elemento é a soma de seus dois antecessores
 #+latex: \vfill
 Algoritmo sequencial
   #+BEGIN_SRC C
   int fib (int n) {
-    if (n < 2) return n;
-    else return fib (n-1) + fib (n-2);
+    if (n == 0) return 0;
+    if (n == 1) return 1;
+    return fib(n-1) + fib(n-2);
   }
   #+END_SRC
 * 
