@@ -40,7 +40,7 @@ com o objetivo de melhorar o aprendizado da disciplina.
 ** Plano e Cronograma
 
 - Veja a [[http://www.inf.ufrgs.br/ppgc/disciplinas/lista-de-disciplinas/cmp270/][Súmula da disciplina]]
-- [[./cronograma/index.org][Cronograma]] (Edição 2019/1, Terças e Quintas, 10:30 – 12:10)
+- [[./cronograma/index.org][Cronograma]] (Edição 2020/1, Terças e Quintas, 10:30 – 12:10)
 
 ** Elementos Pedagógicos
 
