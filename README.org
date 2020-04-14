@@ -72,6 +72,7 @@ com o objetivo de melhorar o aprendizado da disciplina.
 - FOSTER, I. Designing and Building Paralllel Programs. Addison Weley, 1995.
 - JAJA, Joseph. An Introduction to Parallel Algorithms. Addison Weley, 1992.
 - Artigos selecionados.
+
 ** Contato
 
 Se você encontrar algum problema, e também no caso de dúvidas, entre em contato por e-mail:
