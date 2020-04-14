@@ -37,7 +37,9 @@ Prof. Lucas M. Schnorr
 \vfill
 
 #+BEGIN_CENTER
-``Two [sic] /links/ [sic] to rule them all''
+``Three [sic] /links/ [sic] to rule them all''
+
+https://github.com/schnorr/par/
 
 https://gitlab.com/schnorr/par/
 
