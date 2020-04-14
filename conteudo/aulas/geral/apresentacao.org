@@ -77,5 +77,4 @@ Em dúvidas
 - StarPU (1 - 2)
 - Análise de dados (1 - 2)
 #+Latex: \vfill
-- Algumas aulas em laboratório
-  - Parte do trabalho a ser realizado durante estas aulas
+- Algumas aulas práticas em laboratório 
