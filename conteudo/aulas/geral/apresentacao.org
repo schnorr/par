@@ -56,14 +56,15 @@ Em aula
 - Perguntar em caso de dúvida
 
 Em campo
+- https://github.com/schnorr/par/
 - https://gitlab.com/schnorr/par/
 - https://moodle.inf.ufrgs.br/course/view.php?id=722
 - Material de apoio, livros
 - Lista de exercícios
 
 Em dúvidas
-- [[https://gitlab.com/schnorr/par/issues][Abra uma Issue no GitLab]]
 - Envie um e-mail, e converse com o professor
+
 * Avaliação
 + Um único trabalho na área de interesse do aluno
   + Envolve a redação de um artigo a ser submetido
