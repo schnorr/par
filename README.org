@@ -41,6 +41,9 @@ com o objetivo de melhorar o aprendizado da disciplina.
 
 - Veja a [[http://www.inf.ufrgs.br/ppgc/disciplinas/lista-de-disciplinas/cmp270/][Súmula da disciplina]]
 - [[./cronograma/index.org][Cronograma]] (Edição 2020/1, Terças e Quintas, 10:30 – 12:10)
+- Ações durante COVID-19
+  - Veja o [[./CMP270_EaD.pdf][plano de atuação]]
+  - [[https://mconf.ufrgs.br/webconf/cmp270][Sala de aula virtual de CMP270]]
 
 ** Elementos Pedagógicos
 
