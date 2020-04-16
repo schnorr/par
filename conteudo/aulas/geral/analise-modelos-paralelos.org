@@ -77,30 +77,46 @@ Alguns fatos relevantes
 
 + Isso impede de chegar à complexidade do algoritmo
 
-* Modelos analíticos para modelar a *máquina*
+* Modelos analíticos para modelar a *máquina* (1/2)
 
 *Máquina estática homogênea*; rede perfeita (lat = 0, vazão = \inf)
 - *Máquina PRAM* (/Parallel random-access machine/)
   - Desconsidera as comunicações, memória compartilhada
   - Processadores multicore, manycore
 
-#+latex: \pause
+#+latex: \vfill\pause
 
 *Máquina estática homogênea*, rede com contenção
 - *Modelo LogP* (L: latência; o: /overhead/; g: gap; P: processos)
   - Culler, David, et al. "LogP: Towards a realistic model of parallel
     computation." Proceedings of the fourth ACM SIGPLAN symposium on
     Principles and practice of parallel programming. 1993.
+- *Modelo LogGP* (Long messages, G is the cost per byte)
+  - Alexandrov, Albert, et al. "LogGP: incorporating long messages
+    into the LogP model—one step closer towards a realistic model for
+    parallel computation." Proceedings of the seventh annual ACM
+    symposium on Parallel algorithms and architectures. 1995.
 - Inúmeras derivações
-  - LogGP (Long messages, G is the cost per byte)
   - LogGPS (Sender sync, S is the message-size threshold for sync)
   - LogGOPS (Network pipeling, comp/comm overlap)
   - ...
 
-#+latex: \vfill\pause
+* Modelos analíticos para modelar a *máquina* (2/2)
 
 E sobre máquinas concretas? (/aka/ *Máquina dinâmica heterogênea*)
-- Grid/Cloud/Supercomputadores/Níveis de Cache
+- Grid/Cloud/Cluster/Supercomputadores/Níveis de Cache
+
+#+latex: \vfill\pause
+
+Tentativas no que diz respeito a Grid/Cloud/Cluster
+- Projeto SimGrid: https://simgrid.org/
+  - Henri Casanova, Arnaud Giersch, Arnaud Legrand, Martin Quinson,
+    Frédéric Suter. Versatile, Scalable, and Accurate Simulation of
+    Distributed Applications and Platforms. Journal of Parallel and
+    Distributed Computing, Elsevier, 2014, 74 (10), pp.2899-2917.
+#+latex: \pause
+- Validação em escala média (clusters médio porte, até ~1000 nós)
+- Pouca validação em larga escala (supercomputadores)
 
 * Modelos analíticos para modelar o *programa*
 
