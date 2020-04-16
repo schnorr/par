@@ -1,0 +1,87 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Objetivo Alto Desempenho (e Conceitos Básicos)
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+
+* Programação paralela para alto desempenho
+
+#+BEGIN_CENTER
+High Performance Computing
+#+END_CENTER
+
+Programação paralela /versus/ distribuída
++ Em nível de arquitetura
++ Em nível do problema
+
+#+latex: \pause
+
+Objetivo principal: *alto desempenho*
++ Diferente de tolerância a falhas
++ Diferente de maximizar o uso dos recursos
++ Diferente de preocupações com consumo de energia
+
+#+latex: \vfill\pause
+
++ Quer-se um ``bom'' programa paralelo
+  + Que tenha um bom tempo de execução?
+  + Que tenha uma boa aceleração/eficiência?
+  + Que tenha uma boa escalabilidade?
+
+* Conceitos básicos: Aceleração e Eficiência
+
+Aceleração (/speedup/)
+- S_p = T_1 / T_p
+Eficiência
+- E_p = S_p / p
+
+#+caption: Fonte: Wikipedia
+#+attr_latex: :width .6\linewidth
+[[./img/AmdahlsLaw.png]]
+
+* Conceitos básicos: Escalabilidade
+
+Escalabilidade forte (Lei de Amhdal)
+- Tamanho do problema fixo enquanto aumenta-se p
+Escalabilidade fraca (Lei de Gustafson)
+- Tamanho do problema aumenta enquanto aumenta-se p
+
+#+caption: Fonte: Wikipedia
+#+attr_latex: :width .6\linewidth
+[[./img/Gustafson.png]]
+
+* Objetivo: alto desempenho
+
+Tendência: sair programando em geral falha
+- Estimulada por tutoriais e minicursos de programação paralela
+- Enfoque demasiado em detalhes arquiteturais desde o início
+
+#+latex: \pause\bigskip
+
+Melhor abordagem em fases
++ Análise \rightarrow escolha de um bom algoritmo para o problema
++ Implementação \rightarrow programação para uma arquitetura
++ Avaliação experimental do desempenho obtido
+
+#+latex: \vfill\pause
+
+#+BEGIN_CENTER
+Abordagem *PCAM*
+#+END_CENTER
+
+| P | Particionamento |
+| C | Comunicação     |
+| A | Agregação       |
+| M | Mapeamento      |
+

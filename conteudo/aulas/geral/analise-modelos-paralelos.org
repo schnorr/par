@@ -1,0 +1,157 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Além de PCAM @@latex: \linebreak@@ Análise da Complexidade de ``Modelos'' Paralelos
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+
+* Análise de complexidade
+
+Complexidade é uma métrica de avaliação _quantitativa_ de um algoritmo
+
+Depende
+- Da modelagem do algoritmo/programa paralelo
+  - Dados, cálculos, quantidade de sincronizações
+- Da modelagem da máquina paralela
+  - Processadores, memória, rede
+
+#+latex: \vfill\pause
+
+Há uma grande diferença da abordagem sequencial
+- Modelo de Von Neumann
+- Complexidade de algoritmos/problemas
+  + *É independente de máquina*
+  + Complexidade polinomial, exponencial
+  + Transformação polinomial
+
+* O que se deseja de um modelo?
+
+Precisa ser *completo*
+- Em geral, complexo demais com muitos parâmetros
+- Deve levar a uma implementação do algoritmo
+
+#+latex: \pause
+
+Precisa *abstrair* fenômenos e capturar comportamento geral
+- Ser mais genérico
+
+#+latex: \pause
+
+Precisa possibilitar a obtenção de métricas
+- Tempo de execução
+- Espaço de memória usado
+- Volume de comunicações
+- De uma maneira geral \to *permitir predições*
+
+* Modelos para programação paralela
+
+Não existe um modelo universal, existem vários
+- Dependendo dos tipos de máquinas e programas
+
+#+latex: \vfill\pause
+
+Alguns fatos relevantes
+
++ Difícil passar de um modelo com rede de interconexão para um
+  modelo de memória compartilhada sem uma profunda diferença na
+  complexidade do programa
+#+latex: \pause
+
++ Melhores resultados de análise foram obtidos com modelos de
+  *memória compartilhada*, embora limitados em escalabilidade
+#+latex: \pause
+
++ Se estuda a complexidade com modelos de máquina adaptados à
+  complexidade do programa
+#+latex: \pause
+
++ Isso impede de chegar à complexidade do algoritmo
+
+* Modelos analíticos para modelar a *máquina*
+
+*Máquina estática homogênea*; rede perfeita (lat = 0, vazão = \inf)
+- *Máquina PRAM* (/Parallel random-access machine/)
+  - Desconsidera as comunicações, memória compartilhada
+  - Processadores multicore, manycore
+
+#+latex: \pause
+
+*Máquina estática homogênea*, rede com contenção
+- *Modelo LogP* (L: latência; o: /overhead/; g: gap; P: processos)
+  - Culler, David, et al. "LogP: Towards a realistic model of parallel
+    computation." Proceedings of the fourth ACM SIGPLAN symposium on
+    Principles and practice of parallel programming. 1993.
+- Inúmeras derivações
+  - LogGP (Long messages, G is the cost per byte)
+  - LogGPS (Sender sync, S is the message-size threshold for sync)
+  - LogGOPS (Network pipeling, comp/comm overlap)
+  - ...
+
+#+latex: \vfill\pause
+
+E sobre máquinas concretas? (/aka/ *Máquina dinâmica heterogênea*)
+- Grid/Cloud/Supercomputadores/Níveis de Cache
+
+* Modelos analíticos para modelar o *programa*
+
+Considerar o custo teórico das operações (FLOPS)
+
+Contar os acessos à memória
+- Cada acesso tem o mesmo custo (memória UMA)
+- Extrai o grão máximo de paralelismo (como modelo PRAM)
+
+#+latex: \pause
+
+Levar em consideração as comunicações (troca de mensagens)
+- Definir granularidade/tarefas, distribuição de dados
+- Obtém-se um grafo
+  - De chamadas ou de tarefas
+  - De fluxo de dados (orientados ou não)
+
+#+latex: \pause\vfill
+
+Problemas em aberto (considerando a escala)
+- Controle automático da granularidade
+- Como mapear o grafo na máquina
+- Portabilidade
+
+* Escolhendo um modelo de programação
+
+Memória compartilhada (CPU)
+- POSIX Threads, OpenMP, OpenACC, StarPU, ...
+
+Memória compartilhada (CPU/GPU)
+- CUDA, OpenCL, StarPU
+
+#+latex: \pause
+
+Distribuído / Passagem de mensagem
+- MPI-3 (/de facto/ industry standard)
+
+Distribuído / Modelo paralelo de dados (PGAS)
+- Espaço de endereçamento global particionado, local ou distribuído
+- Coarray Fortran, Unified Parallel C (UPC), Chapel
+
+#+latex: \pause
+
+Modelos híbridos
+- MPI+OpenMP, MPI+CUDA, MPI+OpenMP+CUDA
+- StarPU+MPI, /your nice combination here/ (be creative)
+
+* Influências arquiteturais
+
+A arquitetura da máquina que impera
+
+- Arquitetura ARM big.LITTLE
+- Múltiplas placas gráficas (GPGPU) por nó
+- Abordagens híbridas e heterogêneas
