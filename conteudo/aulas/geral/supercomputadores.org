@@ -15,6 +15,11 @@
 #+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
 #+LATEX_HEADER: \input{../org-babel.tex}
 
+* Introdução
+
+See the Top500 Lists
+- https://www.top500.org/lists/top500/
+
 * Sequoia Supercomputer (IBM BlueGene/Q) 
 1.572.864 cores -- 17 petaflops -- #3 2014/2
 
@@ -42,6 +47,11 @@
 
 #+CAPTION: 64 cores (256 threads) for 1 Teraflop
 [[./img/xeonphi.png]]
+
+* Xilinx Alveo U250 (FPGA)
+
+#+CAPTION: Arquiteturas programáveis
+[[./img/alveo.jpg]]
 
 * Samsung Galaxy S6
 
