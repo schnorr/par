@@ -25,7 +25,7 @@
 560.640 cores -- 17 petaflops -- #2 2014/2
 
 #+CAPTION: AMD Opteron + NVIDIA K20
-[[./Titan_render.png]]
+[[./img/Titan_render.png]]
 
 * Tianhe-2 Supercomputer 
 3.120.000 cores -- 22 petaflops -- #1 2014/2
