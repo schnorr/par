@@ -1,0 +1,77 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Discussão de Artigo
+#+Subtitle: Hybrid MPI/OpenMP Parallel Programming on Clusters of Multi-Core SMP Nodes
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+
+* Referência
+
+Rabenseifner, R.; Hager, G.; Jost, G., *Hybrid MPI/OpenMP Parallel
+Programming on Clusters of Multi-Core SMP Nodes* Parallel, Distributed
+and Network-based Processing, 2009 17th Euromicro International
+Conference on , vol., no., pp.427,436, 18-20 Feb. 2009. doi:
+10.1109/PDP.2009.43
+- Citado por 468
+
+* O artigo se propõe a fazer o quê?
+
+#+latex: \pause
+
+Comparar:
+- MPI puro (Sec 2.1)
+- OpenMP puro (Sec 2.4)
+- MPI+OpenMP em vários sabores (combinações) (Sec 2.2, Sec 2.3)
+
+* Quais combinações?
+
+#+latex: \pause
+
+- Hybrid masteronly (Sec 2.2)
+- Hybrid with overlap (Sec 2.3)
+
+* Problemas de "casamento" (/mismatch/)
+
+Quais são os problemas?
+
+#+latex: \pause
+
+- Problema de mapeamento
+  - Domínio: 80 subdomínios, 5\times16
+  - Máquina: 10 máquinas, cada uma com quatro 8 cores
+
+Quais os outros problemas?
+
+#+latex: \pause
+
+- Questões de comunicação MPI intra-nó (Sec 3.2)
+- Saturação da rede e /threads/ ociosas - hybrid masteronly (Sec 3.3)
+  - Uma única /thread/ pode não ser capaz de saturar a rede
+  - As outras /threads/ ficam ociosas enquanto se comunica
+- Mascarando comunicação com cálculo (Sec 3.4)
+- OpenMP performance pitfalls (Sec 3.5)
+
+* Qual aplicação/benchmark e plataforma foram utilizados?
+
+#+latex: \pause
+
+NAS Benchmark
+- Multi-Zone (MZ): captura múltiplos níveis de paralelismo
+- BT-MZ (class E) -- /block tridiagonal simulated CFD/
+- and SP-MZ (class E) -- /scalar pentadiagonal simulated CFD/
+- Aggregated grid size: 4224×3456×92 (4096 zones)
+
+TACC's Ranger
+- 3936 ccNUMA, each with 4\times AMD Opteron quad-core chips
+- Peak of 579 TFlop/s

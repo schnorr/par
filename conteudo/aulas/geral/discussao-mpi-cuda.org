@@ -1,0 +1,51 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Discussão de Artigo
+#+Subtitle: An MPI-CUDA implementation for massively parallel incompressible flow computations on multi-GPU clusters
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+
+* Referência
+
+Jacobsen, Dana, Julien Thibault, and Inanc Senocak. "An MPI-CUDA
+implementation for massively parallel incompressible flow computations
+on multi-GPU clusters." 48th AIAA Aerospace Sciences Meeting Including
+the New Horizons Forum and Aerospace Exposition. 2010.
+
+- Citado por 214
+
+* O artigo se propõe a fazer o quê?
+
+#+latex: \pause
+
+Comparar três estratégias
+- Non-blocking MPI with No Overlapping of Computation
+- Overlapping Computation with MPI
+- Overlapping Computation with MPI Communications and GPU Transfers
+
+Qual a diferença entre essas estratégias?
+
+* Que análise de desempenho foi feita?
+
+Que experimentos foram conduzidos?
+- Qual o projeto experimental?
+
+#+latex: \pause
+
+- Escalabilidade forte
+- Escalabilidade fraca
+
+#+latex: \pause
+
+Qual é o tempo "sequencial"?
