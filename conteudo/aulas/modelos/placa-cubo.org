@@ -1,0 +1,44 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Exercício: Placa e Cubo metálicos
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+
+* Transferência de calor em placa metálica
+- Introdução do problema com video
+  - https://www.youtube.com/watch?v=TvlIfSlLB0c
+- Matriz de calor e equação
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 3cm :center
+[[./img/heat_initial.png]]
+
+#+ATTR_LATEX: :width 3cm :center
+[[./img/heat_equation.png]]
+#+END_CENTER
+\hfill Author of figures: Blaise Barney, LLNL
+
+* Exercício: considerando um cubo metálico
+
+- Empregue a estratégia PCAM
+  - Particionamento
+  - Comunicação
+  - Aglomeração
+  - Mapeamento
+- Balanceamento de carga
+
+#+latex: \vfill
+
+Assuma que a plataforma é um cluster de computadores onde cada nó tem
+dois processadores com uma certa quantidade de cores. Os nós são
+interconectados por uma rede de baixa latência.
