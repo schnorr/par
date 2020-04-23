@@ -18,16 +18,15 @@
 #+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
 
 * SimGrid e SMPI
-Simulador SimGrid - (Tutorial: [[http://simgrid.gforge.inria.fr/tutorials/simgrid-101.pdf][SimGrid 101]])
+Simulador SimGrid - https://simgrid.org/ - (Tutorial: [[http://simgrid.org/tutorials/simgrid-101.pdf][SimGrid 101]])
 - Estudar o comportamento de sistemas de grande escala
 - Implementa modelos de comunicação, cálculo, etc
 - Avaliar heurísticas, prototipar aplicações
 - Múltiplas API para programação
 
-
 #+Latex: \vfill\pause
 
-SMPI - (Tutorial: [[http://simgrid.gforge.inria.fr/tutorials/simgrid-smpi-101.pdf][SMPI 101]])
+SMPI - (Tutorial: [[http://simgrid.org/tutorials/simgrid-smpi-101.pdf][SMPI 101]])
 - Reimplementa a especificação MPI sobre SimGrid
 - Cálculo é executado de verdade; comunicações são simuladas
 
@@ -40,36 +39,29 @@ São necessários
 
 * Descrição da plataforma
 
-Descrição de um cluster a tag =cluster= ([[http://simgrid.gforge.inria.fr/simgrid/3.12/doc/platform.html#pf_cluster][Documentação]])
+Descrição de um cluster a tag =cluster= ([[https://simgrid.org/doc/latest/Platform_Examples.html?highlight=cluster#cluster-with-a-shared-backbone][Documentação]])
+- https://simgrid.org/doc/latest/Platform_Examples.html
 
 #+BEGIN_SRC xml :tangle cluster.xml
-<?xml version=’1.0’?>
-<!DOCTYPE platform SYSTEM
-"http://simgrid.gforge.inria.fr/simgrid.dtd">
-<platform version="3">
-<cluster
-    id="acme"
-
-    prefix="node-"
-    radical="0-15"
-    suffix=".acme"
-    power="1Gf"
-
-    bw="125MBps"    
-    lat="50us"
-
-    bb_bw="2.25GBps"
-    bb_lat="500us"/>
+<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
+<platform version="4.1">
+  <cluster id="hype" prefix="hype-" radical="1-5" suffix=".inf.ufrgs.br"
+	   speed="1Gf" bw="125MBps" lat="50us"
+           bb_bw="2.25GBps"  bb_lat="500us"/>
 </platform>
 #+END_SRC
 
-* Hostfile a aplicação
+* Hostfile
 
 Lista com o nome dos recursos (idênticos àqueles da plataforma)
 
 #+BEGIN_SRC txt :tangle hostfile.txt
-node-0.acme
-node-1.acme
+hype-1.inf.ufrgs.br
+hype-2.inf.ufrgs.br
+hype-3.inf.ufrgs.br
+hype-4.inf.ufrgs.br
+hype-5.inf.ufrgs.br
 #+END_SRC
 
 O código da aplicação
