@@ -64,7 +64,7 @@ hype-4.inf.ufrgs.br
 hype-5.inf.ufrgs.br
 #+END_SRC
 
-O código da aplicação
+* O código da aplicação
 
 #+begin_src C :results output :tangle appcode.c
 #include <stdio.h>
@@ -97,6 +97,20 @@ int main(int argc, char**argv) {
   return 0;
 }
 #+end_src
+
+* Compilando e executando uma vez
+
+#+begin_src shell :results output
+smpicc -g appcode.c -o app
+smpirun --cfg=smpi/host-speed:100000 \
+        -np 2 \
+        -platform cluster.xml \
+        -hostfile hostfile.txt \
+        ./app 1000
+#+end_src
+
+#+RESULTS:
+: 0.001170: Got message of 1000 INTs (4000 bytes) from rank 0.
 
 * Compilando e executando várias vezes
 

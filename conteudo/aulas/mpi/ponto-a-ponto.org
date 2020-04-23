@@ -149,5 +149,5 @@ stat.MPI_SOURCE
 #+latex: \vfill\pause
 
 =MPI_Send= e =MPI_Recv= são bloqueantes
-+ Na prática, [[http://simgrid.gforge.inria.fr/contrib/smpi-calibration-doc/][bloqueante ou não depende do tamanho da mensagem]]
++ Na prática, [[https://framagit.org/simgrid/platform-calibration/][bloqueante ou não depende do tamanho da mensagem]]
 
