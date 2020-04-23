@@ -105,7 +105,11 @@ smpicc -g appcode.c -o app
 for i in $(seq 1 20)
 do
     SIZE=$(echo "2^$i" | bc)
-    smpirun -platform platform.xml -hostfile hostfile.txt ./app $SIZE
+    smpirun --cfg=smpi/host-speed:100000 \
+            -np 2 \
+	      -platform cluster.xml \
+	      -hostfile hostfile.txt \
+	      ./app $SIZE
 done
 
 #+end_src
