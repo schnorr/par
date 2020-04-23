@@ -161,11 +161,4 @@ mpirun -np 6 ./exemplo_simples
 : Oi pessoal, do processo 1 dentro de 6!
 : Oi pessoal, do processo 2 dentro de 6!
 
-* Olá Mundo no PCAD
 
-#+begin_src shell :results output
-mpirun --mca oob_tcp_if_include 192.168.30.0/24 \
-       --mca btl_tcp_if_include 192.168.30.0/24 \
-       -machinefile machinefile \
-       -np 6 ./olamundo
-#+end_src

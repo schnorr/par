@@ -151,3 +151,12 @@ stat.MPI_SOURCE
 =MPI_Send= e =MPI_Recv= são bloqueantes
 + Na prática, [[https://framagit.org/simgrid/platform-calibration/][bloqueante ou não depende do tamanho da mensagem]]
 
+* Um olá mundo mais legal
+
+Welcome to SMPI CourseWare \\
+https://simgrid.github.io/SMPI_CourseWare/
+
+#+latex: \vfill
+
+Topic #0 Module: Hello World! \\
+https://simgrid.github.io/SMPI_CourseWare/topic_getting_started/hello_world/
