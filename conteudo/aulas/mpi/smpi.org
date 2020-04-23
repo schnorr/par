@@ -96,7 +96,7 @@ int main(int argc, char**argv) {
   } else {
     MPI_Status status;
     MPI_Recv(&data, nelements, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
-    printf("%f: Got message of %d INTs (%d bytes) from rank 0.\n", MPI_Wtime(), nelements, nelements*sizeof(int));
+    printf("%f: Got message of %d INTs (%ld bytes) from rank 0.\n", MPI_Wtime(), nelements, nelements*sizeof(int));
   }
 
  // free(data);
