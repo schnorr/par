@@ -54,6 +54,205 @@ MPI_Comm_spawn (
 #+END_SRC
 
 *Demonstração*: pai-filho com troca de mensagens
+* Exemplo básico
+
+#+begin_src shell :results output :dir ./exemplos/basic
+mpicc spawn_trabalhador.c -o trabalhador
+mpicc spawn_mestre.c -o mestre
+echo "localhost slots=64" > hosts
+mpirun -machinefile hosts -np 1 ./mestre
+#+end_src
+
+#+RESULTS:
+#+begin_example
+0: Oi
+2: Oi
+1: Oi
+4: Oi
+9: Oi
+8: Oi
+6: Oi
+3: Oi
+7: Oi
+5: Oi
+0: Recebi o dado 0 do pai
+1: Recebi o dado 1 do pai
+2: Recebi o dado 2 do pai
+3: Recebi o dado 3 do pai
+4: Recebi o dado 4 do pai
+5: Recebi o dado 5 do pai
+6: Recebi o dado 6 do pai
+7: Recebi o dado 7 do pai
+9: Recebi o dado 9 do pai
+0: pai terminando
+8: Recebi o dado 8 do pai
+filho terminou
+filho terminou
+filho terminou
+filho terminou
+filho terminou
+filho terminou
+filho terminou
+filho terminou
+filho terminou
+filho terminou
+filho terminou mesmo
+filho terminou mesmo
+filho terminou mesmo
+filho terminou mesmo
+filho terminou mesmo
+filho terminou mesmo
+filho terminou mesmo
+filho terminou mesmo
+filho terminou mesmo
+filho terminou mesmo
+#+end_example
+* Exemplo básico: rastreamento aky
+** Compila/Executa
+#+begin_src shell :results output :dir ./exemplos/basic
+mpicc spawn_trabalhador.c -o trabalhador
+mpicc spawn_mestre.c -o mestre
+rm rastro*.rst
+echo "localhost slots=64" > hosts
+LD_PRELOAD=~/dev/akypuera/b/libaky.so mpirun -machinefile hosts -np 1 ./mestre
+#+end_src
+
+** Converte/Gráfico
+#+begin_src shell :results output :dir ./exemplos/basic
+~/dev/akypuera/b/aky_converter --no-links rastro-*.rst | ~/dev/pajeng/b/pj_dump  | grep ^State > rastro.csv
+#+end_src
+
+#+RESULTS:
+
+#+begin_src R :results output :session :exports both
+library(tidyverse)
+read_paje_trace <- function(file) {
+  df <- read.csv(file, header=FALSE, strip.white=TRUE)
+  names(df) <- c("Nature","ResourceId","Type","Start","End","Duration", "Depth", "Value")
+  df$Origin=file
+  m <- min(df$Start)
+  df$Start <- df$Start - m
+  df$End <- df$Start+df$Duration
+  df$Origin <- NULL
+  df$Nature <- NULL
+  df$Depth <- NULL
+  df$ResourceId <- as.integer(gsub("rank", "", df$ResourceId))
+  df
+}
+
+# read trace file
+inputFilename = "rastro.csv"
+df <- read_paje_trace (inputFilename)
+df
+stateType = "STATE"
+
+# make the trace selection
+timeSelection = FALSE;
+if (length(args) >= 3) {
+    timeSelection = TRUE;
+    startTime = as.double(args[3]);
+}else{
+    startTime = 0;
+}
+if (length(args) >= 4) {
+    timeSelection = TRUE;
+    endTime = as.double(args[4]);
+}else{
+    endTime = max(df$End);
+}
+
+if (timeSelection){
+    df <- df[df$Start >= startTime & df$End <= endTime,];
+}
+df <- df[df$Type == stateType,];
+
+# get rid of durations == 0
+df <- df[df$Duration != 0,];
+
+# prepare name of output file
+outputFile = paste (inputFilename, "-", stateType, "-", startTime, "-", endTime, ".pdf", sep="");
+
+library(ggplot2);
+p <- ggplot(df, aes(xmin=Start,xmax=End, ymin=ResourceId,ymax=ResourceId+0.9, fill=Value)) + theme_bw() + geom_rect(size=4);
+ggsave(outputFile,
+       plot=p,
+       width=13,
+       height=2,
+       limitsize=FALSE)
+
+
+#+end_src
+
+#+RESULTS:
+#+begin_example
+
+   ResourceId  Type    Start      End Duration                Value
+1           9 STATE 0.008795 0.008795 0.000000 MPI_Comm_remote_size
+2           9 STATE 0.008796 0.008796 0.000000        MPI_Comm_rank
+3           9 STATE 0.008826 0.068662 0.059836          MPI_Barrier
+4           9 STATE 0.068667 0.224713 0.156046             MPI_Recv
+5           9 STATE 0.224829 0.244769 0.019940          MPI_Barrier
+6           9 STATE 0.244824 0.290365 0.045541         MPI_Finalize
+7           8 STATE 0.020744 0.020744 0.000000 MPI_Comm_remote_size
+8           8 STATE 0.020745 0.020745 0.000000        MPI_Comm_rank
+9           8 STATE 0.020752 0.068660 0.047908          MPI_Barrier
+10          8 STATE 0.068664 0.233202 0.164538             MPI_Recv
+11          8 STATE 0.233207 0.233238 0.000031          MPI_Barrier
+12          8 STATE 0.233242 0.290363 0.057121         MPI_Finalize
+13          7 STATE 0.020750 0.020750 0.000000 MPI_Comm_remote_size
+14          7 STATE 0.020750 0.020750 0.000000        MPI_Comm_rank
+15          7 STATE 0.020762 0.068660 0.047898          MPI_Barrier
+16          7 STATE 0.068661 0.196676 0.128015             MPI_Recv
+17          7 STATE 0.196680 0.244131 0.047451          MPI_Barrier
+18          7 STATE 0.244136 0.291787 0.047651         MPI_Finalize
+19          6 STATE 0.012745 0.012746 0.000001 MPI_Comm_remote_size
+20          6 STATE 0.012746 0.012746 0.000000        MPI_Comm_rank
+21          6 STATE 0.012754 0.060668 0.047914          MPI_Barrier
+22          6 STATE 0.060671 0.176673 0.116002             MPI_Recv
+23          6 STATE 0.176678 0.244690 0.068012          MPI_Barrier
+24          6 STATE 0.244693 0.294173 0.049480         MPI_Finalize
+25          5 STATE 0.008762 0.008762 0.000000 MPI_Comm_remote_size
+26          5 STATE 0.008763 0.008763 0.000000        MPI_Comm_rank
+27          5 STATE 0.008771 0.060660 0.051889          MPI_Barrier
+28          5 STATE 0.060662 0.152673 0.092011             MPI_Recv
+29          5 STATE 0.152676 0.244723 0.092047          MPI_Barrier
+30          5 STATE 0.244727 0.290361 0.045634         MPI_Finalize
+31          4 STATE 0.016745 0.016745 0.000000 MPI_Comm_remote_size
+32          4 STATE 0.016746 0.016746 0.000000        MPI_Comm_rank
+33          4 STATE 0.016753 0.052752 0.035999          MPI_Barrier
+34          4 STATE 0.052754 0.136668 0.083914             MPI_Recv
+35          4 STATE 0.136673 0.244779 0.108106          MPI_Barrier
+36          4 STATE 0.244786 0.293261 0.048475         MPI_Finalize
+37          3 STATE 0.016749 0.016749 0.000000 MPI_Comm_remote_size
+38          3 STATE 0.016750 0.016750 0.000000        MPI_Comm_rank
+39          3 STATE 0.016758 0.064664 0.047906          MPI_Barrier
+40          3 STATE 0.064668 0.112673 0.048005             MPI_Recv
+41          3 STATE 0.112677 0.244785 0.132108          MPI_Barrier
+42          3 STATE 0.244792 0.291819 0.047027         MPI_Finalize
+43          2 STATE 0.000753 0.000753 0.000000 MPI_Comm_remote_size
+44          2 STATE 0.000754 0.000754 0.000000        MPI_Comm_rank
+45          2 STATE 0.000762 0.052756 0.051994          MPI_Barrier
+46          2 STATE 0.052761 0.076676 0.023915             MPI_Recv
+47          2 STATE 0.076680 0.244687 0.168007          MPI_Barrier
+48          2 STATE 0.244693 0.290362 0.045669         MPI_Finalize
+49          1 STATE 0.008743 0.008743 0.000000 MPI_Comm_remote_size
+50          1 STATE 0.008744 0.008744 0.000000        MPI_Comm_rank
+51          1 STATE 0.008751 0.056663 0.047912          MPI_Barrier
+52          1 STATE 0.056667 0.056724 0.000057             MPI_Recv
+53          1 STATE 0.056728 0.244722 0.187994          MPI_Barrier
+54          1 STATE 0.244759 0.291788 0.047029         MPI_Finalize
+55          0 STATE 0.000000 0.000001 0.000001 MPI_Comm_remote_size
+56          0 STATE 0.000002 0.000002 0.000000        MPI_Comm_rank
+57          0 STATE 0.000058 0.052752 0.052694          MPI_Barrier
+58          0 STATE 0.052758 0.052772 0.000014             MPI_Recv
+59          0 STATE 0.052805 0.244850 0.192045          MPI_Barrier
+60          0 STATE 0.244855 0.292713 0.047858         MPI_Finalize
+#+end_example
+
+* Exemplo básico: visualização dos trabalhadores
+
+#+attr_latex: :width \linewidth
+[[./exemplos/basic/rastro.csv-STATE-0-0.294173.pdf]]
 
 * Sequência de Fibonacci
 Cálculo do i-ésimo elemento da sequência de Fibonacci
@@ -74,18 +273,18 @@ Algoritmo sequencial
   #+END_SRC
 * 
 #+ATTR_LATEX: :width \linewidth
-[[./fib_1.pdf]]
+[[./fib_1.png]]
 * 
 #+ATTR_LATEX: :width \linewidth
-[[./fib_2.pdf]]
+[[./fib_2.png]]
 * 
 #+ATTR_LATEX: :width \linewidth
-[[./fib_3.pdf]]
+[[./fib_3.png]]
 * 
 #+ATTR_LATEX: :width \linewidth
-[[./fib_4.pdf]]
+[[./fib_4.png]]
 * 
 #+ATTR_LATEX: :width \linewidth
-[[./fib_5.pdf]]
+[[./fib_5.png]]
 * Implementando a Sequência de Fibonacci
 Como implementar em paralelo com =MPI_Comm_spawn=?
