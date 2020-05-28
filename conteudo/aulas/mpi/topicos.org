@@ -26,17 +26,5 @@ Subprojects
 Check publications
 https://www.open-mpi.org/papers/
 
-[[https://www.open-mpi.org/papers/sc-2016][Supercomputing 2016 slides]]
-Slides from the Open MPI State of the Union BOF at SC'16
-
-* Supercomputing 2016 slides
-
-- Random sample of v2.x features / work (Slide 31)
-  - Singularity (32)
-  - Open MPI I/O (”OMPIO”) (38)
-- Exciting new capabilities in Open MPI (43)
-  - OMPI-X (DOE Exascale)
-  - =MPI_THREAD_MULTIPLE=
-  - Asynchronous progress
-  - Collective Communications
-- Mapping, Ranking, Binding: Oh My! (84)
+Always check Supercomputing slides (updates)
+- Open MPI State of the Union BOF at SC
