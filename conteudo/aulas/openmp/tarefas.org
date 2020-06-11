@@ -104,22 +104,33 @@ Opções podem ser if(expr), untied, shared(list), private(list),
 * Código exemplo
 \scriptsize
 #+BEGIN_SRC C
-  struct node {
-    struct node *left;
-    struct node *right;
-  };
-  extern void process (struct node*);
+struct node {
+  struct node *left;
+  struct node *right;
+};
+extern void process (struct node*);
 
-  void traverse (struct node *p){
-    if (p->left){
-       #pragma omp task //p is firstprivate by default
-         traverse(p->left);
-    }
-
-    if (p->right){
-       #pragma omp task
-         traverse(p->right);
-    }
-    process(p);
+void traverse (struct node *p){
+  if (p->left){
+     #pragma omp task //p is firstprivate by default
+       traverse(p->left);
   }
+
+  if (p->right){
+     #pragma omp task
+       traverse(p->right);
+  }
+  process(p);
+}
+
+int main() {
+  struct node *p = NULL;
+  //p alloc + creation
+#pragma omp parallel
+#pragma omp single
+  traverse(p);
+}
 #+END_SRC
+* Exemplo com fibonacci
+
+fib.c
