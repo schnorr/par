@@ -74,17 +74,22 @@ Forma da distribuição das iterações
 + Análise de desempenho
 + Fixo?
 * Diretiva de escalonamento -- omp for schedule
-*omp for schedule (static [, chunk])*
+*omp for schedule (static[,chunk])*
 + Distribuição estática das iterações por bloco
     + Tamanho do bloco é *chunk*
-\pause  *omp for schedule (dynamic [, chunk])*
+\pause  *omp for schedule (dynamic[,chunk])*
 + Distribuição dinâmica (cíclica)
-\pause  *omp for schedule (guided [, chunk])*
+\pause  *omp for schedule (guided[,chunk])*
 + Distribuição estática
 + Tamanho do bloco diminui a medida que o cálculo anda
 \pause  *omp for schedule (runtime)*
 + Definido em tempo de execução
-    + Variável de ambiente *OMP_SCHEDULE*
+  + Variável de ambiente ~OMP_SCHEDULE~
+    https://www.openmp.org/spec-html/5.0/openmpse49.html
+  + Exemplos com /bashrc/
+    #+begin_src shell :results output
+    export OMP_SCHEDULE="static"
+    #+end_src
 * Exemplo comparativo
 omp parallel
   \small
