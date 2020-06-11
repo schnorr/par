@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <strings.h>
 #include <mpi.h>
 
 #define TAMANHO 16
@@ -17,6 +18,7 @@ int main(int argc, char *argv[])  {
 
   MPI_Request reqs[8];
   MPI_Status stats[8];
+  bzero(stats, 8*sizeof(MPI_Status));
   MPI_Comm cartcomm;
   
   MPI_Init(&argc,&argv);
