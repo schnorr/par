@@ -1,0 +1,236 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Dependências finas entre tarefas OpenMP
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+* Dependências fortes entre tarefas OpenMP (1)
+
+~taskwait~
+- Espera pelo término das tarefas filhas da tarefa corrente
+- Ponto de escalonamento implícito
+
+#+latex: \bigskip
+#+BEGIN_SRC C
+#pragma omp task
+{
+  printf("Tarefa filha\n");
+  #pragma omp task
+    printf("Tarefa neta\n");
+}
+#pragma omp taskwait
+#+END_SRC
+
+* Dependências fortes entre tarefas OpenMP (2)
+
+~taskgroup~
+- Espera pelo término de *todas as tarefas descendentes da tarefa
+  corrente* criada na região do grupo de tarefas
+- Ponto de escalonamento implícito
+
+#+latex: \bigskip
+#+BEGIN_SRC C
+#pragma omp taskgroup
+{
+  #pragma omp task
+  {
+     printf("Tarefa filha\n");
+     #pragma omp task
+       printf("Tarefa neta\n");
+  }
+}
+#+END_SRC
+
+* Problema com ~taskwait~ e ~taskgroup~
+
+Trata-se de um ponto de sincronização forte
+- Difícil de especificar dependências finas (tarefa a tarefa)
+
+* Grafo de tarefas (/Directed Acyclic Graph/ -- DAG)
+
+Fatoração LU sem pivotamento com tarefas
+
+[[./img/LU_DAG.png]]
+
+Como especificar dependência fina entre tarefas (por par de tarefas)?
+
+* Cláusula ~depend~
+
+Força uma dependência explícita entre duas tarefas
+- Permite restringir a execução a uma certa ordem
+
+Desassociação da criação da execução de uma tarefa
+- Tarefas prontas (/ready tasks/) de submetidas (/submitted/)
+
+#+caption: (fonte) Make the Most of OpenMP Tasking by Sergi Mateo Bellido (Compiler engineer) -- SC17 OpenMP BOF
+#+attr_latex: :width .8\linewidth
+[[./img/depend.pdf]]
+
+* Funcionamento da cláusula ~depend~
+
+~depend(dep-type: list)~, onde
+- ~dep-type~ pode ser ~in~, ~out~, ~inout~
+- ~list~ pode ser
+  - uma variável (~depend(inout: x)~, x é uma variável)
+  - uma seção de um vetor (~depend(inout: a[10:20])~, a é um vetor)
+
+#+latex: \vfill\pause
+
+Uma tarefa aguarda o término de seus predecessores
+
+#+attr_latex: :width .4\linewidth
+[[./img/LU_DAG.png]]
+
+* Como usar ~in~, ~out~ e ~inout~ para impor precedência?
+
+Se uma tarefa define uma dependência ~in~ sobre uma variável
+- a execução desta tarefa dependerá de todas as tarefas irmãs *geradas
+  previamente* que contenham a mesma variável em uma construção ~out~ e
+  ~inout~
+
+#+attr_latex: :width .6\linewidth
+[[./img/in_out-inout.pdf]]
+
+#+latex: \vfill\pause
+
+Se uma tarefa define uma dependência ~out~ ou ~inout~ sobre uma variável
+- a execução desta tarefa dependerá de todas as tarefas irmãs *geradas
+  previamente* que contenham a mesma variável em uma lista da
+  construção ~depend~ (~in~, ~out~, ~inout~)
+
+#+attr_latex: :width .6\linewidth
+[[./img/inout_in-out-inout.pdf]]
+
+* Exemplo #1
+
+#+attr_latex: :width .2\linewidth :center nil
+[[./img/diamond.pdf]]
+
+#+begin_src C
+int x = 0;
+#pragma omp parallel
+#pragma omp single
+{
+    #pragma omp task depend(inout:x)
+    { A; }
+    #pragma omp task depend(in:x)
+    { B; }
+    #pragma omp task depend(in:x)
+    { C; }
+    #pragma omp task depend(inout:x)
+    { D; }
+
+}
+#+end_src
+
+* Exemplo #2
+
+#+BEGIN_SRC C :main no
+#include <stdio.h>
+#include <omp.h>
+#include <unistd.h>
+int main () {
+  int x, y;
+  #pragma omp parallel num_threads(10)
+  {
+    #pragma omp single nowait
+    {
+      #pragma omp task depend(out:x) //task1
+      { x = 1; }
+
+      #pragma omp task depend(in:x) depend(out:y) //task2
+      { sleep (2); y = x + 1; } //Does task3 wait for us? Yes!
+
+      #pragma omp task depend(inout:x) //task3
+      { x++; printf ("task3(x): %d\n", x); }
+
+      #pragma omp task depend(in:x,y) //task4
+      { printf ("task4 (x+y): %d\n", x + y); }
+    }
+  }
+  return 0;
+}
+#+END_SRC
+
+Veja o exemplo e explicação no link: [[https://stackoverflow.com/questions/27475174/task-dependency-in-openmp-4][Task Dependency in OpenMP 4]]
+
+* Exemplo #3 - Multiplicação de Matrizes
+
+Este exemplo mostra uma multiplicação de matrizes por bloco. Matrizes
+são quadradas, com NxN elementos, e a multiplicação ocorre em blocos
+também quadrados de BSxBS elementos.
+
+#+BEGIN_SRC C
+// Assumimos que BS dividem N perfeitamente
+void matmul_depend(int N, int BS, float A[N][N], float B[N][N], float C[N][N]) {
+  int i, j, k, ii, jj, kk;
+  for (i = 0; i < N; i+=BS) {
+    for (j = 0; j < N; j+=BS) {
+      for (k = 0; k < N; k+=BS) {
+        // Nota 1: i, j, k, A, B, C são firstprivate por default
+        // Nota 2: A, B e C são apenas ponteiros
+        #pragma omp task private(ii, jj, kk) \
+                depend ( in: A[i:BS][k:BS], B[k:BS][j:BS] ) \
+                depend ( inout: C[i:BS][j:BS])
+        for (ii = i; ii < i+BS; ii++ )
+          for (jj = j; jj < j+BS; jj++ )
+	      for (kk = k; kk < k+BS; kk++ )
+		C[ii][jj] = C[ii][jj] + A[ii][kk] * B[kk][jj];
+      }
+    }
+  }
+}
+#+END_SRC
+
+* Fatoração QR de matrizes densas (thanks Marcelo Miletto)
+
+#+BEGIN_SRC C
+#pragma omp parallel
+#pragma omp single
+{
+ for(k=0; k < min(b,mb); k++) { // for each diagonal block
+   kb = k*nb*n + k*nb;
+   #pragma omp task depend(inout: A[kb:kb], A[kb+1:kb+1]) depend(out: T[0:tsize])
+   LAPACKE_dgeqrt(LAPACK_ROW_MAJOR, nb, nb, nb, &A[kb], lda, T, ldt);
+
+   for(j=k+1; j<b; j++) { // update diagonal right blocks 
+     jb = k*nb*n + j*nb;
+     #pragma omp task depend(in: A[kb:kb], T[0:tsize]) depend(inout: A[jb:jb+nb])
+        LAPACKE_dlarfb(LAPACK_ROW_MAJOR, 'L', 'T', 'F', 'C',  nb, nb, nb, &A[kb], lda, T, ldt, &A[jb], lda);
+   }
+         
+   for(i=k+1; i<mb; i++) { // eliminate blocks below the diagonal
+     ib = i*nb*n + k*nb;
+     #pragma omp task depend(inout: A[kb+1:kb+1], A[ib:ib+nb]) depend(out: T2[0:tsize])
+     LAPACKE_dtpqrt(LAPACK_ROW_MAJOR, nb, nb, 0, nb, &A[kb], lda, &A[ib], lda, T2, ldt);
+
+     for(zit=k+1, z=1; zit<b; zit++, z++) { // update k-th line with i-th line
+       jb = k*nb*n + zit*nb;
+       ib2 = (i*nb*n + k*nb) + z*nb;
+       #pragma omp task depend(inout: A[jb:jb+nb], A[ib2:ib2+nb]) depend (in: A[ib:ib+nb], T2[0:tsize])
+       LAPACKE_dtpmqrt(LAPACK_ROW_MAJOR, 'L', 'T', nb, nb, nb, 0, nb, &A[ib], lda, T2, ldt, &A[jb], lda, &A[ib2], lda);
+     }
+   }
+ }
+}
+#+END_SRC
+
+* Referências
+
+[[https://www.openmp.org/wp-content/uploads/SC17-Bellido-MakeTheMostOfOpenMPTasking.pdf][Make the Most of OpenMP Tasking]] @@latex:\linebreak@@
+by Sergi Mateo Bellido (Compiler engineer)  @@latex:\linebreak@@
+SC17 -- OpenMP BOF
+
