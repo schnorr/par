@@ -29,6 +29,7 @@ disciplina, podem variar em abrangência e profundidade.
 | OpenMP  | [[./aulas/openmp/compartilhamento.org][Compartilhamento de Variáveis]]                |         7 |
 | OpenMP  | [[./aulas/openmp/tarefas.org][Paralelismo de tarefas]]                       |           |
 | OpenMP  | [[./aulas/openmp/sincronizacao.org][Sincronização]]                                |           |
+| OpenMP  | [[./aulas/openmp/detalhamentos.org][Detalhamentos sobre Tarefas]]                  |           |
 | OpenMP  | [[./aulas/openmp/topicos.org][Tópicos de pesquisa]]                          |         8 |
 | OpenMP  | [[./aulas/openmp/pratica.org][Prática em laboratório #1]]                    |         9 |
 | OpenMP  | Prática em laboratório #2: VADD GPU          |        10 |

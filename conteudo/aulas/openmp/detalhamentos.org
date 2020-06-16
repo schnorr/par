@@ -1,0 +1,157 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Detalhamentos sobre Tarefas OpenMP
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+* Tarefas em OpenMP
+
+Uma tarefa tem
+- um pedaço de código
+- seu ambiente de dados (escopo)
+- variáveis internas de controle /aka/ /Internal Control Variables/ (/ICV/)
+
+#+latex: \vfill
+
+#+BEGIN_SRC C
+int foo (int x) {
+  int res = 0;
+  #pragma omp task shared(res) firstprivate(x)
+  {
+    res += x;
+  }
+  #pragma omp taskwait
+}
+
+int main() {
+  int var = 0;
+  #pragma omp parallel
+  #pragma omp master
+  var = foo(4);
+}
+#+END_SRC
+
+* Outras construções para geração de tarefas (~taskloop~)
+
+Forma de especificar que as iterações do laço serão tarefas
+
+#+BEGIN_SRC C
+int foo (int n, int *v) {
+  #pragma omp parallel
+  #pragma omp single
+  #pragma omp taskloop
+  for (int i = 0; i < n; i++) {
+    calcular (v[i]);
+  }
+}
+#+END_SRC
+
+Lembrete do habitual ponto de sincronização implícito no final
+
+* Diferenças entre blocos ~parallel~ e ~task~ (1)
+ 
+Execução síncrona /versus/ assíncrona
+
+#+BEGIN_SRC C :tangle parallel.c
+#include <stdio.h>
+int foo_parallel() {
+  int r = 4;
+  printf("1: &r = %p\n", &r);
+  #pragma omp parallel
+  #pragma omp single
+  printf("2: &r = %p\n", &r);
+  return 0;
+}
+foo_parallel();
+#+END_SRC
+
+Compilando e executando
+#+begin_src shell :results output
+emacs -batch -l ~/.emacs.d/init.el dependencias.org  --funcall org-babel-tangle
+gcc parallel.c -fopenmp -o parallel
+./parallel 2>&1
+#+end_src
+
+#+RESULTS:
+: 1: &r = 0x7fff9ee38284
+: 2: &r = 0x7fff9ee38284
+
+* Diferenças entre blocos ~task~ (2)
+
+Execução síncrona /versus/ assíncrona
+
+#+BEGIN_SRC C :tangle task2.c
+#include <stdio.h>
+int foo_parallel() {
+  int r = 4;
+  printf("1: &r = %p\n", &r);
+
+  #pragma omp task
+  printf("2: &r = %p\n", &r);
+  return 0;
+}
+foo_parallel();
+#+END_SRC
+
+Compilando e executando
+#+begin_src shell :results output
+emacs -batch -l ~/.emacs.d/init.el dependencias.org  --funcall org-babel-tangle
+gcc task2.c -fopenmp -o task2
+./task2 2>&1
+#+end_src
+
+#+RESULTS:
+: 1: &r = 0x7ffccb9e56d8
+: 2: &r = 0x7ffccb9e553c
+
+Variáveis sem especificação são ~firstprivate~ com ~task~
+- Mas ~shared~ com ~parallel~
+- Recomenda-se o uso the ~default(none)~
+* Cláusulas de escalonamento e de /cutoff/
+
+~untied~
+- Tarefas são ~tied~ por default (atadas à uma /thread/)
+- Ao usar ~untied~, as tarefas podem mudar de /thread/ executora
+
+#+latex: \pause\vfill
+
+~priority(expr)~
+- atribui uma prioridade à tarefa
+- pode priorizar tarefas críticas (mais pesadas)
+- balanceamento de carga
+
+#+latex: \vfill
+
+#+BEGIN_SRC C
+int foo (int N, int **elems, int *sizes) {
+  for (int i = 0; i < N; i++) {
+    #pragma omp task priority(sizes[i])
+    computar(elems[i]);
+  }
+}
+#+END_SRC
+
+#+latex: \vfill
+
+~if(expr)~
+- Se ~expr~ avalia para falso, a construção é ignorada
+
+* Referências
+
+[[https://www.openmp.org/wp-content/uploads/SC17-Bellido-MakeTheMostOfOpenMPTasking.pdf][Make the Most of OpenMP Tasking]] @@latex:\linebreak@@
+by Sergi Mateo Bellido (Compiler engineer)  @@latex:\linebreak@@
+SC17 -- OpenMP BOF
+
