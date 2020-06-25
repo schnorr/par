@@ -51,31 +51,31 @@
    + <2->Qual é o melhor sistema?
 ** A Arte da Avaliação de Desempenho
    + Média
-     \small
+     #+latex: \small
      |---------+---------+----------+-------|
      | Sistema | Carga 1 | Carga  2 | Média |
      |---------+---------+----------+-------|
      | A       |      20 |       10 |    15 |
      | B       |      10 |       20 |    15 |
      |---------+---------+----------+-------|
-   + <2->Considerar que o sistema B é a base
-     \small
+   + Considerar que o sistema B é a base
+     #+latex: \small\pause
      |---------+---------+----------+-------|
      | Sistema | Carga 1 | Carga  2 | Média |
      |---------+---------+----------+-------|
-     | *A*     |       2 |      0.5 |  1.25 |
+     | *A*       |       2 |      0.5 |  1.25 |
      | B       |       1 |        1 |     1 |
      |---------+---------+----------+-------|
-   + <3->Considerar que o sistema A é a base
-     \small
+   + Considerar que o sistema A é a base
+     #+latex: \small\pause
      |---------+---------+----------+-------|
      | Sistema | Carga 1 | Carga  2 | Média |
      |---------+---------+----------+-------|
      | A       |       1 |        1 |     1 |
-     | *B*     |     0.5 |        2 |  1.25 |
+     | *B*       |     0.5 |        2 |  1.25 |
      |---------+---------+----------+-------|
-   \vfill
-   + <4->Técnica conhecida como \alert{jogos da razão}
+   #+latex: \vfill\pause
+   + Técnica conhecida como \alert{jogos da razão}
 ** O Livro
 *** 
     :PROPERTIES:
