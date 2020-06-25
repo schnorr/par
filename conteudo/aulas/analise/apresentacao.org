@@ -137,7 +137,7 @@
    + Fatorial completo com dois fatores sem replicação
    + Fatorial completo com dois fatores /com/ replicação
    + Fatorial completo geral com $k$ fatores
-* Visualização
+* Visualização                                                     :noexport:
 ** 
    \vfill
    \centering
@@ -187,11 +187,19 @@
      + GPL!
      + StarVZ, PajeNG, Akypuera, Poti and friends
    + Esforço de institucionalização
-* Conclusão
+* Conclusão                                                        :noexport:
 ** Qual a proposta? \small Conclusão
    + Grupo de estudos sobre \alert{Projeto de Experimentos}
      + Sobretudo utilizar casos reais
    + <2->\alert{Estudos de caso} para análise através da visualização
      + Interesse em problemas de larga escala (espaço, tempo, fatores)
+* Conclusão
+** Referências extras
 
+ CSE567M: Computer Systems Analysis (Fall 2006)
+ https://www.cse.wustl.edu/~jain/cse567-06/index.html
 
+ #+latex: \vfill
+
+ CMP223 -- Computer System Performance Analysis
+ Prof. Luciano Paschoal Gaspary
