@@ -6,7 +6,7 @@
 #+EXPORT_EXCLUDE_TAGS: noexport
 #+EXPORT_SELECT_TAGS: export
 
-#+Title: CUDA
+#+Title: Programando Aceleradores
 #+Author: Prof. Lucas M. Schnorr (UFRGS)
 #+Date: \copyleft
 
@@ -17,7 +17,493 @@
 #+LATEX_HEADER: \RequirePackage{fancyvrb}
 #+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
 
-* Introdução
+* Exemplo de nó computacional com acelerador
+** Left
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+
+#+attr_latex: :width \linewidth :center nil
+[[./img/tupi1.jpg]]
+
+#+latex: \scriptsize
+Intel Xeon E5-2620v4 Broadwell (Q1'16), 2,1 GHz
+8 núcleos
+
+64 GB DDR4 RAM
+
+2 x NVIDIA GeForce GTX 1080Ti, Pascal
+
+Projeto FAPERGS 16/2551-0000354-8
+
+#+latex: \pause
+
+** Right
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+
+Terminologia
+- Host: CPU e sua memória
+- Device: GPU e sua memória
+- Kernel: Função em C
+
+#+latex: \vspace{0.2cm}\pause
+
+Modelo Host -- Device
+- Espaços de endereçamento
+- Comunicação barramento PCI
+- Enfoque HPC
+
+#+latex: \vspace{0.2cm}\pause
+
+Exemplos
+- GPGPU
+- FPGA
+- +Xeon Phi+ (/deprecated/)
+- Híbrido (GPGPU + FPGA)?
+
+* Forma de funcionamento
+
+Um CPU /core/ dedicado para cada GPU, responsável por
+1. Preparar os dados (copiá-los para a GPU)
+2. Lançar o kernel no acelerador
+3. Recuperar os dados (copiá-los de volta para a RAM)
+
+#+attr_latex: :width .5\linewidth
+[[./img/elementos.pdf]]
+
+#+latex: \pause
+
+Impacto dos conceitos básicos
+- Lei de Amdahl (quantos % do código é sequencial)
+- Tamanho da memória da GPU /vs/ Velocidade Barramento PCI
+- Mascaramento da comunicação
+
+* Forma de funcionamento (visão concreta com código)
+
+#+attr_latex: :width .8\linewidth :centerl nil
+[[./img/slide8.pdf]]
+
+Introduction to CUDA C
+
+Autor: Mark Harris -- NVIDIA Corporation
+
+* Comparação CPU /vs/ GPU
+
+CPU: poucos cores com controle independente
+
+GPU: muitos cores, pouco controle
+- Modelo SIMT \to /Single Instruction Multiple Thread/
+- Evitar indireções (condições /if/ no código do kernel)
+
+#+attr_latex: :width .6\linewidth
+[[./img/slide19-esteban.pdf]]
+
+Hands-on CUDA
+
+Autor: Prof. Esteban Walter Gonzalez Clua, Dr., UFF
+
+* Organização de uma GPU em /Stream Processors/ (SM)
+
+Exemplo com 15 SMs
+#+attr_latex: :width .6\linewidth
+[[./img/slide23-esteban.pdf]]
+
+Exemplos
+- GeForce 10-series GTX 1080 Ti (28 SMs)
+- GeForce 20-series RTX 2080 Ti (68 SMs)
+
+* Organização dos /cores/ (/threads/) da GPU
+
+- Threas são agrupadas em blocos de threads 1D, 2D ou 3D
+  - Tamanho do bloco (quantas threads) é fixo no lançamento do kernel
+- Blocos são organizados em uma grade 1D, 2D, 3D
+  - Blocos executam em paralelo nos SMs
+#+attr_latex: :width .3\linewidth
+[[./img/thread-hierarchy.pdf]]
+
+#+latex: \pause\vfill
+
+A quantidade de blocos na grade depende dos dados
+- Pode ser bem maior que a quantidade de SMs
+- *Escalonamento de blocos para SMs* (em HW)
+
+  #+attr_latex: :width .3\linewidth :center nil
+  [[./img/escalonamento.pdf]]
+
+* Organização da Memória da GPU
+
+- Um kernel é executado por uma grade
+
+- A grade tem blocos, cada bloco tem até 1024 threads
+
+- Registradores (thread), Compartilhada (bloco), Global (entre blocos)
+
+#+attr_latex: :width .6\linewidth
+[[./img/slide10-joao-compass.pdf]]
+
+Introduction to CUDA C/C++ (at ComPAS 2013)
+
+Autor: João V. F. Lima (UFSM)
+
+* Olá Mundo em C com kernel vazio em GPU
+#+BEGIN_SRC C
+__global__ void meukernel(void) {
+}
+
+int main(void) {
+  printf("Hello World!\n");
+  meukernel<<<1,1>>>();
+  return 0;
+}
+#+END_SRC
+
+#+latex: \pause
+
+Usamos o compilador ~nvcc~
+#+begin_src shell :results output
+nvcc olamundo.c
+#+end_src
+
+#+latex: \pause\vfill
+
+~__global__~
+- Indica que a função executa no device
+- Invocada do host
+
+Element ``menor menor menor ... maior maior maior''
+- Indica a invocação de um kernel na GPU
+- Operação bloqueante
+
+~nvcc~ (compilador)
+- Gera código para CPU (x86) e para GPU (PTX)
+
+* Exemplo um pouquinho mais interessante
+
+Soma de dois vetores
+
+#+attr_latex: :width .6\linewidth :center nil
+[[./img/somavetor.pdf]]
+
+Ideia
+- Cada posição é encargo de uma /thread/
+
+#+latex: \pause\vfill
+
+Mas antes, vamos simplificar para seguir com /baby steps/
+
+Kernel em GPU (simplificação)
+#+attr_latex: :width .12\linewidth :center nil
+[[./img/somaescalar.pdf]]
+
+#+BEGIN_SRC C
+__global__ void add(int *a, int *b, int *c) {
+  *c = *a + *b;
+}
+#+END_SRC
+Como ~add~ executa no Device
+- Os três ponteiros devem apontar para a memória do Device
+- Copiar os vetores a e b (entrada) e recuperar o vetor c (saída)
+
+* Gerenciamento de Memória
+
+API CUDA para gerenciar memória no Device
+- ~cudaMalloc()~, ~cudaFree()~, ~cudaMemcpy()~
+
+#+latex: \vfill\pause
+
+Passos de um programa para usar uma única GPU
+1. Aloca memória no Device para entrada e saída  -- ~cudaMalloc()~
+2. Copia os dados de entrada do Host para o Device -- ~cudaMemcpy()~
+3. Lança o kernel
+4. Copia os dados de saída do device para o Host -- ~cudaMemcpy()~
+5. Libera a memória no Device -- ~cudaFree()~
+
+* Voltando ao exemplo #1/2
+
+Kernel em GPU (simplificação)
+#+attr_latex: :width .12\linewidth :center nil
+[[./img/somaescalar.pdf]]
+#+BEGIN_SRC C
+__global__ void add(int *a, int *b, int *c) {
+  *c = *a + *b;
+}
+#+END_SRC
+
+Main (início)
+
+#+BEGIN_SRC C
+int main(void) {
+  int a, b, c;	            // host copies of a, b, c
+  int *d_a, *d_b, *d_c;	     // device copies of a, b, c
+  int size = sizeof(int);
+  
+  // Allocate space for device copies of a, b, c
+  cudaMalloc((void **)&d_a, size);
+  cudaMalloc((void **)&d_b, size);
+  cudaMalloc((void **)&d_c, size);
+  
+  // Setup input values
+  a = 2;
+  b = 7;
+#+END_SRC
+
+
+
+* Voltando ao exemplo #2/2
+
+
+Kernel em GPU (simplificação)
+#+attr_latex: :width .12\linewidth :center nil
+[[./img/somaescalar.pdf]]
+#+BEGIN_SRC C
+__global__ void add(int *a, int *b, int *c) {
+  *c = *a + *b;
+}
+#+END_SRC
+
+Main (continuação)
+
+#+BEGIN_SRC C
+  // Copy inputs to device
+  cudaMemcpy(d_a, &a, size, cudaMemcpyHostToDevice);
+  cudaMemcpy(d_b, &b, size, cudaMemcpyHostToDevice);
+
+  // Launch add() kernel on GPU
+  add<<<1,1>>>(d_a, d_b, d_c);
+
+  // Copy result back to host
+  cudaMemcpy(&c, d_c, size, cudaMemcpyDeviceToHost);
+
+  // Cleanup
+  cudaFree(d_a); cudaFree(d_b); cudaFree(d_c);
+  return 0;
+}
+#+END_SRC
+
+* Resolvendo em paralelo
+
+Voltando ao exemplo de soma de dois vetores
+#+attr_latex: :width .6\linewidth :center nil
+[[./img/somavetor.pdf]]
+
+#+latex: \pause\vfill
+
+Para rodar em paralelo, precisamos:
+- Substituir a execução de ~add~ uma única vez
+  #+BEGIN_SRC C
+  add<<< 1, 1 >>>();
+  #+END_SRC
+- Pela execução de ~add~ ~N~ vezes, em paralelo
+  #+BEGIN_SRC C
+  add<<< N, 1 >>>();
+  #+END_SRC
+
+* (Lembrete) Terminologia de threads, blocos e grades
+
+Lembrando com enfoque prático
+- Cada invocação de ~add()~ é chamada de um bloco (block)
+- Cada block tem uma certa quantidade de threads
+- Conjunto de blocos é chamado de uma grade (grid)
+
+#+latex: \pause\vfill
+
+#+attr_latex: :width .6\linewidth
+[[./img/threadIdx-blockIdx.pdf]]
+
+_Identificador do Bloco_
+- Cada invocação pode saber seu bloco usando ~blockIdx.x~
+
+_Identificador de Thread_
+- Cada invocação pode saber seu bloco usando ~threadIdx.x~
+
+* Kernel paralelo por blocos
+
+#+BEGIN_SRC C
+__global__ void add(int *a, int *b, int *c) {
+   c[blockIdx.x] = a[blockIdx.x] + b[blockIdx.x];
+}  
+#+END_SRC
+
+~blockIdx.x~ é usado para indexar os vetores
+- Assim, cada bloco (identificado por ~blockIdx.x~) opera uma posição
+- *Em paralelo*
+
+#+latex: \pause\vfill
+
+Para lançar o kernel com paralelismo por blocos
+#+attr_latex: :width .6\linewidth :center nil
+[[./img/blocos-threads.pdf]]
+
+* Kernel paralelo por threads
+
+#+BEGIN_SRC C
+__global__ void add(int *a, int *b, int *c) {
+   c[threadIdx.x] = a[threadIdx.x] + b[threadIdx.x];
+}  
+#+END_SRC
+
+~threadIdx.x~ é usado para indexar os vetores
+- Assim, cada thread (ident. por ~threadIdx.x~) opera uma posição
+- *Em paralelo*
+
+#+latex: \pause\vfill
+
+Para lançar o kernel com paralelismo por threads
+#+attr_latex: :width .6\linewidth :center nil
+[[./img/blocos-threads-2.pdf]]
+
+* Combinando paralelismo de blocos e threads
+
+#+attr_latex: :width .8\linewidth :centerl nil
+[[./img/slide39-mark.pdf]]
+
+Introduction to CUDA C
+
+Autor: Mark Harris -- NVIDIA Corporation
+
+* Kernel paralelo por blocos e threads
+
+#+BEGIN_SRC C
+__global__ void add(int *a, int *b, int *c) {
+   int index = threadIdx.x + blockIdx.x * blockDim.x;
+   c[index] = a[index] + b[index];
+}
+#+END_SRC
+
+~threadIdx.x~ identificar a thread do bloco ~blockIdx.x~ que tem ~blockDim.x~ threads
+- *Em paralelo* _duplo_
+
+#+latex: \pause\vfill
+
+Para lançar o kernel com paralelismo por blocos e threads
+#+attr_latex: :width .6\linewidth :center nil
+[[./img/blocos-threads-3.pdf]]
+
+* Voltando ao exemplo #1/2 (/déjà vu/, /improved/)
+
+Voltando ao exemplo de soma de dois vetores
+#+attr_latex: :width .6\linewidth :center nil
+[[./img/somavetor-2.pdf]]
+
+#+BEGIN_SRC C
+#define N (2048*2048)                 // In our drawing: 17
+#define THREADS_PER_BLOCK 512         // In our drawing:  3
+int main(void) {
+  int *a, *b, *c;			// host copies of a, b, c
+  int *d_a, *d_b, *d_c;		// device copies of a, b, c
+  int size = N * sizeof(int);
+	
+  // Alloc space for device copies of a, b, c
+  cudaMalloc((void **)&d_a, size);
+  cudaMalloc((void **)&d_b, size);
+  cudaMalloc((void **)&d_c, size);
+
+  // Alloc space for host copies of a, b, c and setup input values
+  a = (int *)malloc(size); random_ints(a, N);
+  b = (int *)malloc(size); random_ints(b, N);
+  c = (int *)malloc(size);
+#+END_SRC
+
+* Voltando ao exemplo #1/2 (/déjà vu/, /improved/)
+
+Voltando ao exemplo de soma de dois vetores
+#+attr_latex: :width .6\linewidth :center nil
+[[./img/somavetor-2.pdf]]
+
+#+BEGIN_SRC C
+  // Copy inputs to device
+  cudaMemcpy(d_a, a, size, cudaMemcpyHostToDevice);
+  cudaMemcpy(d_b, b, size, cudaMemcpyHostToDevice);
+
+  // Launch add() kernel on GPU
+  add<<<N/THREADS_PER_BLOCK,THREADS_PER_BLOCK>>>(d_a, d_b, d_c);
+
+  // Copy result back to host
+  cudaMemcpy(c, d_c, size, cudaMemcpyDeviceToHost);
+
+  // Cleanup
+  free(a); free(b); free(c);
+  cudaFree(d_a); cudaFree(d_b); cudaFree(d_c);
+  return 0;
+}
+#+END_SRC
+
+* Lidando com tamanhos arbitrários
+
+Evitar acessar dados inválidos e calcular corretamente a qtdade de blocos
+
+#+attr_latex: :width .5\linewidth :center nil
+[[./img/somavetor-3.pdf]]
+
+#+latex: \pause
+
+Testamos se o ~index~ é válido (menor que o tamanho do problema)
+#+BEGIN_SRC C
+__global__ void add(int *a, int *b, int *c, int n) {
+  int index = threadIdx.x + blockIdx.x * blockDim.x;
+  if (index < n)
+    c[index] = a[index] + b[index];
+}
+#+END_SRC
+
+#+latex: \vfill\pause
+
+Atualizamos o lançamento do kernel
+- ~N~ : tamanho do problema
+- ~M~ : quantidade de threads por bloco
+#+BEGIN_SRC C
+add<<<(N + M-1) / M,M>>>(d_a, d_b, d_c, N);
+#+END_SRC
+#+latex: \pause
+No nosso exemplo do desenho:
+- N é 17, M é 3
+- Portanto, quantidade de blocos (17+3-1)/3 = 6
+
+* Por que se preocupar com /threads/ se temos /blocos/?
+
+Vimos
+1. Paralelismo por blocos (~blockIdx.x~)
+2. Paralelismo por threads (~threadIdx.x~)
+3. Paralelismo por blocos e threads (~blockIdx.x~ e ~threadIdx.x~)
+4. Lançar N cópias de ~add()~ com
+   #+BEGIN_SRC C
+   add<<<N/M,M>>>( ... );   
+   #+END_SRC
+
+
+#+latex: \pause
+
+Sabendo que
+- podemos ter um número enorme de blocos
+- mas um número máximo de threads (1024, ...)
+
+#+latex: \vfill
+Por que se preocupar com threads?
+#+latex: \pause
+- Threads podem se comunicar, sincronizar...
+
+* Integração com MPI e OpenMP
+
+#+BEGIN_CENTER
+Várias combinações possíveis
+#+END_CENTER
+
+| MPI/GPU        | MPI/FPGA     |
+| MPI/OpenMP/GPU | OpenMP/CUDA? |
+
+#+attr_latex: :width .5\linewidth
+[[./img/integracao.pdf]]
+
+#+latex: \pause
+
+Impacto dos conceitos básicos
+- NUMA /matters/ a lot
+- Interferência entre /interface/ de rede e /GPU/
+
+* Referências
 
 - Veja este site: https://developer.nvidia.com/cuda-education
   - Introduction to CUDA C (by Mark Harris)
+- Outras referências nos slides
