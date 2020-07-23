@@ -1,0 +1,39 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Outras APIs de Programação para HPC
+#+SubTitle: Fechamento da Disciplina
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+* Reflexão sobre programação paralela de alto desempenho
+
+/De Facto/ Standard
+- MPI, OpenMP, CUDA
+
+#+latex: \vfill\pause
+
+Outros paradigmas com enfoque em alto desempenho
+- StarPU, +Cilk+
+- BSP (Bulk synchronous parallelism)
+- PGAS (ex: Unified Parallel C)
+
+#+latex: \vfill\pause
+
+Outras paradigmas geral
+
+- Funcional paralelo (ex: Erlang, Concurrent Haskell)
+- Halide (https://halide-lang.org/)
+  - Separa o *Escalonamento* do *Algoritmo*
