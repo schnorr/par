@@ -1,6 +1,6 @@
 #+startup: beamer
 #+LaTeX_CLASS: beamer
-#+LaTeX_CLASS_OPTIONS: [handout,12pt]
+#+LaTeX_CLASS_OPTIONS: [12pt]
 #+latex_header: \usepackage{textcomp}
 #+latex_header: \usepackage{url}
 #+latex_header: \newcommand{\copyleft}{\includegraphics[width=0.5cm]{./img/cc/cc_cc_30.pdf}\hspace{0.2cm}\includegraphics[width=0.5cm]{./img/cc/cc_by_30.pdf}\hspace{0.2cm}\includegraphics[width=0.5cm]{./img/cc/cc_sa_30.pdf}}

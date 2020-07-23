@@ -1,0 +1,292 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Programando Aceleradores (Parte 2)
+#+SubTitle: Threads Cooperativas
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:1 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+* Revisão: kernel paralelo por blocos e threads
+
+#+BEGIN_SRC C
+__global__ void add(int *a, int *b, int *c) {
+   int index = threadIdx.x + blockIdx.x * blockDim.x;
+   c[index] = a[index] + b[index];
+}
+#+END_SRC
+
+~threadIdx.x~ identificar a thread do bloco ~blockIdx.x~ que tem ~blockDim.x~ threads
+- *Em paralelo* _duplo_
+
+#+latex: \pause\vfill
+
+Para lançar o kernel com paralelismo por blocos e threads
+#+attr_latex: :width .6\linewidth :center nil
+[[./img/blocos-threads-3.pdf]]
+
+* Revisão: Lidando com tamanhos arbitrários
+
+Evitar acessar dados inválidos e calcular corretamente a qtdade de blocos
+
+#+attr_latex: :width .5\linewidth :center nil
+[[./img/somavetor-3.pdf]]
+
+#+latex: \pause
+
+Testamos se o ~index~ é válido (menor que o tamanho do problema)
+#+BEGIN_SRC C
+__global__ void add(int *a, int *b, int *c, int n) {
+  int index = threadIdx.x + blockIdx.x * blockDim.x;
+  if (index < n)
+    c[index] = a[index] + b[index];
+}
+#+END_SRC
+
+#+latex: \vfill\pause
+
+Atualizamos o lançamento do kernel
+- ~N~ : tamanho do problema
+- ~M~ : quantidade de threads por bloco
+#+BEGIN_SRC C
+add<<<(N + M-1) / M,M>>>(d_a, d_b, d_c, N);
+#+END_SRC
+#+latex: \pause
+No nosso exemplo do desenho:
+- N é 17, M é 3
+- Portanto, quantidade de blocos (17+3-1)/3 = 6
+
+* Novo exemplo: Stencil 1D
+
+Aplicar uma máscara qualquer em um vetor
+- Por exemplo, cada elemento ser a média dos valores vizinhos
+
+#+attr_latex: :width .5\linewidth
+[[./img/1dstencil.pdf]]
+
+Neste caso o raio de ação é 3, fazemos portanto a média de 7 elementos.
+
+* Implementando internamente em um bloco
+
+Cada /thread/ processa um elemento
+- ~blockDim.x~ elementos por bloco
+
+#+attr_latex: :width .5\linewidth
+[[./img/1dstencil-bloco.pdf]]
+
+#+latex: \pause
+
+Com um raio de ação de três, cada elemento é lido 7 vezes
+
+* Compartilhando dados entre as /threads/
+
+/Threads/ do bloco compartilham dados por memória compartilhada
+
+#+attr_latex: :width .4\linewidth :center nil
+[[./img/slide10-joao-compass.pdf]]
+
+#+latex: {\tiny
+Introduction to CUDA C/C++ (at ComPAS 2013); Autor: João V. F. Lima (UFSM)
+#+latex: }
+
+#+latex: \pause\vfill
+
+Implementação
+- Variáveis na mem. compartilhada são declaradas com ~__shared__~
+- Essas variáveis são alocadas e restritas ao bloco
+  - Os dados ali não são visíveis para /threads/ de outros blocos
+
+* Implementando com memória compartilhada
+
+*Objetivo*: /cache/ de dados (manual) na memória compartilhada
+1. Ler ~blockDim.x+2*(raio)~ da global para a compartilhada
+2. Calcular ~blockDim.x~ elementos na saída
+3. Levar os ~blockDim.x~ dados calculados para a memória global
+
+#+attr_latex: :width .7\linewidth
+[[./img/1dstencil-bloco-halo.pdf]]
+
+* Kernel 1D Stencil (1) -- Alocar variável temp, Índices
+
+#+BEGIN_SRC C
+__global__ void stencil_1d(int *in, int *out) {
+  // A variável temp fica na memória compartilhada
+  __shared__ int temp[BLOCK_SIZE + 2 * RADIUS];
+
+  // Indices global (gindex) e local (lindex) da thread
+  int gindex = threadIdx.x + blockIdx.x * blockDim.x;
+  int lindex = threadIdx.x + RADIUS;
+  // ...
+#+END_SRC
+
+#+latex: \vfill
+
+#+attr_latex: :width .7\linewidth
+[[./img/1dstencil-code-p1.pdf]]
+
+* Kernel 1D Stencil (2) -- Copiar dados global \to local
+
+Copiar os dados do bloco para a variável compartilhada
+- Cada /thread/ copia o seu dado, em paralelo
+
+#+latex: \vfill
+
+#+BEGIN_SRC C
+  //...
+  // Ler os dados do ponteiro in (global) para temp (compartilhada)
+  temp[lindex] = in[gindex];
+  //...
+#+END_SRC
+
+#+attr_latex: :width .7\linewidth
+[[./img/1dstencil-code-p2.pdf]]
+
+#+latex: \pause
+
+Mas quem vai copiar os dados do raio de ação de cada lado?
+- Temos que fazer uma escolha
+
+* Kernel 1D Stencil (3) -- Copiar dados global \to local (raio)
+
+#+BEGIN_SRC C
+  //...
+  // Ler os dados do raio de ação
+  if (threadIdx.x < RADIUS) {
+    temp[lindex - RADIUS] = in[gindex - RADIUS];
+    temp[lindex + BLOCK_SIZE] = in[gindex + BLOCK_SIZE];
+  }
+  //...
+#+END_SRC
+
+#+attr_latex: :width .7\linewidth
+[[./img/1dstencil-code-p3.pdf]]
+
+* Kernel 1D Stencil (4) -- Aplica o stencil, Média
+
+A variável ~result~ é privada da /thread/ (registradores)
+
+#+BEGIN_SRC C
+  //...
+  // Aplicar o stencil 1D com raio de ação
+  int result = 0;
+  for (int offset = -RADIUS ; offset <= RADIUS ; offset++)
+    result += temp[lindex + offset];
+
+  // Calcula a média
+  result = result/(RADIUS*2)+1;
+  //...
+#+END_SRC
+
+#+latex: \pause
+
+Exemplo para ~threadIdx.x == 0~
+
+#+attr_latex: :width .7\linewidth
+[[./img/1dstencil-code-p4.pdf]]
+
+* Kernel 1D Stencil (5) -- Copia local \to global
+
+#+BEGIN_SRC C
+  //...
+  // Guardar o resultado
+  out[gindex] = result;
+}
+#+END_SRC
+
+#+attr_latex: :width .7\linewidth
+[[./img/1dstencil-code-p5.pdf]]
+
+* Código completo que não funciona
+
+#+BEGIN_SRC C
+__global__ void stencil_1d(int *in, int *out) {
+  __shared__ int temp[BLOCK_SIZE + 2 * RADIUS];
+  int gindex = threadIdx.x + blockIdx.x * blockDim.x;
+  int lindex = threadIdx.x + RADIUS;
+  temp[lindex] = in[gindex];
+  if (threadIdx.x < RADIUS) {
+    temp[lindex - RADIUS] = in[gindex - RADIUS];
+    temp[lindex + BLOCK_SIZE] = 
+      in[gindex + BLOCK_SIZE];
+  }
+  int result = 0;
+  for (int offset = -RADIUS ; offset <= RADIUS ; offset++)
+    result += temp[lindex + offset];
+  result = result/(RADIUS*2)+1;
+  out[gindex] = result;
+}
+#+END_SRC
+
+Por que não funciona?
+
+* Problema de condição de corrida de dados
+
+Relembrando a cópia dos dados e aplicação do stencil
+
+#+BEGIN_SRC C
+  //...
+  // Ler os dados do ponteiro in (global) para temp (compartilhada)
+  temp[lindex] = in[gindex];
+  // Ler os dados do raio de ação
+  if (threadIdx.x < RADIUS) {
+    temp[lindex - RADIUS] = in[gindex - RADIUS];
+    temp[lindex + BLOCK_SIZE] = in[gindex + BLOCK_SIZE];
+  }
+  int result = 0;
+  for (int offset = -RADIUS ; offset <= RADIUS ; offset++)
+    result += temp[lindex + offset];
+  //...
+#+END_SRC
+
+#+attr_latex: :width .4\linewidth :center nil
+[[./img/1dstencil-code-p2.pdf]]
+#+attr_latex: :width .59\linewidth :center nil
+[[./img/1dstencil-code-pX.pdf]]
+
+* Forçando uma barreira de sincronização
+
+~__syncthreads();~
+- Sincroniza todas as /threads/ dentro de um bloco
+- Todas as /threads/ devem atingir a barreira
+  - Em código condicional, a condição deve ser uniforme entre as /threads/
+
+#+latex: \pause
+
+Vejamos como fica
+#+BEGIN_SRC C
+__global__ void stencil_1d(int *in, int *out) {
+  __shared__ int temp[BLOCK_SIZE + 2 * RADIUS];
+  int gindex = threadIdx.x + blockIdx.x * blockDim.x;
+  int lindex = threadIdx.x + RADIUS;
+  temp[lindex] = in[gindex];
+  if (threadIdx.x < RADIUS) {
+    temp[lindex - RADIUS] = in[gindex - RADIUS];
+    temp[lindex + BLOCK_SIZE] = 
+      in[gindex + BLOCK_SIZE];
+  }
+  __syncthreads(); // <-- AQUI
+  int result = 0;
+  for (int offset = -RADIUS ; offset <= RADIUS ; offset++)
+    result += temp[lindex + offset];
+  result = result/(RADIUS*2)+1;
+  out[gindex] = result;
+}
+#+END_SRC
+
+* Referências
+
+
+- Veja este site: https://developer.nvidia.com/cuda-education
+  - Introduction to CUDA C (by Mark Harris)
+- Outras referências nos slides
