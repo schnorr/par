@@ -29,14 +29,25 @@ http://www.openmp.org/events/openmp-sc17-denver-co/
 - Make the Most of OpenMP Tasking
 
 SC16
-- [[https://github.com/UoB-HPC/sc16-tutorial/blob/master/omp_GPGPU_prog_SC16.pdf][Programming your GPU with OpenMP]] \linebreak
+- [[https://github.com/UoB-HPC/sc16-tutorial/blob/master/omp_GPGPU_prog_SC16.pdf][Programming your GPU with OpenMP]]
   - Sources, exercises: https://github.com/UoB-HPC/sc16-tutorial/
   - The device model in OpenMP
   - WSCAD Tutorial: https://github.com/rogerioag/minicurso-openmp-wscad-2017
     - Text: http://www2.sbc.org.br/wscad/anais/Minicurso-III.pdf
 
 [[http://www.openmp.org/specifications/][Latest specifications]]
-- OpenMP 4.5 Summary Card – C/C++
 - OMPT: An OpenMP Tools Application Programming Interface for Performance Analysis
-- OpenMP 5.0 draft
+- OpenMP 5.0
 
+* Reflexão
+
+OpenMP cresceu (e continua crescendo)
+- O resumo de comandos tem 12 páginas
+
+#+latex: \vfill
+
+The OpenMP Common Core
+
+by Timothy G. Mattson, Yun (Helen) He, and Alice E. Koniges
+
+http://ompcore.com/
