@@ -7,7 +7,7 @@
 #+EXPORT_SELECT_TAGS: export
 
 #+Title: Outras APIs de Programação para HPC
-#+SubTitle: Fechamento da Disciplina
+#+SubTitle: (& Fechamento da Disciplina)
 #+Author: Prof. Lucas M. Schnorr (UFRGS)
 #+Date: \copyleft
 
@@ -25,10 +25,19 @@
 
 #+latex: \vfill\pause
 
-Outros paradigmas com enfoque em alto desempenho
-- StarPU, +Cilk+
+Outros
+- OpenCL
 - BSP (Bulk synchronous parallelism)
 - PGAS (ex: Unified Parallel C)
+
+#+latex: \vfill\pause
+
+Outros com enfoque em paralelismo de tarefas
+- StarPU, +Cilk+
+- PaRSEC
+- OmpSs
+- OpenMP > 4.0
+- XKaapi
 
 #+latex: \vfill\pause
 
@@ -37,3 +46,12 @@ Outras paradigmas geral
 - Funcional paralelo (ex: Erlang, Concurrent Haskell)
 - Halide (https://halide-lang.org/)
   - Separa o *Escalonamento* do *Algoritmo*
+
+* Fechamento & Conclusão da Disciplina
+
+#+latex: \LARGE\vfill
+#+BEGIN_CENTER
+That’s it!
+#+END_CENTER
+#+latex: \vfill
+
