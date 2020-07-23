@@ -286,7 +286,6 @@ __global__ void stencil_1d(int *in, int *out) {
 
 * Referências
 
-
 - Veja este site: https://developer.nvidia.com/cuda-education
   - Introduction to CUDA C (by Mark Harris)
 - Outras referências nos slides
