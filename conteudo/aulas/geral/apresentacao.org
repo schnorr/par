@@ -39,11 +39,7 @@ Prof. Lucas M. Schnorr
 #+BEGIN_CENTER
 ``Three [sic] /links/ [sic] to rule them all''
 
-https://github.com/schnorr/par/
-
-https://gitlab.com/schnorr/par/
-
-https://moodle.inf.ufrgs.br/course/view.php?id=722
+https://moodle.inf.ufrgs.br/course/view.php?id=1127
 #+END_CENTER
      
 * Bibliografia
@@ -56,9 +52,7 @@ Em aula
 - Perguntar em caso de dúvida
 
 Em campo
-- https://github.com/schnorr/par/
-- https://gitlab.com/schnorr/par/
-- https://moodle.inf.ufrgs.br/course/view.php?id=722
+- https://moodle.inf.ufrgs.br/course/view.php?id=1127
 - Material de apoio, livros
 - Lista de exercícios
 
