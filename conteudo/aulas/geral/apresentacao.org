@@ -37,9 +37,9 @@ Prof. Lucas M. Schnorr
 \vfill
 
 #+BEGIN_CENTER
-``Three [sic] /links/ [sic] to rule them all''
+``One /link/ [sic] to rule them all''
 
-https://moodle.inf.ufrgs.br/course/view.php?id=1127
+https://moodle.inf.ufrgs.br/course/view.php?id=1186
 #+END_CENTER
      
 * Bibliografia
@@ -52,7 +52,7 @@ Em aula
 - Perguntar em caso de dúvida
 
 Em campo
-- https://moodle.inf.ufrgs.br/course/view.php?id=1127
+- https://moodle.inf.ufrgs.br/course/view.php?id=1186
 - Material de apoio, livros
 - Lista de exercícios
 
@@ -61,12 +61,13 @@ Em dúvidas
 
 * Avaliação
 + Um único trabalho na área de interesse do aluno
-  + Envolve a redação de um artigo a ser submetido
+  + Envolve a redação de um artigo (que pode ser submetido)
 + Mini-trabalhos de programação ao longo do semestre
 * Cronograma preliminar de aulas (Programação)
 - Introdução (2 - 3)
 - MPI (3 - 4)
 - OpenMP (3 - 4)
+- CUDA (1 - 2)
 - Análise de desempenho (1 - 2)
 - StarPU (1 - 2)
 - Análise de dados (1 - 2)
