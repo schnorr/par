@@ -1,0 +1,9 @@
+#+startup: overview indent
+#+TITLE: Julia Set in MPI
+
+* Introduction
+
+Check the hands-on "Computing a Julia Set"
+https://simgrid.github.io/SMPI_CourseWare/topic_basics_of_distributed_memory_programming/julia_set/
+
+Follow the steps but adapt it to make it work in PCAD using a Slurm submission script.
