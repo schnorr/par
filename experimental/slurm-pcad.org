@@ -1,3 +1,5 @@
+#+startup: overview indent
+#+TITLE: Hello World in MPI
 * MPI + Slurm in PCAD
 
 PCAD is here:
