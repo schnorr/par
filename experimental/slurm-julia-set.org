@@ -14,7 +14,9 @@ tutorial to facilitate the beginning.
 * Auxiliary files
 ** Function =compute_julia_pixel.c=
 
- #+begin_src C :tangle compute_julia_pixel.c
+#+begin_src C :tangle compute_julia_pixel.c
+#include <stdio.h>
+#include <math.h>
 /*
  * compute_julia_pixel(): compute RBG values of a pixel in a
  *                        particular Julia set image.
@@ -74,6 +76,8 @@ int compute_julia_pixel(int x, int y, int width, int height, float tint_bias, un
 
 ** Function =write_bmp_header.c=
  #+begin_src C :tangle write_bmp_header.c
+#include <stdio.h>
+#include <math.h>
 /* write_bmp_header():
  *
  *   In:
@@ -141,9 +145,145 @@ for (y=0; y < height; y++) {
   // padding in case of an even number of pixels per row
   unsigned char padding[3] = {0,0,0};
   fwrite(padding, sizeof(char), ((width * 3) % 4), output_file);
-  fclose(output_file);
 }
- #+end_src
+#+end_src
 * Next steps
 Continue with Activity #2
 https://simgrid.github.io/SMPI_CourseWare/topic_basics_of_distributed_memory_programming/julia_set/
+* Doing the tutorial
+** SLURM Script
+#+begin_src bash :tangle julia.slurm
+#!/bin/bash
+#SBATCH --nodes=3
+#SBATCH --ntasks=50
+#SBATCH --time=02:00:00
+#SBATCH --partition=draco
+#SBATCH --output=%x_%j.out
+#SBATCH --error=%x_%j.err
+
+# Prepare the machien file
+MACHINEFILE="nodes.$SLURM_JOB_ID"
+srun -l /bin/hostname | sort -n | awk '{print $2}' > $MACHINEFILE
+
+# Get number of cores available
+NP=$(cat $MACHINEFILE | wc -l)
+
+# Compile the program
+mpicc write_bmp_header.c compute_julia_pixel.c 1D_parallel_julia.c -o julia -lm
+
+# Execute the program
+for i in 10000; do
+    echo "Testing with n = $i"
+    mpirun --mca btl ^openib \
+	   --mca btl_tcp_if_include eno1 \
+	   --bind-to none \
+	   --mca btl_base_warn_component_unused 0 \
+	   -np $NP \
+	   -machinefile $MACHINEFILE \
+	   ./julia $i
+    echo
+done
+#+end_src
+** The program
+#+begin_src C :tangle 1D_parallel_julia.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <mpi.h>
+
+int compute_julia_pixel(int x, int y, int width, int height,
+			float tint_bias, unsigned char *rgb);
+int write_bmp_header(FILE * f, int width, int height);
+
+int main(int argc, char **argv)
+{
+    int rank = -1, size = -1, n = -1;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    if (argc == 1) {
+	printf("Please, provide a strictly positive number.\n");
+    } else {
+	n = atoi(argv[1]);
+	int step = n / size, start = -1, end = -1;
+	start = rank * step;
+	end = start + step;
+	if (n % size != 0 && rank == size - 1) {
+	    end += n % size;
+	    step += n % size;
+	}
+	printf("[Process %d out of %d]: "
+	       "I should compute pixels rows %d to %d "
+	       "for a total of %d rows.\n", rank, size, start, end, step);
+
+	//allocate memory
+	int i, npixels = step * n;
+	int bytes_to_allocate = sizeof(unsigned char) * npixels * 3;
+	unsigned char *rgb = malloc(bytes_to_allocate);
+	unsigned char *aux = rgb;
+    double t0 = MPI_Wtime();
+	for (i = 0; i < npixels; i++) {
+	    int y = (start*n + i) / n;
+	    int x = (start*n + i) % n;
+	    //      printf("%d/%d: (%d,%d)\n", rank, size, x, y);
+	    compute_julia_pixel(x, y, n, n, 0.2, aux);
+	    aux += 3;
+	}
+    double t1 = MPI_Wtime();
+	printf("%d/%d, finished in %lf seconds\n", rank, size, t1-t0);
+	if (rank == 0) {
+	    int i;
+	    // open BMP file for writing
+	    FILE *f = fopen("output.bmp", "w");
+	    // write BMP header
+	    write_bmp_header(f, n, n);
+	    // write BMP data from RGB coordinates computed by myself (rank 0)
+
+	    // Writing the pixels after the header
+	    int x, y;
+	    for (y = start; y < end; y++) {
+		for (x = 0; x < n; x++) {
+		    fwrite(&(rgb[y * 3 * n + x * 3]), sizeof(char), 3, f);
+		}
+		// padding in case of an even number of pixels per row
+		unsigned char padding[3] = { 0, 0, 0 };
+		fwrite(padding, sizeof(char), ((n * 3) % 4), f);
+	    }
+
+
+	    // Receive data
+	    for (i = 1; i < size; i++) {
+		int bytes;
+		MPI_Status status;
+		MPI_Recv(&bytes, 1, MPI_INT, i, 0, MPI_COMM_WORLD,
+			 &status);
+		//receive RGB coordinates for every pixel from rank i
+		unsigned char *buf = malloc(bytes);
+		MPI_Recv(buf, bytes, MPI_BYTE, i, 0, MPI_COMM_WORLD,
+			 &status);
+		//write BMP data from received RGB coordinates
+	        for (y = 0; y < (bytes/3)/n; y++) {
+	            for (x = 0; x < n; x++) {
+		        fwrite(&(buf[y * 3 * n + x * 3]), sizeof(char), 3, f);
+		    }
+		    // padding in case of an even number of pixels per row
+		    unsigned char padding[3] = { 0, 0, 0 };
+		    fwrite(padding, sizeof(char), ((n * 3) % 4), f);
+	        }		
+	    }
+	    //fclose BMP file
+	    fclose(f);
+	} else {
+	    //send computed RGB coordinates to rank 0
+	    MPI_Send(&bytes_to_allocate, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+	    MPI_Send(rgb, bytes_to_allocate, MPI_BYTE, 0, 0,
+		     MPI_COMM_WORLD);
+	}
+	free(rgb);
+    }
+    MPI_Finalize();
+    return 0;
+}
+
+
+#+end_src
+
