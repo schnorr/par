@@ -40,13 +40,13 @@ int main(int argc, char* argv[]) {
 mpicc hello.c -o hello
 
 # Execute the program
-mpirun \
-	--mca oob_tcp_if_include 192.168.30.0/24 \
-	--mca btl_tcp_if_include 192.168.30.0/24 \
-	--mca btl_base_warn_component_unused 0 \
-	-np $NP \
-	-machinefile $MACHINEFILE \
-	./hello
+mpirun --mca btl ^openib \
+       --mca btl_tcp_if_include eno1 \
+       --bind-to none \
+       --mca btl_base_warn_component_unused 0 \
+       -np $NP \
+       -machinefile $MACHINEFILE \
+       ./hello
 #+END_SRC
 
 Steps to use it:
