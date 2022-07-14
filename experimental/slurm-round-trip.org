@@ -1,0 +1,69 @@
+#+startup: overview indent
+#+TITLE: Round Trip in MPI
+* Round Trip + Slurm in PCAD
+
+PCAD is here:
+http://gppd-hpc.inf.ufrgs.br/
+
+The goal of this tutorial is to understand how =MPI_Send= and =MPI_Recv= work.
+
+We shall create a token that will traverse all MPI processes. Every
+time a process receives the token, it prints a message. The process
+that start up the ring is the rank 0.
+
+The origin of the source code available here is the SMPI CourseWare:
+https://simgrid.github.io/SMPI_CourseWare/topic_getting_started/hello_world/
+Check their full tutorial to use SMPI (Simgrid MPI) because it is awesome!
+
+* Source code of the Round Trip
+
+#+begin_src C :tangle round-trip.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <mpi.h>
+
+#define N (1024 * 1024 * 1)
+
+int main(int argc, char *argv[]){
+  int size, rank;
+  struct timeval start, end;
+  char hostname[256];
+  int hostname_len;
+
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  MPI_Get_processor_name(hostname,&hostname_len);
+
+  // Allocate a 10MiB buffer
+  char *buffer = malloc(sizeof(char) * N);
+
+  // Communicate along the ring
+  if (rank == 0){
+    gettimeofday(&start,NULL);
+    printf("Rank %d (running on '%s'): sending the message rank %d\n",rank,hostname,1);
+    MPI_Send(buffer, N, MPI_BYTE, 1, 1, MPI_COMM_WORLD);
+    MPI_Recv(buffer, N, MPI_BYTE, size-1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    printf("Rank %d (running on '%s'): received the message from rank %d\n",rank,hostname,size-1);
+    gettimeofday(&end,NULL);
+    printf("%f\n",(end.tv_sec*1000000.0 + end.tv_usec -
+		   start.tv_sec*1000000.0 - start.tv_usec) / 1000000.0);
+  }else{
+    MPI_Recv(buffer, N, MPI_BYTE, rank-1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    printf("Rank %d (running on '%s'): receive the message and sending it to rank %d\n",rank,hostname,(rank+1)%size);
+    MPI_Send(buffer, N, MPI_BYTE, (rank+1)%size, 1, MPI_COMM_WORLD);
+  }
+
+  free(buffer);
+
+  MPI_Finalize();
+  return 0;
+}
+
+#+end_src
+
+* Tasks
+
+1. Understand the source-code of the program
+2. Do some tests in PCAD with a varying number of processes
+
