@@ -39,7 +39,7 @@ Prof. Lucas M. Schnorr
 #+BEGIN_CENTER
 ``One /link/ [sic] to rule them all''
 
-https://moodle.inf.ufrgs.br/course/view.php?id=1186
+http://moodle.ufrgs.br
 #+END_CENTER
      
 * Bibliografia
@@ -47,27 +47,31 @@ https://moodle.inf.ufrgs.br/course/view.php?id=1186
 - Jajá. An Introduction to Parallel Algorithms.
 - Foster. Designing and building parallel programs.
 * Funcionamento
+
 Em aula
 - Participar das discussões
 - Perguntar em caso de dúvida
 
 Em campo
-- https://moodle.inf.ufrgs.br/course/view.php?id=1186
+- http://moodle.ufrgs.br
 - Material de apoio, livros
-- Lista de exercícios
+- Atividades práticas
 
 Em dúvidas
 - Envie um e-mail, e converse com o professor
 
 * Avaliação
+
 + Um único trabalho na área de interesse do aluno
   + Envolve a redação de um artigo (que pode ser submetido)
 + Mini-trabalhos de programação ao longo do semestre
+  
 * Cronograma preliminar de aulas (Programação)
+
 - Introdução (2 - 3)
-- MPI (3 - 4)
-- OpenMP (3 - 4)
 - CUDA (1 - 2)
+- OpenMP (3 - 4)
+- MPI (3 - 4)
 - Análise de desempenho (1 - 2)
 - StarPU (1 - 2)
 - Análise de dados (1 - 2)
