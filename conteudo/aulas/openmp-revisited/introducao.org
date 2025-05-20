@@ -1,0 +1,384 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+#+startup: beamer overview indent
+#+LANGUAGE: pt-br
+#+TAGS: noexport(n)
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export
+
+#+Title: Uma introdução à OpenMP
+#+Author: Prof. Lucas M. Schnorr (UFRGS)
+#+Date: \copyleft
+
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [xcolor=dvipsnames]
+#+OPTIONS:   H:2 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+LATEX_HEADER: \input{../org-babel.tex}
+#+LATEX_HEADER: \RequirePackage{fancyvrb}
+#+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize}
+
+* Fundamentos do OpenMP
+** O que é OpenMP?
+
+OpenMP (Open Multi-Processing) é uma API (Application Programming
+Interface) para programação paralela em sistemas de memória
+compartilhada. Consiste em:
+
+- Um conjunto de diretivas de compilação
+- Funções de biblioteca
+- Variáveis de ambiente
+
+Suporta múltiplas linguagens: C, C++ e Fortran.
+
+[[https://www.openmp.org/specifications/][Especificações OpenMP em https://www.openmp.org]]
+
+** Arquitetura do Modelo de Programação
+
+OpenMP utiliza o modelo de programação **fork-join**:
+
+- O programa inicia com uma única thread (thread mestre)
+- Quando encontra uma região paralela, a thread mestre "bifurca" (fork) em múltiplas threads
+- Ao final da região paralela, as threads são sincronizadas e "juntadas" (join)
+- A execução segue com a thread mestre
+
+[[https://www.openmp.org/wp-content/uploads/OpenMP-API-Specification-6-0.pdf][Modelo Fork-Join]]
+
+** Principais características
+
+- **Modelo incremental**: permite paralelizar progressivamente aplicações sequenciais
+- **Portabilidade**: funciona em diversas plataformas e sistemas operacionais
+- **Escalabilidade**: adaptação a diferentes números de processadores/núcleos
+- **Facilidade de uso**: API de alto nível com abstração de muitos detalhes de baixo nível
+
+* Estrutura Básica e Sintaxe
+** Diretivas OpenMP
+
+As diretivas OpenMP possuem a seguinte sintaxe geral:
+
+#+begin_src C
+
+#+end_src
+
+**Em C/C++:**
+#+begin_src C
+#pragma omp diretiva [cláusula[ [,] cláusula]...]
+#+end_src
+
+**Em Fortran:**
+#+begin_src fortran
+!$omp diretiva [cláusula[ [,] cláusula]...]
+#+end_src
+** Exemplo básico de região paralela
+
+**Em C:**
+#+begin_src C
+#include <stdio.h>
+#include <omp.h>
+
+int main() {
+    // Código sequencial
+
+    #pragma omp parallel
+    {
+        // Código executado por todas as threads
+        int id = omp_get_thread_num();
+        printf("Hello from thread %d\n", id);
+    }
+
+    // Código sequencial novamente
+    return 0;
+}
+#+end_src
+
+** Compilação de programas OpenMP
+
+Para compilar programas com OpenMP:
+
+- **GCC**: =gcc -fopenmp programa.c -o programa=
+- **Clang**: =clang -fopenmp programa.c -o programa=  
+- **Intel**: =icc -qopenmp programa.c -o programa=
+
+* Controle de Paralelismo
+** Cláusulas de escopo de dados
+
+- **private**: Cada thread possui uma cópia privada da variável
+- **shared**: A variável é compartilhada entre todas as threads
+- **firstprivate**: Como private, mas inicializada com o valor da variável mestre
+- **lastprivate**: Como private, mas o valor da última iteração é propagado para a variável mestre
+- **reduction**: Combina cópias privadas em uma única variável compartilhada
+
+Exemplo:
+#+begin_src C
+#pragma omp parallel for private(x) shared(y) reduction(+:sum)
+#+end_src
+** Construções de trabalho paralelo
+
+- **parallel**: Cria uma equipe de threads
+- **for/do**: Distribui iterações de um loop entre threads
+- **sections**: Distribui blocos de código distintos entre threads
+- **single**: Executa um bloco por apenas uma thread
+- **master**: Executa um bloco apenas pela thread mestre
+- **task**: Define unidades de trabalho independentes
+
+Exemplo de paralelização de loop:
+#+begin_src C
+#pragma omp parallel for
+for (int i = 0; i < n; i++) {
+    // Trabalho paralelo
+}
+#+end_src
+** Sincronização
+
+- **barrier**: Ponto de sincronização para todas as threads
+- **critical**: Região de exclusão mútua
+- **atomic**: Operação atômica
+- **ordered**: Execução em ordem sequencial
+- **nowait**: Elimina sincronização implícita
+
+Exemplo:
+#+begin_src C
+#pragma omp critical
+{
+    // Região crítica - uma thread por vez
+    total += local_sum;
+}
+#+end_src
+* Programação Avançada com OpenMP
+** Escalonamento de loops
+
+- **static**: Divisão em chunks de tamanho fixo
+- **dynamic**: Alocação dinâmica de chunks
+- **guided**: Tamanho de chunk diminui ao longo do tempo
+- **auto**: Decisão deixada para o compilador/runtime
+- **runtime**: Determinado por variável de ambiente OMP_SCHEDULE
+
+Exemplo:
+#+begin_src C
+#pragma omp parallel for schedule(dynamic, 10)
+#+end_src
+** Nested Parallelism
+
+- Paralelismo aninhado: regiões paralelas dentro de regiões paralelas
+- Controle via função =omp_set_max_active_levels()= ou variável
+  =OMP_MAX_ACTIVE_LEVELS=
+#+begin_src C :tangle nested.c
+#include <omp.h>
+#include <stdio.h>
+
+int main() {
+    omp_set_max_active_levels(2); // Habilita paralelismo aninhado
+    omp_set_num_threads(3); // Threads da região externa
+    #pragma omp parallel
+    {
+        int outer_id = omp_get_thread_num();
+        printf("Outer thread %d starting inner region\n", outer_id);
+        omp_set_num_threads(2); // Threads da região interna
+        #pragma omp parallel
+        {
+            int inner_id = omp_get_thread_num();
+            printf("Inner thread %d in outer thread %d\n", inner_id, outer_id);
+        }
+    }
+    return 0;
+}
+#+end_src
+
+
+** Tasks
+
+Modelo de programação baseado em tarefas para paralelismo irregular:
+
+#+begin_src C
+#pragma omp task
+{
+    // Código da tarefa
+}
+
+#pragma omp taskwait  // Aguarda conclusão de tarefas
+#+end_src
+** Modelo de memória OpenMP
+
+- Memória compartilhada com reordenamento permitido
+- Flush implícito e explícito
+- Cláusulas de coerência de memória
+* Desempenho e Otimização
+** Fatores que afetam o desempenho
+- Granularidade da paralelização
+- Balanceamento de carga
+- Localidade de dados
+- Sobrecarga de gerenciamento de threads
+- Contenção por recursos compartilhados
+** Técnicas de otimização
+- Ajuste de escalonamento de loops
+- Redução de sincronizações
+- Minimização de regiões críticas
+- Otimização de localidade de cache
+- Paralelismo em diferentes níveis de granularidade
+* OMPT (OpenMP Tools Interface)
+** Análise de desempenho via OMPT (OpenMP Tools Interface)
+
+OMPT é uma interface padronizada para monitoramento e perfilamento de
+aplicações OpenMP. Principais características:
+
+- **Interface de callback**: Permite que ferramentas de análise registrem callbacks para eventos OpenMP (criação de threads, início/fim de regiões paralelas, etc.)
+- **Baixa sobrecarga**: Projetada para minimizar o impacto no desempenho da aplicação
+- **Portabilidade**: Interface única que funciona em diferentes implementações OpenMP
+- **Acesso a estados internos**: Fornece acesso ao estado das threads e
+  regiões paralelas
+  
+** Arquitetura OMPT
+
+1. **Runtime OpenMP**: Emite eventos para pontos de rastreamento pré-definidos
+2. **Ferramenta de análise**: Registra callbacks para eventos de interesse
+3. **Contexto**: Cada evento fornece contexto detalhado (por exemplo, identificadores de regiões paralelas)
+
+** Eventos monitorados
+
+- Início/fim de execução de programa OpenMP
+- Criação/término de thread
+- Início/fim de região paralela
+- Entrada/saída de barreiras
+- Atividades de tarefas (criação, início, fim)
+- Operações de sincronização (locks, critical sections)
+- Operações de dispositivo (offloading para GPU)
+
+** Ferramentas baseadas em OMPT
+
+- **LLVM/OpenMP OMPT**: Implementação de referência
+- **Score-P**: Instrumentação multi-plataforma para análise de desempenho
+- **OMPT-based Intel VTune**: Análise avançada de desempenho
+- **OMPT-based TAU**: Perfilamento completo de aplicações HPC
+- **POMP2**: Extensão OPARI2 com suporte OMPT
+
+** Vantagens do OMPT para análise de desempenho
+
+- **Análise mais precisa**: Acesso direto a eventos do runtime OpenMP
+- **Menos intrusivo**: Menor necessidade de instrumentação manual
+- **Padronização**: Ferramentas funcionam com diferentes implementações OpenMP
+- **Depuração avançada**: Localização precisa de gargalos em código paralelo
+- **Visualização detalhada**: Captura da dinâmica do runtime OpenMP durante a execução
+
+* Casos de Uso e Aplicações
+** Álgebra linear
+
+#+begin_src C
+// Multiplicação de matrizes
+#pragma omp parallel for collapse(2)
+for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+        double sum = 0.0;
+        for (int k = 0; k < n; k++) {
+            sum += A[i*n+k] * B[k*n+j];
+        }
+        C[i*n+j] = sum;
+    }
+}
+#+end_src
+** Processamento de imagens
+
+#+begin_src C
+// Filtro de convolução
+#pragma omp parallel for
+for (int i = 1; i < height-1; i++) {
+    for (int j = 1; j < width-1; j++) {
+        // Cálculo do filtro para cada pixel
+    }
+}
+#+end_src
+** Simulações científicas
+
+#+begin_src C
+// Método de Jacobi para equações diferenciais
+#pragma omp parallel for
+for (int iter = 0; iter < max_iter; iter++) {
+    // Atualização de cada ponto da malha
+}
+#+end_src
+* OpenMP e Além
+** Novidades do OpenMP
+- Suporte a dispositivos aceleradores (GPUs)
+- Paralelismo de tarefas melhorado
+- Construção =loop=
+- Melhores recursos de memória
+- Modelo de memória aprimorado
+** Diretivas para aceleradores
+#+begin_src C
+#pragma omp target
+{
+    // Código executado no dispositivo
+}
+#+end_src
+** Interoperabilidade
+- Compatibilidade com outros modelos: MPI, CUDA, etc.
+- Programação híbrida para sistemas heterogêneos
+* Fim
+** Exemplo completo: Integração numérica (método do trapézio)     :noexport:
+
+#+begin_src C
+#include <stdio.h>
+#include <omp.h>
+
+double f(double x) {
+    return 4.0 / (1.0 + x*x);  // Função a integrar (pi)
+}
+
+int main() {
+    const int n = 100000000;   // Número de trapézios
+    const double a = 0.0;      // Limite inferior
+    const double b = 1.0;      // Limite superior
+    const double h = (b-a)/n;  // Largura do trapézio
+    double integral = 0.0;     // Resultado
+    double start_time, end_time;
+    
+    start_time = omp_get_wtime();
+    
+    #pragma omp parallel
+    {
+        double local_sum = 0.0;
+        
+        #pragma omp for
+        for (int i = 0; i < n; i++) {
+            double x = a + i*h;
+            local_sum += f(x) + f(x+h);
+        }
+        
+        #pragma omp critical
+        integral += local_sum;
+    }
+    
+    integral = integral * h / 2.0;
+    
+    end_time = omp_get_wtime();
+    
+    printf("Pi aproximado = %.16f\n", integral);
+    printf("Erro = %.16f\n", integral - 3.14159265358979323846);
+    printf("Tempo de execução = %.6f segundos\n", end_time - start_time);
+    
+    return 0;
+}
+#+end_src
+** Exercícios práticos                                            :noexport:
+
+1. Implementar multiplicação de matrizes paralela
+2. Implementar um algoritmo de ordenação paralelo
+3. Analisar speedup com diferentes números de threads
+4. Experimentar com diferentes estratégias de escalonamento
+
+** Referências
+1. OpenMP Architecture Review Board, "OpenMP Application Programming Interface Version 5.1", 2020.
+2. Chapman, B., Jost, G., & Van Der Pas, R. (2008). "Using OpenMP: Portable Shared Memory Parallel Programming", MIT Press.
+3. Chandra, R. et al. (2001). "Parallel Programming in OpenMP", Morgan Kaufmann.
+4. Website oficial: [[https://www.openmp.org/][https://www.openmp.org/]]
+5. Documentação de referência: [[https://www.openmp.org/specifications/][https://www.openmp.org/specifications/]]
+
+** Apêndice: Variáveis de Ambiente Importantes
+
+- =OMP_NUM_THREADS=: Define o número de threads
+- =OMP_SCHEDULE=: Define o escalonamento padrão
+- =OMP_MAX_ACTIVE_LEVELS=: Controla o paralelismo aninhado
+- =OMP_STACKSIZE=: Define o tamanho da pilha por thread
+- =OMP_WAIT_POLICY=: Controla o comportamento de espera das threads
+  - =ACTIVE= (espera ativa, /spinning/) ou =PASSIVE=
+- =OMP_PROC_BIND=: Controla a afinidade das threads aos núcleos
+  - https://www.openmp.org/spec-html/5.0/openmpse52.html
+  - Útil para controle de variabilidade
