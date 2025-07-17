@@ -56,7 +56,7 @@ df |>
 8    15     0     3     0    -2    35    10    -2    -2    16 0 3 0
 #+end_example
 
-#+begin_src R :results file output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 600 :height 400 :session *R*
+#+begin_src R :results file output graphics :file topologia-3d-face0.png :exports both :width 600 :height 400 :session *R*
 df |>
   filter(z == 0) |>
   rowwise() |>
@@ -70,4 +70,4 @@ df |>
 #+end_src
 
 #+RESULTS:
-[[file:/tmp/babel-JjoHxz/figure4zIzIx.png]]
+[[file:topologia-3d-face0.png]]
